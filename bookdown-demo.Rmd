@@ -1,0 +1,77 @@
+---
+title: "Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA) "
+author: "David Alejandro Rivera Correa"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+description: "Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia, Pereira y Manizales"
+---
+
+# Justificación y fuentes de información
+
+En la actualidad conocer en detalle la dinámica del precio de los alimentos resulta ser un elemento valioso para la toma de decisiones, tanto a nivel de quienes viven del agro, como para los consumidores finales; si bien los precios mayoristas representan un eslabón de la formación del precio de los alimentos, es preciso resaltar que este valor representa el ultimo tramo de formación antes de la distribución final a nivel minorista, bajo esta lógica la posibilidad de pronosticar los precios mayoristas de los alimentos permite hacer un acercamiento a posibles escenarios de privación alimentaria futura ligada al poder adquisitivo de los hogares, esto teniendo en cuenta que para el caso de alimentos perecederos como las verduras y hortalizas el mecanismo de transmisión del mercado mayorista al mercado minorista resulta ser mucho más acelerada.
+
+En concordancia a lo anterior, en este ejercicio se tomarán las series de tiempo de precios semanales de hortalizas basicas de consumo frecuente para los municipios de Armenia y Pereira:
+
+-   Cebolla Junca
+-   Tomate chonto
+-   Habichuela
+-   Ahuyama
+
+Las series de tiempo en mención serán tomadas de los boletines semanales del SIPSA que emite el Departamento Nacional de Estadística (DANE) comprendiendo el periodo 2016-2023 buscando realizar pronósticos de las 4 semanas siguientes de los productos de referencia. Para relacionar el precio mayorista con el precio minorista se tomara como referencia la Canasta Básica de Salud Ailmentaria (CABASA) a través de la cual se proyectarán por inflación los precios minoristas con el fin de contrastarlos con la dinámica del precio mayorista mostrado por el mercado y por los periodos de pronóstico, asi mismo se proyectará el valor total de la canasta básica estándar por medio de la inflación y se validará como varia la proporción de la participación monetaria de los 4 alimentos con el fin de determinar como se ve impactado el poder adquisitivo en relación a estos alimentos de referencia tomando siempre como base la participación relativa inicial respecto a las participaciones relativas futuras respecto al precio que toman sobre el valor total de la canasta. Al final del ejercicio se podrá evidenciar que tanto ha variado el esfuerzo monetario para preservar estas hortalizas básicas en la canasta y que tanto será el esfuerzo en las semanas pronosticadas.
+
+Conocer las variaciones de la participación monetaria de los alimentos en la canasta básica permite evidenciar que tanto menos dinero disponible tendrá el consumidor luego de comprar una cantidad "n" de un alimento, por lo tanto, si la participación de ciertos alimentos incrementa de forma desmedida la preservación de las cantidades iniciales consumidas supondrá un esfuerzo mayor y una cantidad restante menor para acceder a los demás alimentos que conforman la canasta completa, manteniendo las cantidades consumidas constantes, esto supondrá finalmente una reducción de las cantidades consumidas o inclusive la eliminación o sustitución de algunos alimentos dentro de la dieta.
+
+El ejercicio de pronóstico y análisis propuesto representa un ejercicio por medio del cual es posible acercarse al impacto del aumento de los precios mayoristas en el consumidor final lo cual se relaciona directamente con la seguridad alimentaria ligada al acceso desde una perspectiva monetaria.
+
+Para la ejecución de este ejercicio se llevarán a cabo los siguientes pasos que demarcarán la estructura del documento:
+
+1.  Recolección, carga y transformación de los datos de precios semanales
+2.  Análisis exploratorio de las series de tiempo
+3.  Modelación para el pronóstico de las series de tiempo
+4.  Evaluación y ajuste de hiperparámetros de los modelos
+5.  Contraste entre series de tiempo y proyección de precios minoristas
+6.  Análisis de la participación conjunta del grupo de 4 hortalizas sobre el valor total de la CABASA
+7.  Conclusiones y recomendaciones
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```
+
+<!--chapter:end:index.Rmd-->
+
+# Recolección, carga y transformación de los datos de precios semanales 
+
+<!--chapter:end:01-RecTransfyCarg.Rmd-->
+
+# Análisis exploratorio de las series de tiempo
+
+
+
+<!--chapter:end:02-EDA.Rmd-->
+
+# Modelación para el pronóstico de las series de tiempo 
+
+
+<!--chapter:end:03-Mod.Rmd-->
+
+# Evaluación y ajuste de hiperparámetros de los modelos 
+
+
+
+<!--chapter:end:04-Evaluacion.Rmd-->
+
+# Contraste entre series de tiempo y proyección de precios minoristas 
+
+
+
+<!--chapter:end:05-Contraste.Rmd-->
+

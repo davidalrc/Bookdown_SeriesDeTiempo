@@ -1,0 +1,162 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{book}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=8pt plus 2pt minus 4pt
+  \thm@postskip=\thm@preskip
+}
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{natbib}
+\bibliographystyle{apalike}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)},
+  pdfauthor={David Alejandro Rivera Correa},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)}
+\author{David Alejandro Rivera Correa}
+\date{2023-08-07}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{1}
+\tableofcontents
+}
+\hypertarget{justificaciuxf3n-y-fuentes-de-informaciuxf3n}{%
+\chapter{Justificación y fuentes de información}\label{justificaciuxf3n-y-fuentes-de-informaciuxf3n}}
+
+En la actualidad conocer en detalle la dinámica del precio de los alimentos resulta ser un elemento valioso para la toma de decisiones, tanto a nivel de quienes viven del agro, como para los consumidores finales; si bien los precios mayoristas representan un eslabón de la formación del precio de los alimentos, es preciso resaltar que este valor representa el ultimo tramo de formación antes de la distribución final a nivel minorista, bajo esta lógica la posibilidad de pronosticar los precios mayoristas de los alimentos permite hacer un acercamiento a posibles escenarios de privación alimentaria futura ligada al poder adquisitivo de los hogares, esto teniendo en cuenta que para el caso de alimentos perecederos como las verduras y hortalizas el mecanismo de transmisión del mercado mayorista al mercado minorista resulta ser mucho más acelerada.
+
+En concordancia a lo anterior, en este ejercicio se tomarán las series de tiempo de precios semanales de hortalizas basicas de consumo frecuente para los municipios de Armenia y Pereira:
+
+\begin{itemize}
+\tightlist
+\item
+  Cebolla Junca
+\item
+  Tomate chonto
+\item
+  Habichuela
+\item
+  Ahuyama
+\end{itemize}
+
+Las series de tiempo en mención serán tomadas de los boletines semanales del SIPSA que emite el Departamento Nacional de Estadística (DANE) comprendiendo el periodo 2016-2023 buscando realizar pronósticos de las 4 semanas siguientes de los productos de referencia. Para relacionar el precio mayorista con el precio minorista se tomara como referencia la Canasta Básica de Salud Ailmentaria (CABASA) a través de la cual se proyectarán por inflación los precios minoristas con el fin de contrastarlos con la dinámica del precio mayorista mostrado por el mercado y por los periodos de pronóstico, asi mismo se proyectará el valor total de la canasta básica estándar por medio de la inflación y se validará como varia la proporción de la participación monetaria de los 4 alimentos con el fin de determinar como se ve impactado el poder adquisitivo en relación a estos alimentos de referencia tomando siempre como base la participación relativa inicial respecto a las participaciones relativas futuras respecto al precio que toman sobre el valor total de la canasta. Al final del ejercicio se podrá evidenciar que tanto ha variado el esfuerzo monetario para preservar estas hortalizas básicas en la canasta y que tanto será el esfuerzo en las semanas pronosticadas.
+
+Conocer las variaciones de la participación monetaria de los alimentos en la canasta básica permite evidenciar que tanto menos dinero disponible tendrá el consumidor luego de comprar una cantidad ``n'' de un alimento, por lo tanto, si la participación de ciertos alimentos incrementa de forma desmedida la preservación de las cantidades iniciales consumidas supondrá un esfuerzo mayor y una cantidad restante menor para acceder a los demás alimentos que conforman la canasta completa, manteniendo las cantidades consumidas constantes, esto supondrá finalmente una reducción de las cantidades consumidas o inclusive la eliminación o sustitución de algunos alimentos dentro de la dieta.
+
+El ejercicio de pronóstico y análisis propuesto representa un ejercicio por medio del cual es posible acercarse al impacto del aumento de los precios mayoristas en el consumidor final lo cual se relaciona directamente con la seguridad alimentaria ligada al acceso desde una perspectiva monetaria.
+
+Para la ejecución de este ejercicio se llevarán a cabo los siguientes pasos que demarcarán la estructura del documento:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Recolección, carga y transformación de los datos de precios semanales
+\item
+  Análisis exploratorio de las series de tiempo
+\item
+  Modelación para el pronóstico de las series de tiempo
+\item
+  Evaluación y ajuste de hiperparámetros de los modelos
+\item
+  Contraste entre series de tiempo y proyección de precios minoristas
+\item
+  Análisis de la participación conjunta del grupo de 4 hortalizas sobre el valor total de la CABASA
+\item
+  Conclusiones y recomendaciones
+\end{enumerate}
+
+\hypertarget{recolecciuxf3n-carga-y-transformaciuxf3n-de-los-datos-de-precios-semanales}{%
+\chapter{Recolección, carga y transformación de los datos de precios semanales}\label{recolecciuxf3n-carga-y-transformaciuxf3n-de-los-datos-de-precios-semanales}}
+
+\hypertarget{anuxe1lisis-exploratorio-de-las-series-de-tiempo}{%
+\chapter{Análisis exploratorio de las series de tiempo}\label{anuxe1lisis-exploratorio-de-las-series-de-tiempo}}
+
+\hypertarget{modelaciuxf3n-para-el-pronuxf3stico-de-las-series-de-tiempo}{%
+\chapter{Modelación para el pronóstico de las series de tiempo}\label{modelaciuxf3n-para-el-pronuxf3stico-de-las-series-de-tiempo}}
+
+\hypertarget{evaluaciuxf3n-y-ajuste-de-hiperparuxe1metros-de-los-modelos}{%
+\chapter{Evaluación y ajuste de hiperparámetros de los modelos}\label{evaluaciuxf3n-y-ajuste-de-hiperparuxe1metros-de-los-modelos}}
+
+\hypertarget{contraste-entre-series-de-tiempo-y-proyecciuxf3n-de-precios-minoristas}{%
+\chapter{Contraste entre series de tiempo y proyección de precios minoristas}\label{contraste-entre-series-de-tiempo-y-proyecciuxf3n-de-precios-minoristas}}
+
+  \bibliography{book.bib,packages.bib}
+
+\end{document}

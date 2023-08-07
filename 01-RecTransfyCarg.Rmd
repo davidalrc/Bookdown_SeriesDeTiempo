@@ -1,0 +1,1 @@
+# Recolección, carga y transformación de los datos de precios semanales 
