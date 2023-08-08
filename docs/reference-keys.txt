@@ -1,0 +1,6 @@
+justificación-y-fuentes-de-información
+recolección-carga-y-transformación-de-los-datos-de-precios-semanales
+análisis-exploratorio-de-las-series-de-tiempo
+modelación-para-el-pronóstico-de-las-series-de-tiempo
+evaluación-y-ajuste-de-hiperparámetros-de-los-modelos
+contraste-entre-series-de-tiempo-y-proyección-de-precios-minoristas
