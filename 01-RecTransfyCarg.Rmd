@@ -1,1 +1,23 @@
 # Recolección, carga y transformación de los datos de precios semanales 
+
+Para desarrollar los elementos mencionados en la sección introductoria es relevante tener en cuenta que el SIPSA presenta diferentes tipos de boletín, presenta boletines diarios para un conjunto predefinido de alimentos conformados por frutas, verduras y hortalizas, y seguidamente publica boletines semanales en donde esta presente una variedad mucho más amplia de alimentos, para el caso de este trabajo se hará uso de los boletines generados semanalmente.
+
+Para la recolección de los boletines semanales se llevará a cabo una descarga directa de los boletines desde el portal del SIPSA en donde se encuentran los boletines publicados semanalmente desde 2012 hasta 2023, como se ha mencionado desde un inicio aqui se tomará como referencia el periodo 2016-2023 tomando como corte el mes de Junio del año en curso; el proceso de recolección de la información da como resultado múltiples archivos en formato excel (.xlsx) con diferentes formatos y disposiciones a nivel de la distribución de información, ante lo cual se hace necesario realizar un procesamiento de todos los archivos resultantes de tal manera que se logre una fuente consolidada con la cual sea mucho más sencillo trabajar.  
+
+El análisis detallado de los archivos descargados permite evidenciar que los boletines tienen algunos atributos particulares:
+
+- La estructura de la tabla de los boletines no contiene explicitamente una fecha,el rango de fecha del archivo se encuentra en el nombre del fichero descargado, por ejemplo "Sem_2ene_8ene_2016.xls".
+
+- La estructura de los boletines no es uniforme a través del tiempo, entre 2016 hasta el 11 de Mayo de 2018 la estructura de los boletines resulta ser más simple ya que el archivo no contiene paginación y cuenta con titulos intermedios para separar los grupos de alimentos. Desde el 11 de Mayo la estructura cambia a documentos de excel paginados por tipo de alimento involucrando inclusive hojas adicionales relacionadas a temas de disponibilidad por asuntos de cantidades ofrecidas en la central de abastos. 
+
+
+
+```{python}
+
+import pandas as pd
+import numpy as np
+import os 
+import openpyxl
+
+```
+
