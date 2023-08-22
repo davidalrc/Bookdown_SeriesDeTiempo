@@ -10,14 +10,833 @@ El análisis detallado de los archivos descargados permite evidenciar que los bo
 
 - La estructura de los boletines no es uniforme a través del tiempo, entre 2016 hasta el 11 de Mayo de 2018 la estructura de los boletines resulta ser más simple ya que el archivo no contiene paginación y cuenta con titulos intermedios para separar los grupos de alimentos. Desde el 11 de Mayo la estructura cambia a documentos de excel paginados por tipo de alimento involucrando inclusive hojas adicionales relacionadas a temas de disponibilidad por asuntos de cantidades ofrecidas en la central de abastos. 
 
+- Para lograr un procesamiento eficiente es necesario realizar operaciones en ciclo para los archivos de tal forma que se logre llegar a un set de datos consolidado.
 
+A continuación se muestra un preview del aspecto de los sets de datos resultantes al leer un boletin tipo 1 y tipo 2:
+
+- Ejemplo boletín tipo 1:
 
 ```{python}
 
 import pandas as pd
-import numpy as np
+import numpy as np 
 import os 
 import openpyxl
 
+## En este caso vamos a leer un boletin de 2016
+
+archivo = pd.read_excel("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bookdown-seriesdetiempo_mcd//Bookdown_SeriesDeTiempo//Historico_Precios_SIPSA//2016//Sem_2ene_8ene_2016.xls",skiprows=1)
+
+archivo.info()
+
 ```
+```{python}
+
+archivo.head()
+```
+Como puede observarse esta primera versión de boletión solo cuenta con 5 columnas, particularmente este tipo de boletin mezcla en una misma columna los productos y los mercados, los productos aparecen una vez se han listado todos los mercados en los que están disponibles y se caracterizan por tener valores vacios en todas las columnas cuando su nombre aparece, seguidamente, como se mencionó no hay una fecha explicita por lo tanto es necesario usar la fecha que esta demarcada en el archivo para poder ubicar los datos en el tiempo. 
+
+- Ejemplo boletín tipo 2:
+
+Para la lectura de este boletín es necesario utilizar varios argumentos adicionales de la función pd.read_excel, de hecho para lograr una extracción completa de los datos es necesario llevar a cabo un ciclo for, no obstante en este caso solo veremos de manera general la estructura de una hoja y los argumentos que es necesario introducir: 
+
+```{python}
+archivo2= pd.read_excel("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bookdown-seriesdetiempo_mcd//Bookdown_SeriesDeTiempo//Historico_Precios_SIPSA//2018//Boletin_Tipo2//Sem_01dic__07dic_2018.xlsx",skiprows=9,sheet_name=1).dropna(axis=1,how="all")
+
+archivo2.info()
+
+```
+```{python}
+archivo2.head()
+
+```
+
+Se puede apreciar que a diferencia del boletin 1, este boletín separa el producto del mercado mayorista lo cual lo acerca a la estructura ideal del set de datos, no obstante la complejidad de este conjunto de información es que involucra multiples hojas por cada archivo procesado, y además cada hoja en ocasiones tiene ciertas particularidades. 
+
+Para facilitar el ejercicio, toda la labor de pre-procesamiento y limpieza inicial han sido realizadas previamente, en esta sección se explican las funciones diseñadas para llevar a cabo este proceso, las porciones de codigo aqui mostradas no son ejecutables simplemente son ilustrativas.
+
+Los paquetes utilizados para llevar a cabo el procesamiento de los boletines han sido pandas, numpy y os.
+
+### Funciones para el pre-procesamiento y limpieza de los boletines para el periodo 2016 a 11 de Mayo de 2018
+
+La primera función que se crea se denomina  bolsipsatipo1_proc(ruta)  el argumento de esta función es la ruta en la cual se encuentra el boletin a procesar, a continuación se muestra el codigo de la función:
+
+```{python echo=TRUE}
+
+def bolsipsatipo1_proc(ruta):
+    nombre=os.path.split(ruta)[1].replace(".xlsx" or ".xls","")
+    boletin= pd.read_excel(ruta,skiprows=1)
+    boletin["periodo"]=nombre
+    boletin= boletin[(boletin["Productos y mercados"].str.find("Cuadro")==-1)\
+                     & (boletin["Productos y mercados"].str.find("Productos")==-1)]
+    boletin["Tendencia"]=boletin["Tendencia"].fillna("Producto")
+    boletin["Producto"]=np.nan 
+    
+    producto=None
+    
+    for index in boletin.index:
+        if boletin.loc[index,"Tendencia"]=="Producto":
+            producto=boletin.loc[index,"Productos y mercados"]
+            boletin.loc[index,"Producto"]= producto
+        else:
+            boletin.loc[index,"Producto"]= producto
+    
+    boletin= boletin[(boletin["Tendencia"]!="Producto")] 
+    boletin= boletin.rename(columns={"Productos y mercados":"Mercado mayorista"})
+    
+    return boletin 
+
+```
+
+Esta primera función inicialmente captura el nombre del archivo removiendo la extensión, posteriormente realiza una lectura del archivo que hay en la ruta omitiendo la lectura de la primera fila y adicionalmente crea una columna denominada periodo en donde se coloca el nombre extraido del archivo que esta siendo procesado, seguidamente omite las filas que contengan los strings "Cuadro" y "Producto" creando una columna denominada tendencia en donde copia el contenido de la columna y lo rellena con la palabra "Producto" en los espacios en blanco, finalmente se crea una columna denominada producto con valores "nan" la finalidad de esta columna es lograr separar el nombre del mercado mayorista del producto. 
+
+Para lograr separar el nombre del producto de la columna "Productos y mercados" se recorre el dataset y se pone el nombre del producto cada vez que aparece el nombre "Productos y mercados"  a partir de esto se comienza a poblar la columna producto en donde queda aislado el nombre del producto; finalmente se eliminan las columnas que quedaron con el nombre "Producto"  y se renombra la columna "Productos y mercados" y pasa a llamarse "Mercado mayorista", finalmente la función devuelve un dataframe denominado "boletin".  
+
+Esta primera función representa el procesamiento de una ruta que haga referencia a un archivo, no obstante para lograr un procesamiento en serie es relevante lograr un procesamiento "por carpeta" que permita procesar directamente los archivos por año, para logra esto se crea la función proc_carpetassipsat1(ruta_carpeta) cuyo argumento es la ruta a una carpeta en particular, el código de la función es el siguiente: 
+
+```{python echo=TRUE}
+
+def proc_carpetassipsat1(ruta_carpeta):
+    ficheros=os.listdir(ruta_carpeta)
+    lista_rutas=[]
+    ruta_entera=None
+    
+    for file in ficheros:
+        ruta_entera= ruta_carpeta+"\\"+file
+        lista_rutas.append(ruta_entera)
+    
+    lista_dataframes=[]
+    
+    for ruta in lista_rutas:
+        print(ruta)
+        boletin_procesado=bolsipsatipo1_proc(ruta)
+        lista_dataframes.append(boletin_procesado)
+        boletin_consolidado= pd.concat(lista_dataframes)
+        
+    return boletin_consolidado
+
+
+```
+
+La función anterior toma la ruta de una carpeta y partir del paquete "os" genera una lista de los archivos que hay dentro de la misma, asi mismo, al inicio se crea una lista vacia de rutas y una variable denominada ruta_entera que servirá para almacenar la ruta completa de cada archivo individual que hay en la carpeta, una vez hecho esto un ciclo for recorre la lista de ficheros que hay en la carpeta y por medio de esta crea la ruta de cada archivo que es almacenada en la variable "lista_rutas" que finalmente contendrá la ruta individual de cada archivo.
+
+Una vez se ejecuta el primer ciclo for se declara la variable lista_dataframes que almacenerá cada uno de los boletines procesados; una vez declarada la variable antes mencionada inicia un nuevo ciclo for que recorre "lista_rutas" en donde a cada archivo individual se le aplica la función bolsipsatipo1_proc() y cada dataframe resultante se almacena en la lista "lista_dataframes" que luego es concatenada dando lugar a un dataframe consolidado para los reportes que reposaban en la carpeta.        
+Finalmente para optimizar aun más el procesamiento se crea la función procesamiento_carpetas_bolSIPSAT1(lista_carpetas) que tiene como argumento una lista de rutas de carpetas, la finalidad de esta función es usar de manera simultanea las funciones anteriormente creadas y acelerar el procesamiento de los archivos buscando la consolidación automatica de varios años de información ahorrando repetición de lineas de código, la función desarrollada es la siguiente:
+
+```{python echo=TRUE}
+
+def procesamiento_carpetas_bolSIPSAT1(lista_carpetas):
+    
+    if type(lista_carpetas) is list:
+        lista_consolidados= []
+        for carpeta in lista_carpetas:
+            print("se esta procesando la carpeta de boletines tipo 1: ",carpeta)
+            consolidado= proc_carpetassipsat1(carpeta)
+            lista_consolidados.append(consolidado)
+            consolidado_carpetas_entrada= pd.concat(lista_consolidados)
+        
+        return consolidado_carpetas_entrada
+    else:
+        raise TypeError("Only list objects are accepted as input")
+
+
+```
+
+Esta función toma una lista de carpetas con boletines del SIPSA y por medio de un ciclo for aplica a cada una de las carpetas la función proc_carpetassipsat1(carpeta) a través de la aplicación de esta función de manera iterativa genera una lista de dataframes de boletines semanales consolidados por año y luego une todos los años procesados en un solo dataframe. 
+
+Las funciones descritas en esta sección permiten hacer un procesamiento en serie de los boletines tipo 1, a continuación veremos las funciones desarrolladas para el tratamiento de los bolestines tipo 2. 
+
+### Funciones para el pre-procesamiento y limpieza de los boletines para el periodo de  Mayo de 2018 a Diciembre de 2022
+
+Como se mencionó con anterioridad los boletines tipo II tienen un grado mayor de complejidad al tratarse de documentos de excel paginados, en medio de esto hay una mayor cantidad de excepciones y casos a considerar que llevan a que las funciones de procesamiento sean mucho más robustas y complejas. Para este caso la dinámica de desarrollo de funciones es la misma, es decir, va de una función inicial para el procesamiento de cada boletín, luego una función para procesamiento a nivel de carpetas y finalmente una función para procesamiento de una lista de carpetas.
+
+Veamos la función construida para la limpieza de cada boletín:
+
+```{python echo=TRUE}
+
+def bolsipsatipo2_2018_proc(ruta):
+    nombre=os.path.split(ruta)[1].replace(".xlsx" or ".xls","")
+    
+    if "Sem_12may__18may_2018_int" in nombre:
+        boletin= pd.read_excel(ruta,sheet_name=None,usecols="B:G")
+        boletin= {key:val for key,val in boletin.items() if not key.endswith("ce")}
+        lista_df=[]
+        
+        for hoja,tabla in boletin.items():
+            tabla=tabla.dropna(axis=1,how="all")
+            lista_df.append(tabla)
+            df_consolidado=pd.concat(lista_df)
+            df_consolidado["periodo"]=nombre
+            print(df_consolidado.columns)
+    else:
+        boletin= pd.read_excel(ruta,skiprows=9,sheet_name=None,usecols="A:F")
+        boletin= {key:val for key,val in boletin.items() if not key.endswith("ce")}
+    
+        lista_df=[]
+    
+        for hoja,tabla in boletin.items():
+            tabla=tabla.dropna(axis=1,how="all")
+            lista_columnas=tabla.columns
+            print(lista_columnas,nombre)
+            
+            if ('          Pesos por kilogramo' in lista_columnas) or\
+            ('          Pesos por kilogramo*' in lista_columnas):
+                print("variacion de nombre de columnas - inicia modificación")
+                tabla.columns.values[0]='Producto'
+                tabla.columns.values[1]='Mercado mayorista'
+                tabla.columns.values[2]='Precio mínimo'
+                tabla.columns.values[3]='Precio máximo'
+                tabla.columns.values[4]='Precio medio'
+                tabla.columns.values[5]='Tendencia'
+                
+                print(tabla.head(1))
+                tabla=tabla.drop(index=0)
+                
+                
+                #print(tabla)
+                
+                lista_df.append(tabla)
+                df_consolidado=pd.concat(lista_df)
+                df_consolidado["periodo"]=nombre
+                #print(df_consolidado.columns)   
+                #print(df_consolidado)
+                
+            
+            elif ('GRUPO' in lista_columnas) or ('TOTAL MERCADOS' in lista_columnas):
+                print("sección de abastecimiento semanal innecesaria - se da paso a sección siguiente")
+                pass
+            
+            
+            elif lista_columnas[5]=="Precio mínimo":
+                print("sección de arroz en molino innecesaria - se da paso a sección siguiente")
+                pass
+            
+            elif '          Pesos por tonelada' in lista_columnas:
+                print("sección de arroz en molino innecesaria - se da paso a sección siguiente")
+                pass
+            
+              
+            elif 'Unnamed: 1' in lista_columnas and tabla.shape[0]>100:
+                print("variacion de nombre de columnas por anomalia de fila adicional - inicia modificación")
+                tabla.columns.values[0]='Producto'
+                tabla.columns.values[1]='Mercado mayorista'
+                tabla.columns.values[2]='Precio mínimo'
+                tabla.columns.values[3]='Precio máximo'
+                tabla.columns.values[4]='Precio medio'
+                tabla.columns.values[5]='Tendencia'
+                
+                print(tabla.head(1))
+                tabla=tabla.drop(index=0)
+                
+                
+                print(tabla)
+                
+                lista_df.append(tabla)
+                df_consolidado=pd.concat(lista_df)
+                df_consolidado["periodo"]=nombre
+                print(df_consolidado.columns)   
+                print(df_consolidado)
+         
+                    
+            else:
+                print("sin variacion de nombre de columnas")
+                      
+                lista_df.append(tabla)
+                df_consolidado=pd.concat(lista_df)
+                df_consolidado["periodo"]=nombre
+                print(df_consolidado.columns)
+            
+    return df_consolidado
+
+
+```
+
+La función anterior realiza tareas similares a la función para boletín tipo 1, no obstante esta considera varios escenarios condicionales, de manera general la función recorre el diccionario resultante de la lectura del archivo de excel en medio de este proceso se excluye la hoja de "Indice" para procesar unicamente hojas que contengan datos, una vez hecho esto se realizan transformaciones orientadas a tener un dataset uniforme que permita una armonización con el tipo de dataset generado en el caso de los boletines tipo 1, algunas de las condiciones que maneja la función son las siguientes: 
+
+- Si el fichero corresponde al boletin Sem_12may__18may_2018_int  se ejecuta un procesamiento normal recorriendo las hojas del docuemento excel y generando un dataset consolidado.
+
+- En caso de no pertenecer al caso anterior se procede a leer el excel y cada una de sus hojas pero se generan varios casos de procesamiento según los elementos que se encuentren en las columnas:
+        
+   - Si en las columnas aparece una columna llamada "Pesos por kilogramo" se procede a renombrar las columnas del set de datos.
+   
+   - Si en las columnas aparece "GRUPO" o "TOTAL MERCADOS" se omite el procesamiento de la hoja. 
+   
+   - Si en la columna 6 del set de datos aparece el nombre "Precio minimo"  o "Pesos por tonelada" tambien se procede a omitir el procesamiento de la hoja del libro de excel.                                
+   - Si aparece el nombre de columna "Unnamed: 1" signifca que hay una fila adicional que impide que las variables queden debidamente nombradas, en este caso tambien se renombran las columnas.  
+   
+- Si no presenta ninguno de los casos anteriores se realiza un procesamiento normal de la hoja y se procede a añadir el dataframe resultante al consolidado del boletin.  
+
+La aplicación de la función da como resultado un dataframe consolidado en donde se encuentra toda la información de las hojas del boletin procesadas. 
+
+Ahora veamos la función que procesa en serie varios boletines contenidos en una carpeta: 
+
+```{python}
+
+def proc_carpetassipsat2(ruta_carpeta):
+    ficheros=os.listdir(ruta_carpeta)
+    lista_rutas=[]
+    ruta_entera=None
+    
+    for file in ficheros:
+        ruta_entera= ruta_carpeta+"\\"+file
+        lista_rutas.append(ruta_entera)
+    
+    lista_dataframes=[]
+    
+    for ruta in lista_rutas:
+        print(ruta)
+        boletin_procesado=bolsipsatipo2_2018_proc(ruta)
+        lista_dataframes.append(boletin_procesado)
+        boletin_consolidado= pd.concat(lista_dataframes)
+        
+    boletin_consolidado= boletin_consolidado.reindex(columns=["Mercado mayorista","Precio mínimo","Precio máximo","Precio medio",
+                                                              "Tendencia","periodo","Producto"])
+    boletin_consolidado= boletin_consolidado[boletin_consolidado["Producto"].isin(["Menor a -20,01%              ---",
+                                                                                   "Entre -10,01% y -20%       --",
+                                                                                   "Entre - 0,01% y -10%        -",
+                                                                                   "Variacion igual a 0%         =",
+                                                                                   "Entre 0,01% y 10%             +",
+                                                                                   "Entre 10,01% y 20%           ++",
+                                                                                   "Mayor a 20,01%                 +++",
+                                                                                   "n.d: no disponible",
+                                                                                    "Tendencia*"])==False]
+    
+    boletin_consolidado= boletin_consolidado[boletin_consolidado["Producto"].str.find("precios")==-1]
+        
+    return boletin_consolidado
+
+
+
+```
+
+Esta función cumple el mismo ciclo de procesamiento que en el caso del boletín 1, no obstante presenta como excepción el hecho de que filtra o elimina algunas filas que contienen información relacionada a las "convenciones de tendencia" que tiene el boletín del SIPSA, finalmente esta función recorre los ficheros de los carpeta, genera una lista de rutas, usa la función para el procesamiento de boletines tipo 2 y concatena los dataframes resultantes en un solo dataframe.  
+
+Finalmente veamos la función para el procesamiento de un listado de carpetas: 
+
+```{python}
+
+def procesamiento_carpetas_bolSIPSAT2(lista_carpetas):
+    
+    if type(lista_carpetas) is list:
+        lista_consolidados= []
+        for carpeta in lista_carpetas:
+            print("se esta procesando la carpeta de boletines tipo 2: ",carpeta)
+            consolidado= proc_carpetassipsat2(carpeta)
+            lista_consolidados.append(consolidado)
+            consolidado_carpetas_entrada= pd.concat(lista_consolidados)
+        
+        return consolidado_carpetas_entrada
+    else:
+        raise TypeError("Only list objects are accepted as input")
+ 
+
+```
+
+Esta función en términos de pasos de procesamiento no tiene grandes diferencias al proceso realizado para boletines tipo 1, la única variación que presenta es el uso de las funciones especificas para este tipo de boletín.  
+
+El uso de los conjuntos de funciones mencionados en cada carpeta en donde se alojan los boletines descargados del SIPSA dan lugar a dos sets de datos consolidados que luego se concatenan para dar lugar a un conjunto de datos que consolida los boletines desde 2016 hasta 2022.  
+
+El conjunto de datos consolidado final se denomina "SIPSA_2016to2022.csv" y contiene las siguientes columnas:
+
+- Mercado mayorista
+- Precio mínimo
+- Precio máximo
+- Precio medio
+- Tendencia
+- periodo
+- Producto
+
+
+### Limpieza de set de datos consolidado de boletines SIPSA 2016 a 2022 
+
+Para este proceso de limpieza se hace uso del set de datos "SIPSA_2016to2022.csv" que es el resultado del procesamiento previo realizado con las funciones explicadas en la sección anterior del documento, la limpieza de este dataset comprende la eliminación de registros inusuales producto de la consolidación, y tiene como objetivo principal normalizar las fechas, es decir, poder pasar las mismas de un "nombre de archivo" a una fecha que sea efectivamente manejable y permita un proceso posterior exitoso a nivel de análisis.
+
+Como primer paso se cargan algunas librerias y el dataset que se almacenará en la variable "df_sipsa" :
+
+```{python}
+
+from datetime import datetime, timedelta
+import re 
+
+df_sipsa= pd.read_csv("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bookdown-seriesdetiempo_mcd//Bookdown_SeriesDeTiempo//FuenteConsolidadaSIPSA//SIPSA_2016to2022.csv",sep="|",low_memory=False)
+df_sipsa.drop(columns={"Unnamed: 0"},inplace=True)
+
+print(f"El set de datos cuenta con {df_sipsa.shape[0]} registros y {df_sipsa.shape[1]} columnas \n")
+df_sipsa.head()
+
+
+```
+Como se puede apreciar el set de datos consolidado producto del procesamiento contiene más de un millón de registros y cuenta con las columnas que se habian mencionado al final de la sección anterior, la información aqui consolidada cuenta con información de 140 mercados mayoristas correspondientes a varios municipios del pais, y información relacionada a 672 productos en diversas frecuencias y disponibilidades según la central de abastos.  
+
+Para iniciar este proceso de limpieza primero se procederá a limpiar registros inusuales en las columnas diferentes a "Periodo, para facilitar este proceso se hará uso del método unique() con el fin de conocer los registros únicos que hay en cada columna y a partir de esto determinar que debe eliminarse u omitirse en caso de ser necesario.
+
+```{python}
+
+df_sipsa["Mercado mayorista"].unique()
+
+```
+
+Al revisar el listado de registros se puede apreciar que el contenido de la columna es consistente, todos los registros únicos disponibles corresponden a centrales de abasto, por lo tanto no es necesario en este caso realizar alguna operación de limpieza. 
+
+Ahora procedamos a revisar las columnas de "precio" con el fin de identificar si tienen algun inconveniente: 
+
+```{python}
+
+df_sipsa["Precio mínimo"].unique()
+
+df_sipsa["Precio máximo"].unique()
+
+df_sipsa["Precio medio"].unique()
+
+
+```
+Al revisar las variables se puede apreciar que los precios tienen un error de formateo dado que están en formato de "string", lo cual indica que es necesario posteriormente llevar a cabo una operación de casteo que lleve estos valores precio a valores númericos.  
+
+Ahora se procede a revisar la columna de tendencia: 
+
+```{python}
+
+df_sipsa["Tendencia"].unique()
+
+```
+Para el caso de esta columna se pueden apreciar valores inusuales como 'Tend' y 'n,d,' lo cual hace necesario validar las columnas con estos registros con el fin si es necesario eliminar filas o simplemente reformatear registros. 
+
+Ahora procedamos a revisar la columna "Producto"
+
+```{python}
+
+df_sipsa["Producto"].unique()
+
+```
+
+Se identifican registros intrusos que no lograron ser depurados totalmente en la consolidación, estos corresponden a secciones de explicación de convenciones de tendencia: 
+
+Menor a -12%                    ---',
+       'Entre -12% y -7%               --',
+       'Entre -6,99% y -3%            -',
+       'Entre -2,99% y 3%              =',
+       'Entre 3,01% y 7%               +',
+       'Entre 7,01% y 12%             ++',
+       'Mayor a 12%                      +++', 'c',
+
+'Menor a -12,01%              ---',
+       'Entre -7,01% y -12%         --', 'Entre -3,01% y -7%           -',
+       'Entre 3% y -3%                 =',
+       'Entre 3,01% y 7%             +', 'Entre 7,01% y 12%           ++',
+       'Mayor a 12,01%               +++',
+       
+Se hace necesario limpiar estos registros ya que generan espacios con "nan" en las demás columnas, además no aportan a los datos.  
+
+
+A partir de los hallazgos realizados en la exploración de los registros en cada columna se crean las siguientes lineas de código con el fin de corregir los errores identificados:
+
+```{python}
+
+# se procede a eliminar los registros de la columna tendencia con valor "Tend"
+
+df_sipsa= df_sipsa[df_sipsa["Tendencia"]!="Tend"]
+
+# se procede a reemplazar los registros de la columna tendencia con valor "n,d"
+
+df_sipsa.loc["Tendencia"]= df_sipsa["Tendencia"].replace('n,d,',"n.d")
+
+# Se eliminan los registros intrusos que quedaron producto de convenciones que quedaron 
+# residualmente en el set de datos consolidado
+
+lista_anomalias=['Menor a -12%                    ---',
+                'Entre -12% y -7%               --',
+                'Entre -6,99% y -3%            -',
+                 'Entre -2,99% y 3%              =',
+                 'Entre 3,01% y 7%               +',
+                 'Entre 7,01% y 12%             ++',
+                 'Mayor a 12%                      +++',
+                 'Menor a -12,01%              ---',
+                 'Entre -7,01% y -12%         --',
+                 'Entre -3,01% y -7%           -',
+                 'Entre 3% y -3%                 =',
+                 'Entre 3,01% y 7%             +',
+                 'Entre 7,01% y 12%           ++',
+                 'Mayor a 12,01%               +++',
+                 'c']
+
+df_sipsa= df_sipsa[df_sipsa["Producto"].isin(lista_anomalias)==False]
+
+
+df_sipsa.shape
+
+```
+Despues de aplicar las operaciones de limpieza anteriores el set de datos queda con un total de 1'657.994 registros.
+
+Dado que se ha finalizado la revisión de las columnas diferentes a periodo, ahora se procede a revisar el estado de los registros de la columna "Periodo" los cuales corresponden a los nombres de los ficheros que fueron procesados, de estos nombre se deberá extraer una fecha de referencia que sirva como base para la serie de tiempo:
+
+```{python}
+
+df_sipsa["periodo"].unique()
+
+```
+
+Al observar el contenido de la columna se puede aprecicar lo siguiente:
+
+- Hay cuatro tipos de codificación de semana:
+  - Sem_10sep_16sep_2016.xls -> El elemento inicial es Sem y demarca los dias referenciando una vez el año, algunos aun contienen la extensión del archivo.
+  - 'Sem_02feb_2019__08feb_2019' -> El elemento inicial es Sem, en este caso el año se referencia dos veces cada vez que se referencia el dia de la semana. 
+  - 'anex_02abr_al_08abr_2022' -> Se cambia el término Sem por anex y nuevamente el año aparece solo una vez. 
+  - Sem_22sep__28sep_2018' -> caso similar al número 1 pero no cuenta con extensión. 
+
+- Adicionalmente se logra apreciar que las semanas se codifican de sábado a viernes teniendo inicio el sábado 02 de Enero de 2016 y finalizando el sábado 31 de 2022. 
+
+- Hay diferentes carácteres a en los rangos establecidos lo cual implica aplicar varias operaciones de limpieza para llegar a extraer fechas.  
+
+Dado que a partir de la revisión del listado de fechas se ha logrado establecer el rango del periodo semanal y tambien encontrar generalidades de los formatos a nivel de semana, se seguirá la siguiente estrategia de trasnformación:
+
+- Se eliminarán los ceros a la izquierda.  
+- Se eliminarán las extensiones de archivo y tambien se eliminarán componentes iniciales como las particulas "Sem","Anex","Al","int" con el fin de dejar unicamente fechas y años.
+- Se generará temporalmente una variable longitud con el fin de conocer la variabilidad de carácteres y orientar el proceso de limpieza. 
+- Se cambiarán las iniciales de los meses por su respectivo número. 
+- Se realizará un split por medio del simbolo de separación "_" con el fin de tener listas en la columna periodo que permitan extraer elementos particulares para estructurar fechas. 
+- Se crearán funciones con elementos condicionales según la longitud del string con el fin de extraer la fecha inicial de la semana.  
+
+Como primer paso se creará la función quitarcerosiniciales() la cual tendrá como objetivo remover los ceros a la izquierda que existan en los nombres de la columna: 
+
+```{python}
+
+def quitarcerosiniciales(string):
+    
+    regex= "^0+(?!$)"
+    string_salida= re.sub(regex,"",string)
+    
+    return string_salida
+
+```
+
+Seguidamente con la función anteriormente creada se aplicarán operaciones con funciones tipo lambda para remover partes de los strings de la columna que no sean relevantes para la extracción de la fecha: 
+
+```{python}
+
+df_sipsa["periodo"]= df_sipsa["periodo"].apply(lambda x:str(x).replace(".xls","").replace(".xlsx","").replace("__","_").replace("Sem_","").replace("anex_","").replace("Anex_","").replace(" (1)","").replace("_int","").replace("_al",""))
+
+df_sipsa["periodo"]=df_sipsa["periodo"].apply(lambda x:quitarcerosiniciales(x))
+
+df_sipsa= df_sipsa[df_sipsa["periodo"]!="nan"]
+
+```
+
+Al aplicar estas operaciones los registros de la columna periodo se ven de la siguiente manera: 
+
+```{python}
+
+df_sipsa["periodo"].unique()
+
+```
+
+Ahora el formato de los strings de periodo tienen un aspecto mucho más regular que permite realizar un trabajo más preciso para la extracción de fecha; para conocer que tan variados son los strings se crea una columna provisional denominada "longitud" la cual contiene el número de carácteres que tienen los strings de la columna:
+
+```{python}
+
+df_sipsa["longitud"]= df_sipsa["periodo"].apply(lambda x:len(x))
+df_sipsa["longitud"].value_counts()
+
+```
+Aun hay una variedad importante de strings no obstante como se reviso con anterioridad el formato ahora solo contiene referencias de fechas y separadores de guion bajo, con el fin de no tener que manejar "textos" para el formateo de las fechas en las siguiente lineas de código se reemplaza el texto corto de los meses [ejemplo: "ene","feb", etc..] por su forma númerica, seguidamente se eliminan otros simbolos que podrian interferir:
+
+```{python}
+
+df_sipsa["periodo"]= df_sipsa["periodo"].apply(lambda x:x.replace("ene","01")\
+                                              .replace("feb","02").replace("mar","03")\
+                                              .replace("abr","04").replace("may","05")\
+                                              .replace("jun","06").replace("jul","07")\
+                                              .replace("ago","08").replace("sep","09")\
+                                              .replace("oct","10").replace("nov","11")\
+                                              .replace("dic","12").replace("-","").replace("t",""))
+
+print(df_sipsa["longitud"].value_counts(),"\n")
+
+print(df_sipsa[df_sipsa["longitud"]==14]["periodo"][0:1])
+print(df_sipsa[df_sipsa["longitud"]==15]["periodo"][0:1])
+print(df_sipsa[df_sipsa["longitud"]==16]["periodo"][0:1])
+print(df_sipsa[df_sipsa["longitud"]==17]["periodo"][0:1])
+print(df_sipsa[df_sipsa["longitud"]==20]["periodo"][0:1])
+print(df_sipsa[df_sipsa["longitud"]==21]["periodo"][0:1])
+
+```
+El procesamiento ha sido efectivo, ahora el string solo esta conformado por números y guiones, esto tambien permite evidenciar que las fechas están expresadas de diferentes maneras, por ende en algunos casos la longitud es variable y da lugar a los casos que se listan en el código anteriormente ejecutado.  
+El hecho lograr el formato que solo tiene números y guiones bajos permite realizar una separación a través de un split que genere listas que independicen cada término de la información de fecha:
+
+```{python}
+
+df_sipsa["periodo"] = df_sipsa["periodo"].apply(lambda x:x.split("_"))
+
+```
+
+El nuevo aspecto de los registros en la columna "periodo" es el siguiente: 
+
+```{python}
+
+df_sipsa["periodo"].head()
+
+```
+Al llegar a este nivel de procesamiento se puede apreciar claramente una diferenciación entre elementos como el año, el mes y el dia, dado que se conoce a priori que los datos tienen una frecuencia de generación semanal, resulta práctico tomar solo un dia como referencia de la semana esto permite que solo sea necesario procesar el primer término de las listas para obtener la fecha, siguiendo esta premisa se crea la función  weekstart_conversor() que toma una lista de la columna periodo y realiza operaciones de slicing con el fin de obtener componentes relevantes para conocer la fecha a la cual se hace referencia:
+
+```{python}
+
+def weekstart_conversor(columna_periodo):
+    
+    longitud_lista= len(columna_periodo)
+    longitud_primer_elemento= None
+    
+    if longitud_lista==3:
+        primer_elemento= columna_periodo[0]
+        anio= columna_periodo[2]
+        longitud_primer_elemento= len(primer_elemento)
+        
+        if longitud_primer_elemento==3:
+            primer_elemento= "0"+primer_elemento
+            dia= primer_elemento[0:2]
+            mes= primer_elemento[2:4]
+        else:
+            dia= primer_elemento[0:2]
+            mes= primer_elemento[2:4]
+    else:
+        primer_elemento=columna_periodo[0]
+        anio= columna_periodo[1]
+        longitud_primer_elemento=len(primer_elemento)
+        
+        if longitud_primer_elemento==3:
+            primer_elemento= "0"+primer_elemento
+            dia= primer_elemento[0:2]
+            mes= primer_elemento[2:4]   
+        else:
+            dia= primer_elemento[0:2]
+            mes= primer_elemento[2:4]
+            
+    
+    week_start= dia+"-"+mes+"-"+anio
+    
+    week_start_date= datetime.strptime(week_start,'%d-%m-%Y')
+
+    
+    return week_start_date
+
+
+```
+
+Una vez construida la función se procede a aplicarla sobre el set de datos principal a través de una función tipo lambda: 
+
+```{python}
+
+df_sipsa["dia_inicio_semana"]= df_sipsa["periodo"].apply(lambda x:weekstart_conversor(x))
+
+```
+
+Una vez aplicada la función se puede apreciar que la nueva columna "dia_inicio_semana" contiene ahora la fecha del primer dia de la semana que toma el boletín :
+
+```{python}
+
+df_sipsa["dia_inicio_semana"].head()
+
+```
+Teniendo en cuenta que el proceso de normalización de la fecha ha sido exitoso se procede a filtrar unicamente las centrales de abasto de interés que en este caso son unicamente las que correspondan a Armenia y a Pereira, asi mismo solo resultan de interés los productos correspondientes a cebolla junca, habichuelas, tomate chonto y ahuyama;en la siguiente linea de código se ejecuta el filtrado del dataset:
+
+```{python}
+
+centrales_interes= ['Armenia, Mercar','Pereira, La 41','Pereira, Mercasa','Armenia, Retiro']
+
+productos= ['Cebolla junca','Tomate chonto','Ahuyama','Habichuela']
+
+df_sipsa_reducido= df_sipsa[df_sipsa["Mercado mayorista"].isin(centrales_interes)==True]
+df_sipsa_reducido= df_sipsa_reducido[df_sipsa_reducido["Producto"].isin(productos)==True]
+
+df_sipsa_reducido.drop(columns=["Tendencia","periodo","longitud"],inplace=True)
+
+```
+
+Ahora se cuenta con un set de datos con las siguientes columnas y extension:
+
+```{python}
+
+print(df_sipsa_reducido.shape)
+
+df_sipsa_reducido.info
+
+```
+El nuevo set de datos cuenta con 4386 registros y 6 columnas que corresponden exclusivamente a las centrales de abasto y productos de interés para el análisis.
+
+Como puede observarse ya los datos y las fechas estan filtradas y normalizadas no obstante hace falta que la fecha sea el indice del set de datos, esta condición es de suma importancia para poder llevar a cabo de manera más eficiente ejercicios posteriores, para cumplir esta condición a nivel de estructura de tabla, se crea una tabla de fechas que contiene los dias de inicio de semana que deberian contener las series de tiempo de los alimentos, esto se hace con la finalidad de tener un marco de fechas completo que permita determinar datos faltantes en el set de datos en revisión, para crear esta tabla de fechas se crea la función rango_fechas() que a partir de una fecha de inicio, una fecha de finalización y una determinada cantidad de años genera un listado de dias en formato yyyy-mm-dd
+
+```{python}
+
+from datetime import timedelta
+from datetime import date
+
+def rango_fechas(fecha_inicio,frecuencia,años):
+    inicio= fecha_inicio
+    periodos= int(round((365/frecuencia)*años,0))
+    lista= range(0,periodos+1)
+    factor_suma= timedelta(days=frecuencia)
+    lista_final=[]
+    
+    for i in lista: 
+        if i==0:
+            fecha= inicio + factor_suma*0
+            lista_final.append(fecha)
+        else:
+            fecha= fecha + factor_suma
+            lista_final.append(fecha)
+    
+    df_fechas_final= pd.DataFrame({"Periodo":lista_final})
+    
+    return df_fechas_final
+
+
+```
+
+Se crea una variable de inicio con la primera fecha que muestra el set de datos, y en la función rango_fechas se introduce una frecuencia 7 (semanal) para un lapso de 7 años (2016-2022) 
+
+```{python}
+start = datetime(2016,1,2)
+tabla_fechas_referencia= rango_fechas(start,7,7)
+tabla_fechas_referencia["Año"]= tabla_fechas_referencia["Periodo"].dt.year
+tabla_fechas_referencia["Año-mes"]= tabla_fechas_referencia["Periodo"].dt.to_period('M')
+tabla_fechas_referencia
+```
+Con esta operación realizada se procede a crear una función más,esta función es get_tidy_ts() la cual busca realizar una reindexación de la tabla origen a una estructura de tabla en donde el indice sea la fecha y las columnas sean los productos asociados a cada central de abastos:
+
+```{python}
+
+def get_tidy_ts(df,mercado,tabla_fechas):
+    
+    productos= df[df["Mercado mayorista"]==mercado]["Producto"].unique()
+    
+    dataframe_list= []
+    
+           
+    
+    for producto in productos:
+         match_producto= df[(df["Producto"]==producto)&(df["Mercado mayorista"]==mercado)]\
+                                        [["Producto","dia_inicio_semana","Precio medio","Mercado mayorista"]]
+         
+         match_producto["prod-merc"]= match_producto["Producto"]+"_"+match_producto["Mercado mayorista"]
+         
+         match_producto.drop(columns={"Mercado mayorista"},inplace=True)
+         
+         calendar_merge= tabla_fechas.merge(right=match_producto,how="left",left_on="Periodo",right_on="dia_inicio_semana")
+         
+         calendar_merge.drop_duplicates(subset=["Periodo"],keep='first',inplace=True)
+         
+         
+         calendar_merge.drop(columns=["dia_inicio_semana","Año","Año-mes"],inplace=True)
+         
+         
+         calendar_merge= calendar_merge.pivot(index="Periodo",columns="prod-merc",values="Precio medio").drop(columns=np.nan)
+            
+         dataframe_list.append(calendar_merge)  
+        
+        
+    tidy_ts_df= pd.concat(dataframe_list, axis=1)
+    
+    
+    
+    return tidy_ts_df
+
+
+```
+
+Antes de aplicar la función anterior se procede a simplificar los nombres de las centrales de abastos:
+
+```{python}
+
+simplificacion_centrales={"Armenia, Mercar":"axm_merc","Armenia, Retiro":"axm_ret",
+"Pereira, La 41":"per_l41","Pereira, Mercasa":"per_merca"}
+
+df_sipsa_reducido["Mercado mayorista"] = df_sipsa_reducido["Mercado mayorista"].replace(simplificacion_centrales)
+
+```
+
+Con la operación anterior realizada se procede a generar una dataset reformateado para los alimentos de interés en la ciudad de Armenia usando la función get_tidy_ts():
+
+```{python}
+
+centrales_armenia=  ['axm_merc']
+
+lista_df_axm= []
+
+for central in centrales_armenia:
+    df_central2=get_tidy_ts(df_sipsa_reducido,central,tabla_fechas_referencia)
+    lista_df_axm.append(df_central2)
+
+df_tseries_axm= pd.concat(lista_df_axm,axis=1)
+
+df_tseries_axm
+
+```
+Ahora se cuenta con un set de datos con 366 registros y 4 columnas que corresponden a los precios de los productos de interesm, ahora repliquemos el mismo ejercicio para la ciudad de Pereira: 
+
+```{python}
+
+centrales_pereira=  ['per_merca']
+
+lista_df_per= []
+
+for central in centrales_pereira:
+    df_central3=get_tidy_ts(df_sipsa_reducido,central,tabla_fechas_referencia)
+    lista_df_per.append(df_central3)
+
+df_tseries_per= pd.concat(lista_df_per,axis=1)
+
+df_tseries_per
+
+```
+Con los sets de datos en el formato adecuado, como ultimo ejercicio se procede a revisar la integridad de las series de tiempo en cada conjunto de datos haciendo uso del método isnull() de Python:
+
+```{python}
+
+
+df_tseries_axm.isnull().sum()
+
+
+```
+
+Se puede apreciar que para el caso de Armenia hay entre 11 y 12 registros faltantes por serie, lo cual significa que hay un 3% de valores faltantes por serie respecto al valor total de registros por producto. 
+
+En el caso de Pereira se aprecia lo siguiente:
+
+```{python}
+
+df_tseries_per.isnull().sum()
+
+```
+Para el caso de Pereira tambien se cumple una condición de ausencia de entre 11 y 12 registros por serie de tiempo.
+
+Para solucionar el problema de valores faltantes y tener finalmente los sets de datos listo para la fase exploratoria se hace uso de la variable interpolate de pandas usando el método "time", para poder aplicar esto de manera efectiva se realiza el casteo de las variables de precio con el fin de que pasen de formato string a formato númerico:
+
+```{python}
+
+df_tseries_axm= df_tseries_axm.apply(pd.to_numeric)
+ts_columns_axm= df_tseries_axm.columns 
+
+for ts in ts_columns_axm:
+    df_tseries_axm[ts]= df_tseries_axm[ts].interpolate(method="time")
+    
+    
+
+df_tseries_per= df_tseries_per.apply(pd.to_numeric)
+ts_columns_per= df_tseries_per.columns 
+
+for ts in ts_columns_per:
+    df_tseries_per[ts]= df_tseries_per[ts].interpolate(method="time")
+
+
+```
+
+Finalmente al revisar nuevamente los valores vacios en las series se tiene lo siguiente:
+
+```{python}
+
+df_tseries_per.isnull().sum()
+
+
+df_tseries_axm.isnull().sum()
+
+```
+Con la serie de operaciones realizadas ahora se cuenta con dos sets de datos en formato correcto para poder llevar a cabo procesos de análisis exploratorio que permitan determinar las propiedades de las series de los alimentos en la central mayorista más representativa de cada ciudad. 
 
