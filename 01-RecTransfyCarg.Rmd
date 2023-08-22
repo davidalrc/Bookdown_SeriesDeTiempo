@@ -22,6 +22,8 @@ import pandas as pd
 import numpy as np 
 import os 
 import openpyxl
+import matplotlib.pyplot as plt 
+import seaborn as sns
 
 ## En este caso vamos a leer un boletin de 2016
 

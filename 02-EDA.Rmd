@@ -1,3 +1,459 @@
 # Análisis exploratorio de las series de tiempo
 
+```{r}
+
+library(reticulate)
+matplotlib <- import("matplotlib")
+matplotlib$use("Agg", force = TRUE)
+
+```
+
+
+En esta sección se hará una exploración inicial de las series de tiempo para los productos en cada ciudad, se revisará la estructura de la serie, su estacionalidad, estacionariedad y su descomposición con el fin de determinar si requiere transformaciones o tratamiento adicional para la etapa de modelación.
+
+Para facilitar el proceso de definición la estacionalidad de las series se crean las siguiente funciones con el fin de formatear el resultado de los test Dickey Fuller Aumentado y KPSS:
+
+
+```{python}
+
+import statsmodels
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import kpss
+from statsmodels.tsa.seasonal import seasonal_decompose
+from pandas.plotting import autocorrelation_plot
+from statsmodels.tsa.seasonal import seasonal_decompose
+def formated_adf(series):
+    adf_result= adfuller(series,autolag="AIC")
+    output_df= pd.DataFrame.from_dict({"ADF Stat:":adf_result[0],"p-value":adf_result[1],"Crit_val1%:":adf_result[4]["1%"],
+                            "Crit_val5%:":adf_result[4]["5%"],"Crit_val10%":adf_result[4]["10%"],"Interpretation":None},orient="index")
+    
+    output_df= output_df.rename(columns={0:"Resultado"})
+
+    adf_pval = adf_result[1]
+    
+    if adf_pval>0.05:
+        interp="La serie no es estacionaria"
+    else:
+        interp="La serie es estacionaria"
+    
+    output_df["Resultado"]["Interpretation"]=interp
+
+    return (output_df,adf_pval)
+
+
+def formated_kpss(series):
+    kpss_result= kpss(series)
+    output_df= pd.DataFrame.from_dict({"KPSS Stat:": kpss_result[0],"p-value": kpss_result[1],"Lags": kpss_result[2],
+                            "Crit_val10%:": kpss_result[3]["10%"],"Crit_val5%": kpss_result[3]["5%"],"Crit_val2.5%": kpss_result[3]["2.5%"],
+                                       "Crit_val1%": kpss_result[3]["1%"]
+                                       ,"Interpretation":None},orient="index")
+    
+    output_df= output_df.rename(columns={0:"Resultado"})
+    
+    kpss_pval=  kpss_result[1]
+    
+    if kpss_pval<0.05:
+        interp="La serie no es estacionaria"
+    else:
+        interp="La serie es estacionaria"
+    
+    output_df["Resultado"]["Interpretation"]=interp
+    
+    return (output_df,kpss_pval)
+
+
+
+```
+
+
+```{python include=FALSE}
+
+
+series_armenia= pd.read_csv("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bookdown-seriesdetiempo_mcd//Bookdown_SeriesDeTiempo//FuenteConsolidadaSIPSA//df_series_axmr.csv")
+
+series_pereira= pd.read_csv("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bookdown-seriesdetiempo_mcd//Bookdown_SeriesDeTiempo//FuenteConsolidadaSIPSA//df_series_per.csv")
+
+```
+
+## Análisis de series de tiempo de precio promedio mayorista semanal para la ciudad de Armenia
+
+### Ahuyama
+
+Como primera medida se aisla la serie de tiempo y directamente se genera una primera diferencia, una segunda diferencia, y medias moviles de 5, 10 y 20 periodos para ver como se comporta en general la serie de tiempo y su tendencia:
+
+```{python echo=TRUE,warning=FALSE}
+
+ahuyama_ts= series_armenia[["Ahuyama_axm_merc"]]
+ahuyama_ts["SMA5"]=ahuyama_ts["Ahuyama_axm_merc"].rolling(5).mean()
+ahuyama_ts["SMA10"]=ahuyama_ts["Ahuyama_axm_merc"].rolling(10).mean()
+ahuyama_ts["SMA20"]= ahuyama_ts["Ahuyama_axm_merc"].rolling(20).mean()
+ahuyama_ts["diff1"]= ahuyama_ts["Ahuyama_axm_merc"].diff()
+ahuyama_ts["diff2"]= ahuyama_ts["diff1"].diff()
+
+```
+```{python}
+
+import matplotlib.pyplot as plt
+
+plt.plot(ahuyama_ts.index,ahuyama_ts[["Ahuyama_axm_merc"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(ahuyama_ts.index,ahuyama_ts["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(ahuyama_ts.index,ahuyama_ts["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(ahuyama_ts.index,ahuyama_ts["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+
+```
+```{python}
+pd.plotting.lag_plot(ahuyama_ts,lag=3)
+plt.show()
+plt.close()
+```
+```{python}
+
+formated_kpss(ahuyama_ts["Ahuyama_axm_merc"])
+formated_adf(ahuyama_ts["Ahuyama_axm_merc"])
+```
+
+
+
+
+### Cebolla Junca
+
+```{python}
+
+cebollaj_ts= series_armenia[["Cebolla junca_axm_merc"]]
+cebollaj_ts["SMA5"]=cebollaj_ts["Cebolla junca_axm_merc"].rolling(5).mean()
+cebollaj_ts["SMA10"]=cebollaj_ts["Cebolla junca_axm_merc"].rolling(10).mean()
+cebollaj_ts["SMA20"]= cebollaj_ts["Cebolla junca_axm_merc"].rolling(20).mean()
+cebollaj_ts["diff1"]= cebollaj_ts["Cebolla junca_axm_merc"].diff()
+cebollaj_ts["diff2"]= cebollaj_ts["diff1"].diff()
+
+
+```
+
+
+```{python}
+
+plt.plot(cebollaj_ts.index,cebollaj_ts[["Cebolla junca_axm_merc"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(cebollaj_ts.index,cebollaj_ts["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(cebollaj_ts.index,cebollaj_ts["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(cebollaj_ts.index,cebollaj_ts["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+
+
+
+```
+
+
+```{python}
+
+pd.plotting.lag_plot(cebollaj_ts,lag=3)
+plt.show()
+plt.close()
+
+
+
+```
+
+
+```{python}
+
+
+formated_kpss(cebollaj_ts["Cebolla junca_axm_merc"])
+formated_adf(cebollaj_ts["Cebolla junca_axm_merc"])
+
+```
+
+
+### Habichuela 
+
+```{python}
+
+habichuela_ts= series_armenia[["Habichuela_axm_merc"]]
+habichuela_ts["SMA5"]=habichuela_ts["Habichuela_axm_merc"].rolling(5).mean()
+habichuela_ts["SMA10"]=habichuela_ts["Habichuela_axm_merc"].rolling(10).mean()
+habichuela_ts["SMA20"]= habichuela_ts["Habichuela_axm_merc"].rolling(20).mean()
+habichuela_ts["diff1"]= habichuela_ts["Habichuela_axm_merc"].diff()
+habichuela_ts["diff2"]= habichuela_ts["diff1"].diff()
+
+
+```
+
+
+```{python}
+
+plt.plot(habichuela_ts.index,habichuela_ts[["Habichuela_axm_merc"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(habichuela_ts.index,habichuela_ts["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(habichuela_ts.index,habichuela_ts["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(habichuela_ts.index,habichuela_ts["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+```
+
+
+
+```{python}
+
+pd.plotting.lag_plot(habichuela_ts,lag=3)
+plt.show()
+plt.close()
+
+
+```
+
+
+
+
+```{python}
+
+formated_kpss(habichuela_ts["Habichuela_axm_merc"])
+formated_adf(habichuela_ts["Habichuela_axm_merc"])
+
+
+```
+
+### Tomate Chonto
+
+```{python}
+
+tomate_ts= series_armenia[["Tomate chonto_axm_merc"]]
+tomate_ts["SMA5"]=tomate_ts["Tomate chonto_axm_merc"].rolling(5).mean()
+tomate_ts["SMA10"]=tomate_ts["Tomate chonto_axm_merc"].rolling(10).mean()
+tomate_ts["SMA20"]= tomate_ts["Tomate chonto_axm_merc"].rolling(20).mean()
+tomate_ts["diff1"]= tomate_ts["Tomate chonto_axm_merc"].diff()
+tomate_ts["diff2"]= tomate_ts["diff1"].diff()
+
+```
+
+
+```{python}
+
+plt.plot(tomate_ts.index,tomate_ts[["Tomate chonto_axm_merc"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(tomate_ts.index,tomate_ts["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(tomate_ts.index,tomate_ts["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(tomate_ts.index,tomate_ts["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+```
+
+
+
+
+
+```{python}
+
+pd.plotting.lag_plot(tomate_ts,lag=3)
+plt.show()
+plt.close()
+
+```
+
+
+
+
+
+```{python}
+
+formated_kpss(tomate_ts["Tomate chonto_axm_merc"])
+formated_adf(tomate_ts["Tomate chonto_axm_merc"])
+
+
+```
+
+
+
+## Análisis de series de tiempo de precio promedio mayorista semanal para la ciudad de Pereira
+
+
+### Ahuyama
+
+```{python}
+
+ahuyama_ts_per= series_pereira[["Ahuyama_per_merca"]]
+ahuyama_ts_per["SMA5"]=ahuyama_ts_per["Ahuyama_per_merca"].rolling(5).mean()
+ahuyama_ts_per["SMA10"]=ahuyama_ts_per["Ahuyama_per_merca"].rolling(10).mean()
+ahuyama_ts_per["SMA20"]= ahuyama_ts_per["Ahuyama_per_merca"].rolling(20).mean()
+ahuyama_ts_per["diff1"]= ahuyama_ts_per["Ahuyama_per_merca"].diff()
+ahuyama_ts_per["diff2"]= ahuyama_ts_per["diff1"].diff()
+
+```
+
+
+
+```{python}
+
+plt.plot(ahuyama_ts_per.index,ahuyama_ts_per[["Ahuyama_per_merca"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(ahuyama_ts_per.index,ahuyama_ts_per["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(ahuyama_ts_per.index,ahuyama_ts_per["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(ahuyama_ts_per.index,ahuyama_ts_per["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+
+```
+
+
+```{python}
+
+pd.plotting.lag_plot(ahuyama_ts_per,lag=3)
+plt.show()
+plt.close()
+
+```
+
+
+### Cebolla Junca
+
+```{python}
+
+cebollaj_ts_per= series_pereira[["Cebolla junca_per_merca"]]
+cebollaj_ts_per["SMA5"]=cebollaj_ts_per["Cebolla junca_per_merca"].rolling(5).mean()
+cebollaj_ts_per["SMA10"]=cebollaj_ts_per["Cebolla junca_per_merca"].rolling(10).mean()
+cebollaj_ts_per["SMA20"]= cebollaj_ts_per["Cebolla junca_per_merca"].rolling(20).mean()
+cebollaj_ts_per["diff1"]= cebollaj_ts_per["Cebolla junca_per_merca"].diff()
+cebollaj_ts_per["diff2"]= cebollaj_ts_per["diff1"].diff()
+
+```
+
+
+```{python}
+
+plt.plot(cebollaj_ts_per.index,cebollaj_ts_per[["Cebolla junca_per_merca"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(cebollaj_ts_per.index,cebollaj_ts_per["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(cebollaj_ts_per.index,cebollaj_ts_per["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(cebollaj_ts_per.index,cebollaj_ts_per["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+```
+
+
+
+```{python}
+pd.plotting.lag_plot(cebollaj_ts_per,lag=3)
+plt.show()
+plt.close()
+```
+
+
+### Habichuela 
+
+```{python}
+
+habichuela_ts_per= series_pereira[["Habichuela_per_merca"]]
+habichuela_ts_per["SMA5"]=habichuela_ts_per["Habichuela_per_merca"].rolling(5).mean()
+habichuela_ts_per["SMA10"]=habichuela_ts_per["Habichuela_per_merca"].rolling(10).mean()
+habichuela_ts_per["SMA20"]= habichuela_ts_per["Habichuela_per_merca"].rolling(20).mean()
+habichuela_ts_per["diff1"]= habichuela_ts_per["Habichuela_per_merca"].diff()
+habichuela_ts_per["diff2"]= habichuela_ts_per["diff1"].diff()
+
+```
+
+
+
+```{python}
+
+plt.plot(habichuela_ts_per.index,habichuela_ts_per[["Habichuela_per_merca"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(habichuela_ts_per.index,habichuela_ts_per["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(habichuela_ts_per.index,habichuela_ts_per["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(habichuela_ts_per.index,habichuela_ts_per["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+```
+
+
+```{python}
+
+pd.plotting.lag_plot(habichuela_ts_per,lag=3)
+plt.show()
+plt.close()
+
+
+```
+
+
+### Tomate Chonto
+
+```{python}
+
+tomate_ts_per= series_pereira[["Tomate chonto_per_merca"]]
+tomate_ts_per["SMA5"]=tomate_ts_per["Tomate chonto_per_merca"].rolling(5).mean()
+tomate_ts_per["SMA10"]=tomate_ts_per["Tomate chonto_per_merca"].rolling(10).mean()
+tomate_ts_per["SMA20"]= tomate_ts_per["Tomate chonto_per_merca"].rolling(20).mean()
+tomate_ts_per["diff1"]= tomate_ts_per["Tomate chonto_per_merca"].diff()
+tomate_ts_per["diff2"]= tomate_ts_per["diff1"].diff()
+
+
+```
+
+
+
+```{python}
+
+plt.plot(tomate_ts_per.index,tomate_ts_per[["Tomate chonto_per_merca"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.plot(tomate_ts_per.index,tomate_ts_per["SMA5"],linewidth=1,color="red",label="SMA5")
+plt.plot(tomate_ts_per.index,tomate_ts_per["SMA10"],linewidth=1,color="green",label="SMA10")
+plt.plot(tomate_ts_per.index,tomate_ts_per["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+
+```
+
+
+```{python}
+
+pd.plotting.lag_plot(tomate_ts_per,lag=3)
+plt.show()
+plt.close()
+
+
+```
+
 
