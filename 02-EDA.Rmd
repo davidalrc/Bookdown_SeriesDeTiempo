@@ -1,6 +1,6 @@
 # Análisis exploratorio de las series de tiempo
 
-```{r}
+```{r include=FALSE}
 
 library(reticulate)
 matplotlib <- import("matplotlib")
@@ -22,6 +22,9 @@ from statsmodels.tsa.stattools import kpss
 from statsmodels.tsa.seasonal import seasonal_decompose
 from pandas.plotting import autocorrelation_plot
 from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.graphics import tsaplots
+
+
 def formated_adf(series):
     adf_result= adfuller(series,autolag="AIC")
     output_df= pd.DataFrame.from_dict({"ADF Stat:":adf_result[0],"p-value":adf_result[1],"Crit_val1%:":adf_result[4]["1%"],
@@ -81,7 +84,7 @@ series_pereira= pd.read_csv("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023
 
 Como primera medida se aisla la serie de tiempo y directamente se genera una primera diferencia, una segunda diferencia, y medias moviles de 5, 10 y 20 periodos para ver como se comporta en general la serie de tiempo y su tendencia:
 
-```{python echo=TRUE,warning=FALSE}
+```{python echo=TRUE, warning=FALSE}
 
 ahuyama_ts= series_armenia[["Ahuyama_axm_merc"]]
 ahuyama_ts["SMA5"]=ahuyama_ts["Ahuyama_axm_merc"].rolling(5).mean()
@@ -109,11 +112,47 @@ plt.close()
 
 
 ```
+Al visualizar la serie de tiempo de los precios promedio semanales de la ahuyama se puede apreciar que no hay un patrón claro que demarque periodos o ciclos consistentes para el precio, al apreciar las medias moviles se puede apreciar que el suavizamiento de las mismas no termina generando evidencia clara de algún patrón estacional, lo único que se puede abstraer con claridad es que este producto ha tenido momentos de "pico de precio" alcanzando valores por encima de los 1200 pesos colombianos, este caso de alza de precio no ha sido exclusivo del periodo pos-pandemia sino que particularmente para este producto ya se habia presentado en el pasado. 
+
+Ahora veamos un lag_plot con un rezago para esta serie de tiempo:
+
+
 ```{python}
-pd.plotting.lag_plot(ahuyama_ts,lag=3)
+pd.plotting.lag_plot(ahuyama_ts,lag=1)
+plt.title("Lag plot serie de precios promedios mayoristas semanales Ahuyama" )
 plt.show()
 plt.close()
 ```
+A través del lag plot con un rezgo es posible apreciar que los datos de esta serie de tiempo exhiben un patrón irregular en donde algunos valores toman una tendencia lineal y otros simplemente toman una distribución mucho más aleatoria creando una nube de puntos, en términos muy generales el aspecto de este lag plot da pie para decir que la serie tiene un componente evidentemente aleatorio y otro que muestra claras señales de autocorrelación (sección superior derecha del gráfico), teniendo en cuenta que cuando los datos presentan comportamiento periodico este tipo de gráfica toma comportamientos circulares o sinusuoidales, es posible inferir que efectivamente esta serie de tiempo no tiene estacionariedad clara.
+
+Demarcado lo anterior es conveniente revisar el comportamiento de la autocorrelación de la serie, para esto se genera un gráfico de función de autocorrelación (acf):
+
+```{python}
+
+tsaplots.plot_acf(ahuyama_ts[["Ahuyama_axm_merc"]],title="Función de autocorrelación para serie de la Ahuyama")
+plt.show()
+
+
+```
+La gráfica de la función de autocorrelación permite apreciar que hay correlación positiva entre las observaciones y el descenso hacia valores cercanos a 0 es lento al punto en el cual los primeros 15 rezagos resulta ser significativos, asi mismo es posible apreciar que el patrón de descenso es lineal por lo tanto no se aprecia alguna dinámica clara de estacionalidad, sin embargo el aspecto de la gráfica si lleva a inferir que la serie de tiempo no es estacionaria y por ende tiene presencia de tendencia dentro de su estructura. 
+
+Para validar estos elementos que se han mencionado se procede a graficar la descomposición de la serie de tiempo con el fin de visualizar sus componentes: 
+
+```{python}
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
 ```{python}
 
 formated_kpss(ahuyama_ts["Ahuyama_axm_merc"])
