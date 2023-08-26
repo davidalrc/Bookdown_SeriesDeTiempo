@@ -106,7 +106,8 @@ ahuyama_ts["diff2"]= ahuyama_ts["diff1"].diff()
 
 import matplotlib.pyplot as plt
 
-plt.plot(ahuyama_ts.index,ahuyama_ts[["Ahuyama_axm_merc"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.figure(figsize=(15,10))
+plt.plot(ahuyama_ts.index,ahuyama_ts[["Ahuyama_axm_merc"]],linewidth=1.1,marker="o",color="blue",label="Serie ppal")
 plt.plot(ahuyama_ts.index,ahuyama_ts["SMA5"],linewidth=1,color="red",label="SMA5")
 plt.plot(ahuyama_ts.index,ahuyama_ts["SMA10"],linewidth=1,color="green",label="SMA10")
 plt.plot(ahuyama_ts.index,ahuyama_ts["SMA20"],linewidth=1,color="orange",label="SMA20")
@@ -127,8 +128,11 @@ Ahora veamos un lag_plot con un rezago para esta serie de tiempo:
 
 
 ```{python}
+
+plt.figure(figsize=(15,10))
 pd.plotting.lag_plot(ahuyama_ts[["Ahuyama_axm_merc"]],lag=1)
 plt.title("Lag plot serie de precios promedios mayoristas semanales Ahuyama" )
+plt.grid()
 plt.show()
 plt.close()
 ```
@@ -138,7 +142,9 @@ Demarcado lo anterior es conveniente revisar el comportamiento de la autocorrela
 
 ```{python}
 
+plt.figure(figsize=(15,10))
 tsaplots.plot_acf(ahuyama_ts[["Ahuyama_axm_merc"]],title="Función de autocorrelación para serie de la Ahuyama")
+plt.grid()
 plt.show()
 plt.close();
 
@@ -151,6 +157,8 @@ Para validar estos elementos que se han mencionado se procede a graficar la desc
 ```{python}
  
 from statsmodels.tsa.seasonal import seasonal_decompose
+
+plt.figure(figsize=(15,10))
 
 ahuy_decomp_axm= seasonal_decompose(ahuyama_ts["Ahuyama_axm_merc"],model="multiplicative")
 
@@ -173,6 +181,7 @@ Al revisar ambos test estadísticos se puede apreciar que la serie de tiempo de 
 
 ```{python}
 
+plt.figure(figsize=(15,10))
 plt.plot(ahuyama_ts["diff1"],linewidth=1.2,color="blue",label="Serie ppal")
 plt.title("Precios mayoristas promedio semanales de la ahuyama en la ciudad de Armenia (diff1)",fontsize=10)
 plt.ylabel("Precio (pesos colombianos)", fontsize=12)
@@ -187,6 +196,8 @@ plt.show()
 Ahora realicemos un lag plot respecto a la serie diferenciada con el fin de ver su comportamiento: 
 
 ```{python}
+
+plt.figure(figsize=(15,10))
 pd.plotting.lag_plot(ahuyama_ts["diff1"],lag=1)
 plt.title("Lag plot serie de precios promedios mayoristas semanales Ahuyama" )
 plt.show()
@@ -196,14 +207,15 @@ Con la aplicación de la primera diferencia se puede apreciar que el comportamie
 
 ```{python}
 
-tsaplots.plot_acf(ahuyama_ts[["diff1"]],title="Función de autocorrelación para serie diferenciada de la Ahuyama")
+plt.figure(figsize=(15,10))
+tsaplots.plot_acf(ahuyama_ts[["diff1"]].dropna(),title="Función de autocorrelación para serie diferenciada de la Ahuyama")
 plt.show()
 plt.close();
 
 ```
 La correlación entre las observaciones y sus rezagos tiende a 0 por lo tanto la serie diferenciada de la ahuyama carece de problemas de autocorrelación serial, por lo tanto el aumento de una observación anterior no afecta necesariamente las observaciones siguientes. 
 
-El análisis gráfico da lugar a establecer que la primera diferencia de esta serie de tiempo no es estacionaria, confirmemoslo aplicando las pruebas adf y KPSS: 
+El análisis gráfico da lugar a establecer que la primera diferencia de esta serie de tiempo es estacionaria, confirmemoslo aplicando las pruebas adf y KPSS: 
 
 ```{python}
 
@@ -212,11 +224,13 @@ formated_adf(ahuyama_ts["diff1"].dropna())
 
 
 ```
-Al aplicar ambas pruebas la interpretación de los valores p conduce a concluir que la primera diferencia de la serie de tiempo de precios resulta es estacionaria, por ende se puede concluir que la serie de tiempo para este producto tiene un nivel de integración 1.  
+Al aplicar ambas pruebas la interpretación de los valores p conduce a concluir que la primera diferencia de la serie de tiempo de precios es estacionaria, por ende se puede concluir que la serie de tiempo para este producto tiene un nivel de integración 1.  
 
 
 
 ### Cebolla Junca
+
+Para el caso de la cebolla junca se sigue el mismo curso metodológico que en el caso de la Ahuyama, se aisla la serie, se calculan medias moviles, primera y segunda diferencia. 
 
 ```{python}
 
@@ -229,7 +243,7 @@ cebollaj_ts["diff2"]= cebollaj_ts["diff1"].diff()
 
 
 ```
-
+Procedamos a visualizar la serie de tiempo y sus tres medias moviles:
 
 ```{python}
 
@@ -237,6 +251,7 @@ plt.plot(cebollaj_ts.index,cebollaj_ts[["Cebolla junca_axm_merc"]],linewidth=1.2
 plt.plot(cebollaj_ts.index,cebollaj_ts["SMA5"],linewidth=1,color="red",label="SMA5")
 plt.plot(cebollaj_ts.index,cebollaj_ts["SMA10"],linewidth=1,color="green",label="SMA10")
 plt.plot(cebollaj_ts.index,cebollaj_ts["SMA20"],linewidth=1,color="orange",label="SMA20")
+plt.title("Precios mayoristas promedio semanales de la cebolla junca en la ciudad de Armenia",fontsize=11)
 plt.ylabel("Precio (pesos colombianos)", fontsize=12)
 plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
 plt.xticks(rotation='vertical')
@@ -246,14 +261,14 @@ plt.show()
 plt.close()
 
 
-
-
 ```
+Al revisar la gráfica de la serie de tiempo de precios promedios semanales se puede apreciar que la cebolla junca presenta un patrón mucho más volatil que el de la Ahuyama, y además se puede observar con claridad procesos de ascenso y descenso que dan cuenta que un patrón estacional pero que no es totalmente regular, sin embargo en medio de su dinámica se puede apreciar una dinámica con dos picos de precio al año, uno al inicio y otro al final, este patrón preserva mayor regularidad hasta 2020, desde 2021 hasta adelante se puede apreciar un cambio en la dinámica de precio en donde el mismo mantiene máximos cercanos a 2500 y llega continuamente a minimos cercanos a los 1700 pesos. Si se toma en cuenta todo el movimiento histórico del precio se puede evidenciar un aumento generalizado, a 2017 el precio alcanzó minimos cercanos a los 600 pesos y para el 2022 el precio nunca descendio por debajo de los 1500 pesos.  
 
+Ahora veamos un lag_plot con un rezago para esta serie de tiempo:
 
 ```{python}
 
-pd.plotting.lag_plot(cebollaj_ts,lag=3)
+pd.plotting.lag_plot(cebollaj_ts[["Cebolla junca_axm_merc"]],lag=3)
 plt.show()
 plt.close()
 
@@ -306,7 +321,7 @@ plt.close()
 
 ```{python}
 
-pd.plotting.lag_plot(habichuela_ts,lag=3)
+pd.plotting.lag_plot(habichuela_ts["Habichuela_axm_merc"],lag=3)
 plt.show()
 plt.close()
 
