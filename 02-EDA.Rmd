@@ -275,6 +275,36 @@ plt.close()
 
 
 ```
+El lag plot considerando tres rezagos describe una tendencia lineal positiva pero dispersa, dentro de la nube de puntos que se presenta no hay patrones claramente sinusoidales por lo tanto no logra evidenciarse con claridad algun patron de estacionalidad claramente definido, por otro lado no se encuentran en la gráfica puntos altamente desviados de la trayectoria, no obstante la linealidad indica presencia de autocorrelación lo cual genera indicios de la existencia de tendencia dentro de la serie lo cual demarcaria que esta no es estacionaria, con el fin de esclarecer las propiedades de la serie se continua ahondando en sus propiedades.
+
+Como parte de la exploración de propiedades de la serie se genera una gráfica de la función de autocorrelación de la serie de tiempo:
+
+```{python}
+
+plt.figure(figsize=(15,10))
+tsaplots.plot_acf(cebollaj_ts[["Cebolla junca_axm_merc"]],title="Función de autocorrelación para serie de la cebolla junca")
+plt.show()
+plt.close();
+
+```
+El patrón descendente progreviso  y fuera de los intervalos de confianza de la gráfica de autocorrelación permiten evidenciar que hay presencia de autocorrelación serial en la serie, esto implica que observaciones anteriores están presentando influencia en las observaciones siguientes. En lo que respecta a estacionalidad no se logra evidenciar un patrón lo suficientemente claro como para confirmarla, con el fin de seguir conociendo las propiedades de la serie se procede a revisar su descomposición:
+
+```{python}
+
+
+plt.figure(figsize=(15,10))
+
+ahuy_decomp_axm= seasonal_decompose(cebollaj_ts[["Cebolla junca_axm_merc"]],model="multiplicative")
+
+ahuy_decomp_axm.plot()
+plt.show()
+plt.close();
+
+
+```
+La descomposición permite evidenciar que la serie en términos de tendencia tiene un comportamiento creciente aunque con comportamiento variable, por ejemplo entre 2019 y 2020 el comportamiento tendencial entra en un periodo de estabilidad hasta entrar en un periodo de descenso hacia finales de 2020 y que persiste en 2021y 2022, en lo que respecta a estacionalidad se puede confirmar lo mencionado al inicio de la visualización de la serie y es que hay dos momentos en el comportamiento de los precios a lo largo del tiempo tales momentos corresponden a ascensos puntuales del precios que se presentan a inicios de año y un poco despues de la mitad del año.  Los elementos revisados al momento darian pie para decir que estamos ante una serie no estacionaria, con autocorrelación y una una estacionalidad existente pero irregular. 
+
+En aras de seguir validando las propiedades de la serie se aplican los test adf y kpss para validar si la serie es o no estacionaria:
 
 
 ```{python}
@@ -284,6 +314,62 @@ formated_kpss(cebollaj_ts["Cebolla junca_axm_merc"])
 formated_adf(cebollaj_ts["Cebolla junca_axm_merc"])
 
 ```
+Al revisar los resultados de los test estadísticos se puede apreciar que ambos conducen a conclusiones distintas, por lo tanto la revisión no es concluyente, sin embargo se le da prelación al hecho de que la series no es estacionaria, por lo tanto se procede a probar la primera diferencia de la serie con el fin de validar si al aplicar esta transformación el resultado de ambas pruebas resulta concluyente. 
+
+Veamos gráficamente la primera diferencia de la serie:
+
+```{python}
+
+
+plt.figure(figsize=(15,10))
+plt.plot(cebollaj_ts["diff1"],linewidth=1.2,color="blue",label="Serie ppal")
+plt.title("Precios mayoristas promedio semanales de la cebolla junca en la ciudad de Armenia (diff1)",fontsize=10)
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+
+
+```
+Al revisar la primera diferencia de la serie es posible apreciar que el componente tendencial ha desaparecido y ahora se tiene una serie de tiempo que se asemeja más a una serie de tiempo estacionaria, se aprecia claramente que no hay un componente tendencial y además tambien es posible ver que en cierta forma se suaviza la dinámica estaciona, no obstante se puede apreciar claramente que hay algunos cambios considerablemente bruscos a mediados de 2016, finales de 2017, y a inicios de 2021. 
+
+Ahora se procede a revisar el lag plot de la primera diferencia:
+
+```{python}
+
+pd.plotting.lag_plot(cebollaj_ts[["diff1"]].dropna(),lag=3)
+plt.show()
+plt.close()
+
+
+```
+
+Se puede apreciar que ahora el lag plot no describe una trayectoria lineal sino que demarca un patrón mucho más aleatorio que distribuye los puntos en diferentes secciones del plano, en este orden de ideas la forma de la gráfica indica que se ha superado al autocorrelación por medio de la primera dferencia.
+
+Ahora veamos la función a autocorrelación:
+
+```{python}
+
+plt.figure(figsize=(15,10))
+tsaplots.plot_acf(cebollaj_ts[["diff1"]].dropna(),title="Función de autocorrelación para serie diferenciada de la cebolla junca")
+plt.show()
+plt.close();
+
+```
+Al observar la gráfica acf se puede apreciar que el problema de autocorrelación ha logrado moderarse, solo se presentan algunas observaciones que superan los intervalos de confianza, no obstante estas observaciones ya no siguen un patron lineal decreciente como si ocurria con anterioridad. 
+
+Ahora veamos el resultado de los test adf y kpss sobre la primera diferencia:
+
+```{python}
+
+formated_kpss(cebollaj_ts["diff1"].dropna())
+formated_adf(cebollaj_ts["diff1"].dropna())
+
+```
+Se puede apreciar que una vez aplicada la primera diferencia sobre la serie es posible concluir que esta primera diferencia resulta ser estacionaria y se superan los resultados disimiles en los test estadisticos. Con esta revisión es posible concluir que la serie de tiempo de la cebolla junca para la ciudad de Armenia es una serie de tiempo con nivel de Integración 1 es decir I(1), por lo tanto para que esta serie llegue a ser estacionaria requiere que sea calculada su primera diferencia. 
+
 
 
 ### Habichuela 
@@ -375,7 +461,7 @@ plt.close()
 
 ```{python}
 
-pd.plotting.lag_plot(tomate_ts,lag=3)
+pd.plotting.lag_plot(tomate_ts["Tomate chonto_axm_merc"],lag=3)
 plt.show()
 plt.close()
 
@@ -433,7 +519,7 @@ plt.close()
 
 ```{python}
 
-pd.plotting.lag_plot(ahuyama_ts_per,lag=3)
+pd.plotting.lag_plot(ahuyama_ts_per["Ahuyama_per_merca"],lag=3)
 plt.show()
 plt.close()
 
@@ -473,7 +559,7 @@ plt.close()
 
 
 ```{python}
-pd.plotting.lag_plot(cebollaj_ts_per,lag=3)
+pd.plotting.lag_plot(cebollaj_ts_per["Cebolla junca_per_merca"],lag=3)
 plt.show()
 plt.close()
 ```
@@ -513,7 +599,7 @@ plt.close()
 
 ```{python}
 
-pd.plotting.lag_plot(habichuela_ts_per,lag=3)
+pd.plotting.lag_plot(habichuela_ts_per["Habichuela_per_merca"],lag=3)
 plt.show()
 plt.close()
 
@@ -557,7 +643,7 @@ plt.close()
 
 ```{python}
 
-pd.plotting.lag_plot(tomate_ts_per,lag=3)
+pd.plotting.lag_plot(tomate_ts_per["Tomate chonto_per_merca"],lag=3)
 plt.show()
 plt.close()
 
