@@ -425,6 +425,58 @@ formated_adf(habichuela_ts["Habichuela_axm_merc"])
 
 ```
 
+
+```{python}
+
+plt.figure(figsize=(15,10))
+plt.plot(habichuela_ts["diff1"],linewidth=1.2,color="blue",label="Serie ppal")
+plt.title("Precios mayoristas promedio semanales de la habichuela en la ciudad de Armenia (diff1)",fontsize=10)
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+```
+
+
+
+```{python}
+
+pd.plotting.lag_plot(habichuela_ts[["diff1"]].dropna(),lag=3)
+plt.show()
+plt.close()
+
+```
+
+
+
+
+
+```{python}
+
+plt.figure(figsize=(15,10))
+tsaplots.plot_acf(habichuela_ts[["diff1"]].dropna(),title="Función de autocorrelación para serie diferenciada de la cebolla junca")
+plt.show()
+plt.close();
+
+```
+
+
+
+
+```{python}
+
+
+formated_kpss(habichuela_ts["diff1"].dropna())
+formated_adf(habichuela_ts["diff1"].dropna())
+
+```
+
+
+
+
+
 ### Tomate Chonto
 
 ```{python}
@@ -457,8 +509,6 @@ plt.close()
 
 
 
-
-
 ```{python}
 
 pd.plotting.lag_plot(tomate_ts["Tomate chonto_axm_merc"],lag=3)
@@ -469,8 +519,6 @@ plt.close()
 
 
 
-
-
 ```{python}
 
 formated_kpss(tomate_ts["Tomate chonto_axm_merc"])
@@ -478,6 +526,50 @@ formated_adf(tomate_ts["Tomate chonto_axm_merc"])
 
 
 ```
+
+```{python}
+
+
+plt.plot(tomate_ts.index,tomate_ts[["diff1"]],linewidth=1.2,marker="o",color="blue",label="Serie ppal")
+plt.ylabel("Precio (pesos colombianos)", fontsize=12)
+plt.xlabel("Dia de referencia - Inicio semana",fontsize= 12)
+plt.xticks(rotation='vertical')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.5,linewidth=1)
+plt.show()
+plt.close()
+
+
+
+
+```
+
+```{python}
+
+pd.plotting.lag_plot(tomate_ts[["diff1"]].dropna(),lag=3)
+plt.show()
+plt.close()
+
+```
+
+```{python}
+
+plt.figure(figsize=(15,10))
+tsaplots.plot_acf(tomate_ts[["diff1"]].dropna(),title="Función de autocorrelación para serie diferenciada del tomate")
+plt.show()
+plt.close();
+
+
+```
+
+
+```{python}
+
+formated_kpss(tomate_ts["diff1"].dropna())
+formated_adf(tomate_ts["diff1"].dropna())
+
+```
+
 
 
 
