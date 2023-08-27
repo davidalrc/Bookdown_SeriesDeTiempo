@@ -628,6 +628,21 @@ plt.close();
 
 ```{python}
 
+plt.figure(figsize=(15,10))
+
+ahuy_decomp_axm= seasonal_decompose(ahuyama_ts_per["Ahuyama_per_merca"],model="multiplicative")
+
+ahuy_decomp_axm.plot()
+plt.show()
+plt.close();
+
+
+```
+
+
+
+```{python}
+
 formated_kpss(ahuyama_ts_per["Ahuyama_per_merca"])
 formated_adf(ahuyama_ts_per["Ahuyama_per_merca"])
 
@@ -725,6 +740,23 @@ plt.show()
 plt.close();
 
 ```
+
+```{python}
+
+plt.figure(figsize=(15,10))
+
+ahuy_decomp_axm= seasonal_decompose(cebollaj_ts_per["Cebolla junca_per_merca"],model="multiplicative")
+
+ahuy_decomp_axm.plot()
+plt.show()
+plt.close();
+
+
+
+```
+
+
+
 
 ```{python}
 
@@ -826,6 +858,22 @@ plt.close();
 
 
 ```
+
+```{python}
+
+
+plt.figure(figsize=(15,10))
+
+ahuy_decomp_axm= seasonal_decompose(habichuela_ts_per["Habichuela_per_merca"],model="multiplicative")
+
+ahuy_decomp_axm.plot()
+plt.show()
+plt.close();
+
+```
+
+
+
 
 ```{python}
 
@@ -971,6 +1019,23 @@ plt.close();
 
 
 ```
+```{python}
+
+plt.figure(figsize=(15,10))
+
+ahuy_decomp_axm= seasonal_decompose(tomate_ts_per["Tomate chonto_per_merca"],model="multiplicative")
+
+ahuy_decomp_axm.plot()
+plt.show()
+plt.close();
+
+```
+
+
+
+
+
+
 
 ```{python}
 
