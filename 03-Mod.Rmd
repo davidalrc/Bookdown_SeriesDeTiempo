@@ -1,2 +1,5 @@
 # Modelación para el pronóstico de las series de tiempo 
 
+En esta sección se explorarán diferentes modelos para plantear el pronóstico de las series de tiempo de los alimentos escogidos, cada uno de los modelos implementados tendrá un subtitulo correspondiente y al final del capitulo se resumiran los resultados de los modelos implementados de manera consolidada con el fin de determinar cual resulta ser el modelo que presenta un mejor nivel de ajuste. 
+
+## Modelo de suavizamiento Holt Winters 
