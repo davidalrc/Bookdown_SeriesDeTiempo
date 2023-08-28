@@ -438,7 +438,7 @@ plt.figure(figsize=(15,10))
 
 habichue_decomp_axm= seasonal_decompose(habichuela_ts["Habichuela_axm_merc"],model="multiplicative")
 
-ceboll_decomp_axm.plot()
+habichue_decomp_axm.plot()
 plt.show()
 plt.close();
 
@@ -508,6 +508,8 @@ Al revisar los p-valores de las pruebas adf y kpss se puede apreciar que despues
 
 ### Tomate Chonto
 
+Para el caso del tomate chonto se continua con el proceso de análisis calculando medias moviles, primera y segunda diferencia con el fin de ser visualizadas. 
+
 ```{python}
 
 tomate_ts= series_armenia[["Tomate chonto_axm_merc"]]
@@ -518,7 +520,7 @@ tomate_ts["diff1"]= tomate_ts["Tomate chonto_axm_merc"].diff()
 tomate_ts["diff2"]= tomate_ts["diff1"].diff()
 
 ```
-
+Inicialmente se visualiza la serie de tiempo del tomate chonto con sus respectivas medias moviles de 5, 10y 20 periodos:
 
 ```{python}
 
@@ -535,8 +537,9 @@ plt.show()
 plt.close()
 
 ```
+Al revisar la serie de tiempo se puede apreciar una dinámica precio que hasta el añ0 2021 oscilo entre los 800 (como minimo) y 3000 pesos como máximo, esta dinámica del precio mayorista cambia de manera abrupta a inicios de 2022 en donde supera la barrera de los 3000 y cerca a la mitad del año alcanza precios por encima de 5000 pesos. En términos de estacionalidad se puede apreciar que el precio tiene dos momentos de picos anuales que están precedidos por disminuciones de precio, los picos se generan mayormente en el primer semestre el año, en las ultimas semanas del año el precio sufren una estabilización a la baja. Si se observa la transición de los precios minimos es posible observar que desde 2029 en adelante los precios nunca volvieron a estar por debajo de los 1000 pesos y hacia finales de 2021 alcanza un minimo de 1200 pesos el cual se mantiene durante 2022 en donde inclusive tal minimo aumenta a 1500. Partiendo de las observaciones anteriores es claro que hay una dinámica de tendencia creciente en los precios teniendo en cuenta el histórico disponible. 
 
-
+Ahora veamos un lag plot de esta serie de tiempo:
 
 ```{python}
 
@@ -545,26 +548,33 @@ plt.show()
 plt.close()
 
 ```
+En términos de patrones en el lag plot no se conforma totalmente un comportamiento lineal claro, se puede apreciar que los precios en su mayoria están concentrados sin embargo si hay evidencia suficiente de outliers que se aprecian muy claramente en el gráfico en la parte derecha del plano.  Con base a lo mencionado dado que la relación lineal no es fuerte podria encontrarse en esta serie un caso de autocorrelación serial moderada.
 
+```{python}
 
+plt.figure(figsize=(15,10))
+tsaplots.plot_acf(tomate_ts["Tomate chonto_axm_merc"],title="Función de autocorrelación para serie diferenciada del tomate")
+plt.show()
+plt.close();
+
+```
+Al apreciar la gráfica de la función de autocorrelación se aprecia un descenso lineal de varias observaciones que están fuera del intervalo de confianza lo cual representa un problema claro de autocorrelación serial, para este caso no se evidencia o no hay indicios de un componente estacional claro, pero el descenso lineal si pertmite demarcar una serie no estacionaria. 
 
 ```{python}
 
 plt.figure(figsize=(15,10))
 
-habichue_decomp_axm= seasonal_decompose(tomate_ts["Tomate chonto_axm_merc"],model="multiplicative")
+tomate_decomp_axm= seasonal_decompose(tomate_ts["Tomate chonto_axm_merc"],model="multiplicative")
 
-ceboll_decomp_axm.plot()
+tomate_decomp_axm.plot()
 plt.show()
 plt.close();
 
 
 ```
+La descomposiición de la serie de tiempo permite evidenciar lo mencionado al principio de análisis de la serie, se puede confirmar claramente la tendencia creciente de los precios, y en términos de estacionalidad puede apreciarse la dinámica de los dos picos durante el año, al observar el patrón y su transición es posible apreciar que el periodo termina siendo practicamente anual.
 
-
-
-
-
+Ahora veamos por medio de los test estadisticos si efectivamente esta serie es estacionaria:
 
 
 ```{python}
@@ -574,6 +584,10 @@ formated_adf(tomate_ts["Tomate chonto_axm_merc"])
 
 
 ```
+Al revisar la interpretación de los p-valores de los test es posible identificar que los resultados no son consistentes, en test adf reporta que la serie es estacionaria, y el test kpss reporta que la serie no es estacionaria, dadas estas condiciones es conveniente revisar el comportamiento de la primera diferencia y ver como se comporta la misma al aplicar las pruebas. 
+
+Veamos el comportamiento gráfico de la primera diferencia:
+
 
 ```{python}
 
@@ -591,6 +605,10 @@ plt.close()
 
 
 ```
+Es posible apreciar que la serie diferenciada muestra un comportamiento más estable y menos tendencial, sin embargo es claramente visible el alza vertiginosa de precio al inicio del año 2022 lo cual representa una distorsión considerable de la varianza pero que resulta corta y no se sostiene en el tiempo, en este orden de ideas se aprecia que la primera diferencia corrige la tendencia pero igualmente queda el impacto de los outliers asociados al comportamiento del precio en este caso del tomate chonto. 
+
+Ahora procedamos a revisar el lagplot de la serie: 
+
 
 ```{python}
 
@@ -599,6 +617,8 @@ plt.show()
 plt.close()
 
 ```
+En este caso ya no se describe una tendencia lineal sino que se muestra una distribución mucho más variada de los puntos, sin embargo las observaciones aisladas persisten.  se puede observar que la autocorrelación logra ser superada, lo cual puede validar con la gráfica de la función de autocorrelación: 
+
 
 ```{python}
 
@@ -609,7 +629,9 @@ plt.close();
 
 
 ```
+Se puede apreciar que luego de aplicada la primera diferencia el problema pronunciado de autocorrelación serial evidenciado en la serie sin diferenciar resulta ser corregido dando lugar a que la mayoria de observaciones se encuentren dentro de los intervalos de confianza.  
 
+Ahora validemos si la serie diferenciada es estacionaria aplicando los test adf y kpss: 
 
 ```{python}
 
@@ -617,8 +639,7 @@ formated_kpss(tomate_ts["diff1"].dropna())
 formated_adf(tomate_ts["diff1"].dropna())
 
 ```
-
-
+Al revisar los p-valores de los test se puede concluir que la primera diferencia de la serie del tomate chonto resulta ser estacionaria, asi las cosas es posible definir esta serie como I(1) es decir tiene un nivel de integración que implica estacionariedad si y solo si la serie es diferenciada una vez. 
 
 
 ## Análisis de series de tiempo de precio promedio mayorista semanal para la ciudad de Pereira
@@ -678,9 +699,9 @@ plt.close();
 
 plt.figure(figsize=(15,10))
 
-ahuy_decomp_axm= seasonal_decompose(ahuyama_ts_per["Ahuyama_per_merca"],model="multiplicative")
+ahuy_decomp_per= seasonal_decompose(ahuyama_ts_per["Ahuyama_per_merca"],model="multiplicative")
 
-ahuy_decomp_axm.plot()
+ahuy_decomp_per.plot()
 plt.show()
 plt.close();
 
