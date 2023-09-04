@@ -47,4 +47,4 @@ estimacion1= holt_model(series_armenia,0.2,"Ahuyama_axm_merc")[0]
 
 
 ```
-
+## Modelo ARIMA
