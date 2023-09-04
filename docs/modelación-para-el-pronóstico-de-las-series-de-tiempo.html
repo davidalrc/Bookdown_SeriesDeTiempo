@@ -23,7 +23,7 @@
 <meta name="author" content="David Alejandro Rivera Correa" />
 
 
-<meta name="date" content="2023-08-27" />
+<meta name="date" content="2023-09-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -195,6 +195,49 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>En esta sección se explorarán diferentes modelos para plantear el pronóstico de las series de tiempo de los alimentos escogidos, cada uno de los modelos implementados tendrá un subtitulo correspondiente y al final del capitulo se resumiran los resultados de los modelos implementados de manera consolidada con el fin de determinar cual resulta ser el modelo que presenta un mejor nivel de ajuste.</p>
 <div id="modelo-de-suavizamiento-holt-winters" class="section level2 hasAnchor" number="4.1">
 <h2><span class="header-section-number">4.1</span> Modelo de suavizamiento Holt Winters<a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#modelo-de-suavizamiento-holt-winters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb342"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb342-1"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-1" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb342-2"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-2" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb342-3"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-3" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.holtwinters <span class="im">import</span> SimpleExpSmoothing, Holt, ExponentialSmoothing</span>
+<span id="cb342-4"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-4" tabindex="-1"></a></span>
+<span id="cb342-5"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-5" tabindex="-1"></a></span>
+<span id="cb342-6"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-6" tabindex="-1"></a><span class="kw">def</span> holt_model(df,test_prop,alimento):</span>
+<span id="cb342-7"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-7" tabindex="-1"></a>  </span>
+<span id="cb342-8"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-8" tabindex="-1"></a>  train<span class="op">=</span> df.iloc[:<span class="op">-</span><span class="bu">int</span>(<span class="bu">len</span>(df)<span class="op">*</span>test_prop)]</span>
+<span id="cb342-9"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-9" tabindex="-1"></a>  test<span class="op">=</span> df.iloc[<span class="op">-</span><span class="bu">int</span>(<span class="bu">len</span>(df)<span class="op">*</span>test_prop):]</span>
+<span id="cb342-10"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-10" tabindex="-1"></a>  </span>
+<span id="cb342-11"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-11" tabindex="-1"></a>  <span class="bu">print</span>(<span class="ss">f&quot;El cojunto de entrenamiento cuenta con </span><span class="sc">{</span>train<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> registros&quot;</span>)</span>
+<span id="cb342-12"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-12" tabindex="-1"></a>  <span class="bu">print</span>(<span class="ss">f&quot;El cojunto de test cuenta con </span><span class="sc">{</span>train<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> registros&quot;</span>)</span>
+<span id="cb342-13"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-13" tabindex="-1"></a>  </span>
+<span id="cb342-14"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-14" tabindex="-1"></a>  <span class="co">### se estima inicialmente un suavizamiento exponencial simple</span></span>
+<span id="cb342-15"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-15" tabindex="-1"></a>  </span>
+<span id="cb342-16"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-16" tabindex="-1"></a>  simple_Es<span class="op">=</span> SimpleExpSmoothing(train[alimento]).fit(optimized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb342-17"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-17" tabindex="-1"></a>  forescast_simp<span class="op">=</span> simple_Es.forecast(<span class="bu">len</span>(test))</span>
+<span id="cb342-18"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-18" tabindex="-1"></a>  </span>
+<span id="cb342-19"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-19" tabindex="-1"></a>  <span class="co">## Se estima como segundo modelo un suavizamiento de Holt</span></span>
+<span id="cb342-20"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-20" tabindex="-1"></a>  </span>
+<span id="cb342-21"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-21" tabindex="-1"></a>  holt_ES<span class="op">=</span> Holt(train[alimento],damped_trend<span class="op">=</span><span class="va">True</span>).fit(optimized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb342-22"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-22" tabindex="-1"></a>  forecast_holt<span class="op">=</span> holt_ES.forecast(<span class="bu">len</span>(test))</span>
+<span id="cb342-23"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-23" tabindex="-1"></a>  </span>
+<span id="cb342-24"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-24" tabindex="-1"></a>  <span class="co">## Se estima como tercer modelo un Holt Winters</span></span>
+<span id="cb342-25"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-25" tabindex="-1"></a>  </span>
+<span id="cb342-26"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-26" tabindex="-1"></a>  hwes <span class="op">=</span> ExponentialSmoothing(train[alimento],trend<span class="op">=</span><span class="st">&quot;mul&quot;</span>,seasonal<span class="op">=</span><span class="st">&quot;mul&quot;</span>).fit(optimized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb342-27"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-27" tabindex="-1"></a>  forecast_hwes<span class="op">=</span> hwes.forecast(<span class="bu">len</span>(test))</span>
+<span id="cb342-28"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-28" tabindex="-1"></a>  </span>
+<span id="cb342-29"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-29" tabindex="-1"></a>  <span class="cf">return</span> (simple_Es,holt_ES,hwes)</span>
+<span id="cb342-30"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb342-30" tabindex="-1"></a>  </span></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb343-1"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb343-1" tabindex="-1"></a></span>
+<span id="cb343-2"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#cb343-2" tabindex="-1"></a>estimacion1<span class="op">=</span> holt_model(series_armenia,<span class="fl">0.2</span>,<span class="st">&quot;Ahuyama_axm_merc&quot;</span>)[<span class="dv">0</span>]</span></code></pre></div>
+<pre><code>## El cojunto de entrenamiento cuenta con 293 registros
+## El cojunto de test cuenta con 293 registros
+## 
+## C:\Users\DAVID\AppData\Roaming\Python\Python39\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency W-SAT will be used.
+##   self._init_dates(dates, freq)
+## C:\Users\DAVID\AppData\Roaming\Python\Python39\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency W-SAT will be used.
+##   self._init_dates(dates, freq)
+## C:\Users\DAVID\AppData\Roaming\Python\Python39\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency W-SAT will be used.
+##   self._init_dates(dates, freq)
+## C:\Users\DAVID\AppData\Roaming\Python\Python39\site-packages\statsmodels\tsa\holtwinters\model.py:83: RuntimeWarning: overflow encountered in matmul
+##   return err.T @ err</code></pre>
 
 </div>
 </div>

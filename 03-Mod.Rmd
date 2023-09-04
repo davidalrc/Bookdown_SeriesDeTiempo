@@ -3,3 +3,48 @@
 En esta sección se explorarán diferentes modelos para plantear el pronóstico de las series de tiempo de los alimentos escogidos, cada uno de los modelos implementados tendrá un subtitulo correspondiente y al final del capitulo se resumiran los resultados de los modelos implementados de manera consolidada con el fin de determinar cual resulta ser el modelo que presenta un mejor nivel de ajuste. 
 
 ## Modelo de suavizamiento Holt Winters 
+
+```{python}
+import pandas as pd
+from matplotlib import pyplot as plt
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt, ExponentialSmoothing
+
+
+def holt_model(df,test_prop,alimento):
+  
+  train= df.iloc[:-int(len(df)*test_prop)]
+  test= df.iloc[-int(len(df)*test_prop):]
+  
+  print(f"El cojunto de entrenamiento cuenta con {train.shape[0]} registros")
+  print(f"El cojunto de test cuenta con {train.shape[0]} registros")
+  
+  ### se estima inicialmente un suavizamiento exponencial simple
+  
+  simple_Es= SimpleExpSmoothing(train[alimento]).fit(optimized=True)
+  forescast_simp= simple_Es.forecast(len(test))
+  
+  ## Se estima como segundo modelo un suavizamiento de Holt
+  
+  holt_ES= Holt(train[alimento],damped_trend=True).fit(optimized=True)
+  forecast_holt= holt_ES.forecast(len(test))
+  
+  ## Se estima como tercer modelo un Holt Winters
+  
+  hwes = ExponentialSmoothing(train[alimento],trend="mul",seasonal="mul").fit(optimized=True)
+  forecast_hwes= hwes.forecast(len(test))
+  
+  return (simple_Es,holt_ES,hwes)
+  
+
+
+```
+
+
+```{python}
+
+estimacion1= holt_model(series_armenia,0.2,"Ahuyama_axm_merc")[0]
+
+
+
+```
+
