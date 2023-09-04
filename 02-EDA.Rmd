@@ -1070,6 +1070,8 @@ Al analizar los p-valores de los test se logra apreciar que al aplicar una segun
 
 ### Tomate Chonto
 
+Finalmente se aplica la misma metodologia a la serie del tomate chonto para la ciudad de Pereira calculando las respectivas medias moviles y la primera y segunda diferencia: 
+
 ```{python}
 
 tomate_ts_per= series_pereira[["Tomate chonto_per_merca"]]
@@ -1081,8 +1083,7 @@ tomate_ts_per["diff2"]= tomate_ts_per["diff1"].diff()
 
 
 ```
-
-
+A partir de lo anteriormente calculado se procede a visualizar la serie y las medias moviles: 
 
 ```{python}
 
@@ -1100,7 +1101,9 @@ plt.close()
 
 
 ```
+Al observar la serie de tiempo se puede identificar hasta finales de 2021 una oscilación de precios entre los 900 pesos y los 3300 pesos como valores máximo, a inicios de 2022 es posible evidenciar una alza notoria en donde primero se alcanza un precio de 3500 y posteriormente hacia mediados del año en mención se llega a un valor por encima de los 5000 pesos y luego se desciende a valores cercanos a los 3500 llegando hacia Julio y Agosto a niveles de precio cercanos a los 1800. En términos de estacionalidad se pueden identificar como minimo dos picos anuales, sin embargo esta dinámica no es fija o persistente por el contrario se torna variable en algunos periodos en donde pueden llegar a presentarse más de dos picos de precio en el año, asi mismo la amplitud de los incrementos o movimientos del precio no convergen siempre a un punto común, por ejemplo durante 2020 los picos solo llegaron como máximo a un precio de 2500 mientras en años anteriorees habian superado el umbral de los 3000.  En concordancia a lo mencionado la visualización de la serie permite demarcar que hay presencia de tendencia creciente pero no constante o con velocidad uniforme, la mayor aceleración de la serie se dentro del tramo de 2022, seguidamente la estacionalidad no resulta ser regular. 
 
+Con el fin de ahondar más en las caracteristicas de la serie, se procede a revisar su lag plot: 
 
 ```{python}
 
@@ -1110,7 +1113,7 @@ plt.close()
 
 
 ```
-
+A partir del lag plot es posible apreciar que la serie tiene una tendencia lineal dispersa y que además dentro de la misma resaltan outliers que se encuentran muy alejados de la nube de puntos principal, es preciso resalar que la tendencia lineal de la nube no es fuerte y por lo tanto representa una dinámica de autocorrelación serial moderada. Con el fin de conocer un poco más la naturaleza de la autocorrelación se procede a gráficar la función de autocorrelación de la serie: 
 
 ```{python}
 
@@ -1121,23 +1124,25 @@ plt.close();
 
 
 ```
+Se puede apreciar que 7 observaciones están por encima de los intervalor de confianza, y que estos elementos tienen una dinámica decreciente que evidencia cierta linealidad lo cual implica no solo presencia de autocorrelación lineal sino que tambien indica la presencia de tendencia, sin embargo la autocorrelación no es persistente en toda la serie y se evidencia que a partir de la observación 8 tiene una clara convergencia a 0. 
+
+Ahora veamos la descomposición de esta serie de tiempo:
+
 ```{python}
 
 plt.figure(figsize=(15,10))
 
-ahuy_decomp_axm= seasonal_decompose(tomate_ts_per["Tomate chonto_per_merca"],model="multiplicative")
+tomate_decomp_per= seasonal_decompose(tomate_ts_per["Tomate chonto_per_merca"],model="multiplicative")
 
-ahuy_decomp_axm.plot()
+tomate_decomp_per.plot()
 plt.show()
 plt.close();
 
 ```
 
+La revisión de la serie de tiempo permite confirmar algunos elementos mencionados con anterioridad, el primero son las observaciones relacionadas a la tendencia, la descomposición muestra con claridad que la tendencia creciente se acentua especialmente a finales de 2021,  y a su vez se aprecia que el componente estacional efectivamente es irregular y presenta varios picos a través del tiempo. 
 
-
-
-
-
+Los elementos revisados hasta ahora dan pie para demarcar que la serie no es estacionaria, no obstante con el fin de confirmar esto se procede a aplicar las pruebas adf y kpss: 
 
 ```{python}
 
@@ -1145,6 +1150,8 @@ formated_kpss(tomate_ts_per["Tomate chonto_per_merca"])
 formated_adf(tomate_ts_per["Tomate chonto_per_merca"])
 
 ```
+A partir de la revisión de los p-valores de las pruebas estadisticas es posible evidenciar que no hay convergencia respecto a las conclusiones de las pruebas, dada esta situación se procede a calcular la primera diferencia de la serie con el fin de validar si al aplicar la misma se logra que la serie sea estacionaria: 
+
 
 ```{python}
 
@@ -1158,6 +1165,7 @@ plt.show()
 plt.close()
 
 ```
+La visualización de la primera diferencia de la serie permite apreciar claramente los cambios de precio que se asocian a los picos y tambien a los descenso del precio del producto, particularmente se puede apreciar un comportamiento mucho más aleatoria y tambien desmarcado de una dinámica tendencial perceptible. En aras de validar esto se procede a visualizar el lag plot de la serie de tiempo: 
 
 ```{python}
 
@@ -1166,6 +1174,7 @@ plt.show()
 plt.close()
 
 ```
+Se puede apreciar que la nube de puntos toma una forma dispersa que se aleja del patrón lineal de la serie sin diferenciar, y a su vez se aprecia con claridad una cantidad considerable de puntos que se alejan de la nube de puntos principal lo cual demarca la presencia de varios valores extremos dentro de la serie diferenciada, los cuales se asocian a los puntos de incremento y descenso de las series de tiempo. 
 
 ```{python}
 
@@ -1177,7 +1186,9 @@ plt.close();
 
 
 ```
+Al apreciar la gráfica de la función de autocorrelación es posible evidenciar que la mayoria de observaciones ahora convergen a 0, sin embargo aun hay una leve presencia de autocorrelación serial ligada a 3 observaciones que están por encima de los intervalos de confianza establecidos. 
 
+Finalmente se aplican las pruebas estadisticas respectivas ante las cuales se evidencia lo siguiente: 
 
 ```{python}
 
@@ -1186,6 +1197,5 @@ formated_adf(tomate_ts_per["diff1"].dropna())
 
 
 ```
-
-
+El análisis de los p-valores de los test permite identificar ambas pruebas coinciden en demarcar la primera diferencia de la serie como estacionaria, esto lleva a concluir que la serie de tiempo del tomate chonto es I(1) es decir, esta serie llega a ser estacionaria una vez se le aplica la primera diferencia.  
 
