@@ -2,39 +2,129 @@
 
 En esta sección se explorarán diferentes modelos para plantear el pronóstico de las series de tiempo de los alimentos escogidos, cada uno de los modelos implementados tendrá un subtitulo correspondiente y al final del capitulo se resumiran los resultados de los modelos implementados de manera consolidada con el fin de determinar cual resulta ser el modelo que presenta un mejor nivel de ajuste. 
 
-## Modelo de suavizamiento Holt Winters 
+## Definición de funciones base para la fase de modelación 
+
+Esta sección tiene la finalidad de definir funciones con la finalidad de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para cada modelo a aplicar. 
+
+### Función para separación de la serie en conjunto de test y entrenamiento
 
 ```{python}
+
 import pandas as pd
 from matplotlib import pyplot as plt
+import plotly.graph_objects as go
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt, ExponentialSmoothing
 
+def train_test_ts(serie,prop_test):
+    train= serie.iloc[:-int(len(serie)*prop_test)]
+    test= serie.iloc[-int(len(serie)*prop_test):]
+    return train, test
+  
+  
+```
 
-def holt_model(df,test_prop,alimento):
+### Funciones para aplicación de modelos de suavizamiento exponencial, generación de métricas y gráfica comparativa con plotly
+
+```{python}
+
+
+def plot_fcast(series,
+               alimento,
+               prop_test,
+               fcast1:list[float],
+               fcast2:list[float],
+               fcast3:list[float],
+               title:str
+               ):
+      serie_train,serie_test= train_test_ts(series[alimento],prop_test)
+      
+      fig=go.Figure()
+      fig.add_trace(go.Scatter(x=serie_train.index,y=serie_train,name="Train"))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=serie_test,name="Test"))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=fcast1,name="Simple"))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=fcast2,name="Holt's Linear"))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=fcast3,name="Holt Winter's"))
+      fig.update_layout(template="simple_white", font=dict(size=12), title_text=title,
+                      width=700, title_x=0.5, height=400, xaxis_title='Fecha',
+                      yaxis_title='Precio (Pesos Colombianos)')
+      
+      return fig.show()
+
+
+
+def expon_smooth_mod(serie,alimento,prop_test):
   
-  train= df.iloc[:-int(len(df)*test_prop)]
-  test= df.iloc[-int(len(df)*test_prop):]
+    serie_train,serie_test= train_test_ts(serie[alimento],prop_test)
   
-  print(f"El cojunto de entrenamiento cuenta con {train.shape[0]} registros")
-  print(f"El cojunto de test cuenta con {train.shape[0]} registros")
+    simple_exp= SimpleExpSmoothing(serie_train).fit(optimized=True)
+    forecast_simple= simple_exp.forecast(len(serie_test))
+    MAE1= np.mean(np.abs(serie_test-forecast_simple))
+    MSE1= np.mean(np.square(serie_test-forecast_simple))
+    RMSE1= np.sqrt(np.mean(np.square(serie_test-forecast_simple)))
+    MAPE1= np.mean(np.abs((serie_test-forecast_simple)/serie_test)*100)
   
-  ### se estima inicialmente un suavizamiento exponencial simple
+    double_exp= Holt(serie_train,damped_trend=True).fit(optimized=True)
+    forecast_holt= double_exp.forecast(len(serie_test))
+    MAE2= np.mean(np.abs(serie_test-forecast_holt))
+    MSE2= np.mean(np.square(serie_test-forecast_holt))
+    RMSE2= np.sqrt(np.mean(np.square(serie_test-forecast_holt)))
+    MAPE2= np.mean(np.abs((serie_test-forecast_holt)/serie_test)*100)
   
-  simple_Es= SimpleExpSmoothing(train[alimento]).fit(optimized=True)
-  forescast_simp= simple_Es.forecast(len(test))
+    hw_exp= ExponentialSmoothing(serie_train,trend="add",seasonal="add",seasonal_periods=52,damped_trend=True).fit(optimized=True)
+    forecast_hw= hw_exp.forecast(len(serie_test))
+    MAE3= np.mean(np.abs(serie_test-forecast_hw))
+    MSE3= np.mean(np.square(serie_test-forecast_hw))
+    RMSE3= np.sqrt(np.mean(np.square(serie_test-forecast_hw)))
+    MAPE3= np.mean(np.abs((serie_test-forecast_hw)/serie_test)*100)
   
-  ## Se estima como segundo modelo un suavizamiento de Holt
+    results_dict= {"Modelo":["Suavizamiento simple","Suavizamiento de Holt","Holt-Winters"],
+                 "MAE":[MAE1,MAE2,MAE3],
+                 "MSE":[MSE1,MSE2,MSE3],
+                 "RMSE":[RMSE1,RMSE2,RMSE3],
+                 "MAPE":[MAPE1,MAPE2,MAPE3]} 
+                 
+    results_df= pd.DataFrame.from_dict(results_dict,orient="columns")
   
-  holt_ES= Holt(train[alimento],damped_trend=True).fit(optimized=True)
-  forecast_holt= holt_ES.forecast(len(test))
-  
-  ## Se estima como tercer modelo un Holt Winters
-  
-  hwes = ExponentialSmoothing(train[alimento],trend="mul",seasonal="mul").fit(optimized=True)
-  forecast_hwes= hwes.forecast(len(test))
-  
-  return (simple_Es,holt_ES,hwes)
-  
+    return results_df,forecast_simple,forecast_holt,forecast_hw
+
+
+
+
+
+```
+
+
+### Funciones para aplicación de modelo ARIMA, generación de métricas y gráfica comparativa con plotly
+
+
+
+## Modelos de suavizamiento Exponencial (Simple,Doble y Triple) 
+
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
+
+```{python}
+
+fr_ahuy_axm= expon_smooth_mod(series_armenia,"Ahuyama_axm_merc",0.2)
+
+plot_fcast(series_armenia,"Ahuyama_axm_merc",0.20,fr_ahuy_axm[1],fr_ahuy_axm[2],fr_ahuy_axm[3],"Pronóstico precio Ahuyama axm (métodos de suavizamiento)")
+
+```
+
+Al comparar el desempeño de los modelos se tiene lo siguiente
+
+```{python}
+
+fr_ahuy_axm[0]
+
+```
+
+### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Armenia)
+
+```{python}
+
+fr_cebollj_axm= expon_smooth_mod(series_armenia,"Cebolla junca_axm_merc",0.2)
+
+plot_fcast(series_armenia,"Cebolla junca_axm_merc",0.20,fr_cebollj_axm[1],fr_cebollj_axm[2],fr_cebollj_axm[3],"Pronóstico precio cebolla junca axm (métodos de suavizamiento)")
 
 
 ```
@@ -42,9 +132,47 @@ def holt_model(df,test_prop,alimento):
 
 ```{python}
 
-estimacion1= holt_model(series_armenia,0.2,"Ahuyama_axm_merc")[0]
+fr_cebollj_axm[0]
+
+```
+
+### Pronóstico serie de tiempo de la Habichuela (Ciudad de Armenia)
+
+```{python}
+
+fr_habich_axm= expon_smooth_mod(series_armenia,"Habichuela_axm_merc",0.2)
+
+plot_fcast(series_armenia,"Habichuela_axm_merc",0.20,fr_habich_axm[1],fr_habich_axm[2],fr_habich_axm[3],"Pronóstico precio habichuela axm (métodos de suavizamiento)")
+
+
+```
+
+```{python}
+
+fr_habich_axm[0]
+
+```
+
+### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
+
+
+```{python}
+
+fr_tomate_axm= expon_smooth_mod(series_armenia,"Tomate chonto_axm_merc",0.2)
+
+plot_fcast(series_armenia,"Tomate chonto_axm_merc",0.20,fr_tomate_axm[1],fr_tomate_axm[2],fr_tomate_axm[3],"Pronóstico precio tomate chonto axm (métodos de suavizamiento)")
 
 
 
 ```
+
+
+```{python}
+
+fr_tomate_axm[0]
+
+
+```
+
+
 ## Modelo ARIMA

@@ -77,12 +77,14 @@ series_armenia= pd.read_csv("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023
 
 series_armenia["Periodo"]= pd.to_datetime(series_armenia["Periodo"])
 series_armenia.set_index("Periodo",drop=True,inplace=True)
+series_armenia.index.freq= 'W-SAT'
 
 
 series_pereira= pd.read_csv("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bookdown-seriesdetiempo_mcd//Bookdown_SeriesDeTiempo//FuenteConsolidadaSIPSA//df_series_per.csv")
 
 series_pereira["Periodo"]= pd.to_datetime(series_pereira["Periodo"])
 series_pereira.set_index("Periodo",drop=True,inplace=True)
+series_pereira.index.freq='W-SAT'
 
 ```
 

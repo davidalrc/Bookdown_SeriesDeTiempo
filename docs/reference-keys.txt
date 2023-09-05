@@ -15,6 +15,15 @@ cebolla-junca-1
 habichuela-1
 tomate-chonto-1
 modelación-para-el-pronóstico-de-las-series-de-tiempo
-modelo-de-suavizamiento-holt-winters
+definición-de-funciones-base-para-la-fase-de-modelación
+función-para-separación-de-la-serie-en-conjunto-de-test-y-entrenamiento
+funciones-para-aplicación-de-modelos-de-suavizamiento-exponencial-generación-de-métricas-y-gráfica-comparativa-con-plotly
+funciones-para-aplicación-de-modelo-arima-generación-de-métricas-y-gráfica-comparativa-con-plotly
+modelos-de-suavizamiento-exponencial-simpledoble-y-triple
+pronóstico-serie-de-tiempo-de-la-ahuyama-ciudad-de-armenia
+pronóstico-serie-de-tiempo-de-la-cebolla-junca-ciudad-de-armenia
+pronóstico-serie-de-tiempo-de-la-habichuela-ciudad-de-armenia
+pronóstico-serie-de-tiempo-del-tomate-chonto-ciudad-de-armenia
+modelo-arima
 evaluación-y-ajuste-de-hiperparámetros-de-los-modelos
 contraste-entre-series-de-tiempo-y-proyección-de-precios-minoristas
