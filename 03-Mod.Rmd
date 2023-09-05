@@ -13,7 +13,10 @@ Esta sección tiene la finalidad de definir funciones con la finalidad de simpli
 import pandas as pd
 from matplotlib import pyplot as plt
 import plotly.graph_objects as go
+import pmdarima
+from pmdarima.arima import auto_arima
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt, ExponentialSmoothing
+
 
 def train_test_ts(serie,prop_test):
     train= serie.iloc[:-int(len(serie)*prop_test)]
@@ -95,6 +98,43 @@ def expon_smooth_mod(serie,alimento,prop_test):
 
 
 ### Funciones para aplicación de modelo ARIMA, generación de métricas y gráfica comparativa con plotly
+
+
+```{python}
+
+
+def perf_auto_arima(serie,alimento,prop_test,integracion,fits):
+  
+  serie_train,serie_test= train_test_ts(serie[alimento],prop_test)
+  
+  mod_aut_arima= auto_arima(serie_train,start_p=0,d=integracion,start_q=0,
+                 max_p=5, max_d=2, max_q=5, start_P=0,D=integracion,start_Q=0,
+                 max_P=5,max_D=5,max_Q=5,m=52,seasonal=True,trace=True,supress_warnings=True,stepwise=True,
+                 random_state=41,n_fits=fits,information_criterion="bic")
+                 
+  arima_forecast= mod_aut_arima.fit_predict(n_periods=len(serie_test),y=serie_test.index)
+  resume= mod_aut_arima.summary()
+  
+  MAE1= np.mean(np.abs(serie_test-arima_forecast))
+  MSE1= np.mean(np.square(serie_test-arima_forecast))
+  RMSE1= np.sqrt(np.mean(np.square(serie_test-arima_forecast)))
+  MAPE1= np.mean(np.abs((serie_test-arima_forecast)/serie_test)*100)
+  
+  results_dict= {"Modelo":["ARIMA Optimizado"],
+                 "MAE":[MAE1],
+                 "MSE":[MSE1],
+                 "RMSE":[RMSE1],
+                 "MAPE":[MAPE1]}
+                 
+  results_df= pd.DataFrame.from_dict(results_dict,orient="columns")
+  
+  return results_df,resume,arima_forecast              
+  
+
+
+
+```
+
 
 
 
