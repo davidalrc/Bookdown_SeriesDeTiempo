@@ -97,41 +97,72 @@ def expon_smooth_mod(serie,alimento,prop_test):
 ```
 
 
+
 ### Funciones para aplicación de modelo ARIMA, generación de métricas y gráfica comparativa con plotly
 
 
 ```{python}
 
-
-def perf_auto_arima(serie,alimento,prop_test,integracion,fits):
-  
-  serie_train,serie_test= train_test_ts(serie[alimento],prop_test)
-  
-  mod_aut_arima= auto_arima(serie_train,start_p=0,d=integracion,start_q=0,
-                 max_p=5, max_d=2, max_q=5, start_P=0,D=integracion,start_Q=0,
-                 max_P=5,max_D=5,max_Q=5,m=52,seasonal=True,trace=True,supress_warnings=True,stepwise=True,
-                 random_state=41,n_fits=fits,information_criterion="bic")
+def plot_fcas_arimat(series,
+               alimento,
+               prop_test,
+               fcast1:list[float],
+               conf_inttbl,
+               title:str):
                  
-  arima_forecast= mod_aut_arima.fit_predict(n_periods=len(serie_test),y=serie_test.index)
-  resume= mod_aut_arima.summary()
+      serie_train,serie_test= train_test_ts(series[alimento],prop_test)
+      upper= conf_inttbl["Lower"]
+      lower= conf_inttbl["Upper"]
+      
+      fig=go.Figure()
+      fig.add_trace(go.Scatter(x=serie_train.index,y=serie_train,name="Train"))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=serie_test,name="Test"))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=upper,name="Limite superior cofint 95%",mode="lines",marker=dict(color="#444"),showlegend=False))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=lower,name="Limite inferior cofint 95%",mode="lines",fillcolor="rgba(68, 68, 68,           0.3)",fill='tonexty',marker=dict(color="#444"),showlegend=False))
+      fig.add_trace(go.Scatter(x=serie_test.index,y=fcast1,name="Gráfica pronóstico modelo "+title))
+      fig.update_layout(template="simple_white", font=dict(size=12), title_text=title,
+                      width=700, title_x=0.5, height=400, xaxis_title='Fecha',
+                      yaxis_title='Precio (Pesos Colombianos)')
+      
+      return fig.show()
+
+
+
+def perf_auto_arima(serie,alimento,prop_test,fits):
   
-  MAE1= np.mean(np.abs(serie_test-arima_forecast))
-  MSE1= np.mean(np.square(serie_test-arima_forecast))
-  RMSE1= np.sqrt(np.mean(np.square(serie_test-arima_forecast)))
-  MAPE1= np.mean(np.abs((serie_test-arima_forecast)/serie_test)*100)
+    serie_train,serie_test= train_test_ts(serie[alimento].dropna(),prop_test)
   
-  results_dict= {"Modelo":["ARIMA Optimizado"],
+  #mod_aut_arima= auto_arima(serie_train,start_p=0,d=None,start_q=0,test="kpss",
+                 #max_p=5, max_d=2, max_q=5, start_P=0,D=None,start_Q=0,
+                 #max_P=5,max_D=5,max_Q=5,m=52,seasonal=True,trace=True,supress_warnings=True,stepwise=True
+                 #,n_fits=fits,information_criterion="aic",maxiter=500)
+                 
+    mod_aut_arima= auto_arima(serie_train,test="kpss",seasonal_test='ocsb',seasonal=True,m=52,
+                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True).fit(serie_train)
+                            
+                 
+    arima_forecast,conf_int= mod_aut_arima.predict(n_periods=len(serie_test),return_conf_int=True,alpha=0.05)
+    resume= mod_aut_arima.summary()
+    opt_mod_name= resume.tables[0][1][1].data
+    conf_int_tbl= pd.DataFrame(conf_int,columns=["Lower","Upper"],index=serie_test.index)
+  
+    MAE1= np.mean(np.abs(serie_test-arima_forecast))
+    MSE1= np.mean(np.square(serie_test-arima_forecast))
+    RMSE1= np.sqrt(np.mean(np.square(serie_test-arima_forecast)))
+    MAPE1= np.mean(np.abs((serie_test-arima_forecast)/serie_test)*100)
+  
+    results_dict= {"Modelo":[opt_mod_name],
                  "MAE":[MAE1],
                  "MSE":[MSE1],
                  "RMSE":[RMSE1],
                  "MAPE":[MAPE1]}
                  
-  results_df= pd.DataFrame.from_dict(results_dict,orient="columns")
+    results_df= pd.DataFrame.from_dict(results_dict,orient="columns")
+    
+    diagnosis=  mod_aut_arima.plot_diagnostics(figsize=(16, 8))
   
-  return results_df,resume,arima_forecast              
+    return results_df,resume,arima_forecast,conf_int_tbl,opt_mod_name,diagnosis
   
-
-
 
 ```
 
@@ -215,4 +246,299 @@ fr_tomate_axm[0]
 ```
 
 
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
+
+```{python}
+
+fr_ahuy_per= expon_smooth_mod(series_pereira,"Ahuyama_per_merca",0.2)
+
+plot_fcast(series_pereira,"Ahuyama_per_merca",0.20,fr_ahuy_per[1],fr_ahuy_per[2],fr_ahuy_per[3],"Pronóstico precio Ahuyama per (métodos de suavizamiento)")
+
+
+```
+
+```{python}
+
+fr_ahuy_per[0]
+
+```
+
+
+### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Pereira)
+
+```{python}
+
+fr_ceboll_per= expon_smooth_mod(series_pereira,"Cebolla junca_per_merca",0.2)
+
+plot_fcast(series_pereira,"Cebolla junca_per_merca",0.20,fr_ceboll_per[1],fr_ceboll_per[2],fr_ceboll_per[3],"Pronóstico precio cebolla per (métodos de suavizamiento)")
+
+
+```
+
+```{python}
+
+fr_ceboll_per[0]
+
+
+```
+
+### Pronóstico serie de tiempo de la Habichuela (Ciudad de Pereira)
+
+```{python}
+
+fr_habich_per= expon_smooth_mod(series_pereira,"Habichuela_per_merca",0.2)
+
+plot_fcast(series_pereira,"Habichuela_per_merca",0.20,fr_habich_per[1],fr_habich_per[2],fr_habich_per[3],"Pronóstico precio habichuela per (métodos de suavizamiento)")
+
+
+```
+
+```{python}
+
+fr_habich_per[0]
+
+```
+
+
+### Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)
+
+```{python}
+
+fr_tomat_per= expon_smooth_mod(series_pereira,"Tomate chonto_per_merca",0.2)
+
+plot_fcast(series_pereira,"Tomate chonto_per_merca",0.20,fr_tomat_per[1],fr_tomat_per[2],fr_tomat_per[3],"Pronóstico precio tomate per (métodos de suavizamiento)")
+
+```
+
+
+```{python}
+
+fr_tomat_per[0]
+
+```
+
+
 ## Modelo ARIMA
+
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
+
+```{python}
+
+fr_arima_ahuy_axm= perf_auto_arima(series_armenia,"Ahuyama_axm_merc",0.20,50)
+
+fr_arima_ahuy_axm[5]
+plt.show()
+
+```
+
+```{python}
+
+plot_fcas_arimat(series_armenia,"Ahuyama_axm_merc",0.20,fr_arima_ahuy_axm[2],fr_arima_ahuy_axm[3],fr_arima_ahuy_axm[4])
+
+```
+
+
+```{python}
+
+fr_arima_ahuy_axm[0]
+
+```
+
+### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Armenia)
+
+```{python}
+
+fr_arima_ceboll_axm= perf_auto_arima(series_armenia,"Cebolla junca_axm_merc",0.20,50)
+
+fr_arima_ceboll_axm[5]
+plt.show()
+
+
+```
+
+
+```{python}
+
+plot_fcas_arimat(series_armenia,"Cebolla junca_axm_merc",0.20,fr_arima_ceboll_axm[2],fr_arima_ceboll_axm[3],fr_arima_ceboll_axm[4])
+
+
+```
+
+
+```{python}
+
+fr_arima_ceboll_axm[0]
+
+```
+
+
+
+### Pronóstico serie de tiempo de la habichuela (Ciudad de Armenia)
+
+```{python}
+
+fr_arima_habich_axm= perf_auto_arima(series_armenia,"Habichuela_axm_merc",0.20,50)
+
+fr_arima_habich_axm[5]
+plt.show()
+
+
+```
+
+
+```{python}
+
+plot_fcas_arimat(series_armenia,"Habichuela_axm_merc",0.20,fr_arima_habich_axm[2],fr_arima_habich_axm[3],fr_arima_habich_axm[4])
+
+
+```
+
+
+```{python}
+
+fr_arima_habich_axm[0]
+
+```
+
+
+### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
+
+```{python}
+
+fr_arima_tomat_axm= perf_auto_arima(series_armenia,"Tomate chonto_axm_merc",0.20,50)
+
+fr_arima_tomat_axm[5]
+plt.show()
+
+
+```
+
+
+```{python}
+
+plot_fcas_arimat(series_armenia,"Tomate chonto_axm_merc",0.20,fr_arima_tomat_axm[2],fr_arima_tomat_axm[3],fr_arima_tomat_axm[4])
+
+
+plt.show()
+
+
+```
+
+
+```{python}
+
+fr_arima_tomat_axm[0]
+
+```
+
+
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
+
+```{python}
+
+fr_arima_ahuy_per= perf_auto_arima(series_pereira,"Ahuyama_per_merca",0.20,50)
+
+fr_arima_ahuy_per[5]
+plt.show()
+
+
+```
+
+
+```{python}
+
+plot_fcas_arimat(series_pereira,"Ahuyama_per_merca",0.20,fr_arima_ahuy_per[2],
+fr_arima_ahuy_per[3],fr_arima_ahuy_per[4])
+
+```
+
+
+```{python}
+
+fr_arima_ahuy_per[0]
+
+```
+
+
+### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Pereira)
+
+```{python}
+
+fr_arima_ceboll_per= perf_auto_arima(series_pereira,"Cebolla junca_per_merca",0.20,50)
+
+fr_arima_ceboll_per[5]
+plt.show()
+
+
+```
+
+
+```{python}
+
+plot_fcas_arimat(series_pereira,"Cebolla junca_per_merca",0.20,fr_arima_ceboll_per[2],
+fr_arima_ceboll_per[3],fr_arima_ceboll_per[4])
+
+
+```
+
+
+```{python}
+
+fr_arima_ceboll_per[0]
+
+```
+
+
+### Pronóstico serie de tiempo de la habichuela (Ciudad de Pereira)
+
+```{python}
+
+fr_arima_habich_per= perf_auto_arima(series_pereira,"Habichuela_per_merca",0.20,50)
+
+fr_arima_habich_per[5]
+plt.show()
+
+
+```
+
+
+```{python}
+
+plot_fcas_arimat(series_pereira,"Habichuela_per_merca",0.20,fr_arima_habich_per[2],
+fr_arima_habich_per[3],fr_arima_habich_per[4])
+
+
+```
+
+
+```{python}
+
+fr_arima_habich_per[0]
+
+```
+
+
+### Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)
+
+```{python}
+
+
+
+
+```
+
+
+```{python}
+
+
+
+
+```
+
+
+```{python}
+
+
+
+```
+

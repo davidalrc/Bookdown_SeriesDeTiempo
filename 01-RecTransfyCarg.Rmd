@@ -31,7 +31,10 @@ archivo = pd.read_excel("C://Users//DAVID//Documents//SeriesDeTiempo_MCD2023//bo
 
 archivo.info()
 
+
 ```
+
+
 ```{python}
 
 archivo.head()
