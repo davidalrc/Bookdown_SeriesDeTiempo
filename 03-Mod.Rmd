@@ -16,6 +16,8 @@ import plotly.graph_objects as go
 import pmdarima
 from pmdarima.arima import auto_arima
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt, ExponentialSmoothing
+import prophet
+from prophet import Prophet
 
 
 def train_test_ts(serie,prop_test):
@@ -138,7 +140,7 @@ def perf_auto_arima(serie,alimento,prop_test,fits):
                  #,n_fits=fits,information_criterion="aic",maxiter=500)
                  
     mod_aut_arima= auto_arima(serie_train,test="kpss",seasonal_test='ocsb',seasonal=True,m=52,
-                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True).fit(serie_train)
+                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True,maxiter=30).fit(serie_train)
                             
                  
     arima_forecast,conf_int= mod_aut_arima.predict(n_periods=len(serie_test),return_conf_int=True,alpha=0.05)
@@ -165,6 +167,26 @@ def perf_auto_arima(serie,alimento,prop_test,fits):
   
 
 ```
+
+### Funciones para aplicación de modelo Prophet 
+
+```{python}
+
+def perf_prophet(serie,alimento,prop_test):
+  
+  serie_train,serie_test= train_test_ts(serie[alimento],prop_test)
+  
+  mod_prophet= Prophet()
+  fit_prophet = mod_prophet.fit(serie_train)
+  forecast_prophet= fit_prophet.predict(periods=len(serie_test))
+  forecast_plot= fit_prophet.plot(forecast_prophet)
+  
+  return fit_prophet,forecast_prophet,forecast_plot
+  
+
+
+```
+
 
 
 
@@ -522,15 +544,10 @@ fr_arima_habich_per[0]
 
 ```{python}
 
+fr_arima_tomat_per= perf_auto_arima(series_pereira,"Tomate chonto_per_merca",0.20,50)
 
-
-
-```
-
-
-```{python}
-
-
+fr_arima_tomat_per[5]
+plt.show()
 
 
 ```
@@ -539,6 +556,16 @@ fr_arima_habich_per[0]
 ```{python}
 
 
+plot_fcas_arimat(series_pereira,"Tomate chonto_per_merca",0.20,fr_arima_tomat_per[2],
+fr_arima_tomat_per[3],fr_arima_tomat_per[4])
+
+
+```
+
+
+```{python}
+
+fr_arima_tomat_per[0]
 
 ```
 
