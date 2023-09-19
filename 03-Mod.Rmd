@@ -140,7 +140,7 @@ def perf_auto_arima(serie,alimento,prop_test,fits):
                  #,n_fits=fits,information_criterion="aic",maxiter=500)
                  
     mod_aut_arima= auto_arima(serie_train,test="kpss",seasonal_test='ocsb',seasonal=True,m=52,
-                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True,maxiter=30).fit(serie_train)
+                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True,maxiter=50,n_fits=10,method="nm",n_jobs=-1,information_criterion="bic").fit(serie_train)
                             
                  
     arima_forecast,conf_int= mod_aut_arima.predict(n_periods=len(serie_test),return_conf_int=True,alpha=0.05)
