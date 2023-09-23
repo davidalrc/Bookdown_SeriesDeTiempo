@@ -1,10 +1,10 @@
-# Modelación para el pronóstico de las series de tiempo 
+# Modelación para el pronóstico de las series de tiempo
 
-En esta sección se explorarán diferentes modelos para plantear el pronóstico de las series de tiempo de los alimentos escogidos, cada uno de los modelos implementados tendrá un subtitulo correspondiente y al final del capitulo se resumiran los resultados de los modelos implementados de manera consolidada con el fin de determinar cual resulta ser el modelo que presenta un mejor nivel de ajuste. 
+En esta sección se explorarán diferentes modelos para plantear el pronóstico de las series de tiempo de los alimentos escogidos, cada uno de los modelos implementados tendrá un subtitulo correspondiente y al final del capitulo se resumiran los resultados de los modelos implementados de manera consolidada con el fin de determinar cual resulta ser el modelo que presenta un mejor nivel de ajuste.
 
-## Definición de funciones base para la fase de modelación 
+## Definición de funciones base para la fase de modelación
 
-Esta sección tiene la finalidad de definir funciones con la finalidad de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para cada modelo a aplicar. 
+Esta sección tiene la finalidad de definir funciones con la finalidad de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para cada modelo a aplicar.
 
 ### Función para separación de la serie en conjunto de test y entrenamiento
 
@@ -98,10 +98,7 @@ def expon_smooth_mod(serie,alimento,prop_test):
 
 ```
 
-
-
 ### Funciones para aplicación de modelo ARIMA, generación de métricas y gráfica comparativa con plotly
-
 
 ```{python}
 
@@ -168,30 +165,46 @@ def perf_auto_arima(serie,alimento,prop_test,fits):
 
 ```
 
-### Funciones para aplicación de modelo Prophet 
+### Funciones para aplicación de modelo Prophet
 
 ```{python}
 
 def perf_prophet(serie,alimento,prop_test):
-  
-  serie_train,serie_test= train_test_ts(serie[alimento],prop_test)
-  
+
+  prep_df= serie[[alimento]].reset_index().rename(columns={"Periodo":"ds",alimento:"y"})
+
+
+  serie_train,serie_test= train_test_ts(prep_df,prop_test)
+
+  print(serie_train)
+
   mod_prophet= Prophet()
   fit_prophet = mod_prophet.fit(serie_train)
-  forecast_prophet= fit_prophet.predict(periods=len(serie_test))
+  future= fit_prophet.make_future_dataframe(periods=len(serie_test))
+  forecast_prophet= fit_prophet.predict(future)
   forecast_plot= fit_prophet.plot(forecast_prophet)
-  
-  return fit_prophet,forecast_prophet,forecast_plot
+
+  MAE1= np.mean(np.abs(serie_test["y"]-forecast_prophet["yhat"]))
+  MSE1= np.mean(np.square(serie_test["y"]-forecast_prophet["yhat"]))
+  RMSE1= np.sqrt(np.mean(np.square(serie_test["y"]-forecast_prophet["yhat"])))
+  MAPE1= np.mean(np.abs((serie_test["y"]-forecast_prophet["yhat"])/forecast_prophet["yhat"])*100)
+
+  results_dict= {"Modelo":"Prophet",
+                 "MAE":[MAE1],
+                 "MSE":[MSE1],
+                 "RMSE":[RMSE1],
+                 "MAPE":[MAPE1]}
+
+  results_df= pd.DataFrame.from_dict(results_dict,orient="columns")
+
+
+  return fit_prophet,forecast_prophet,forecast_plot,results_df
   
 
 
 ```
 
-
-
-
-
-## Modelos de suavizamiento Exponencial (Simple,Doble y Triple) 
+## Modelos de suavizamiento Exponencial (Simple,Doble y Triple)
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
@@ -222,7 +235,6 @@ plot_fcast(series_armenia,"Cebolla junca_axm_merc",0.20,fr_cebollj_axm[1],fr_ceb
 
 ```
 
-
 ```{python}
 
 fr_cebollj_axm[0]
@@ -248,7 +260,6 @@ fr_habich_axm[0]
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
 
-
 ```{python}
 
 fr_tomate_axm= expon_smooth_mod(series_armenia,"Tomate chonto_axm_merc",0.2)
@@ -259,14 +270,12 @@ plot_fcast(series_armenia,"Tomate chonto_axm_merc",0.20,fr_tomate_axm[1],fr_toma
 
 ```
 
-
 ```{python}
 
 fr_tomate_axm[0]
 
 
 ```
-
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
 
@@ -284,7 +293,6 @@ plot_fcast(series_pereira,"Ahuyama_per_merca",0.20,fr_ahuy_per[1],fr_ahuy_per[2]
 fr_ahuy_per[0]
 
 ```
-
 
 ### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Pereira)
 
@@ -321,7 +329,6 @@ fr_habich_per[0]
 
 ```
 
-
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)
 
 ```{python}
@@ -332,13 +339,11 @@ plot_fcast(series_pereira,"Tomate chonto_per_merca",0.20,fr_tomat_per[1],fr_toma
 
 ```
 
-
 ```{python}
 
 fr_tomat_per[0]
 
 ```
-
 
 ## Modelo ARIMA
 
@@ -359,7 +364,6 @@ plot_fcas_arimat(series_armenia,"Ahuyama_axm_merc",0.20,fr_arima_ahuy_axm[2],fr_
 
 ```
 
-
 ```{python}
 
 fr_arima_ahuy_axm[0]
@@ -378,7 +382,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 plot_fcas_arimat(series_armenia,"Cebolla junca_axm_merc",0.20,fr_arima_ceboll_axm[2],fr_arima_ceboll_axm[3],fr_arima_ceboll_axm[4])
@@ -386,14 +389,11 @@ plot_fcas_arimat(series_armenia,"Cebolla junca_axm_merc",0.20,fr_arima_ceboll_ax
 
 ```
 
-
 ```{python}
 
 fr_arima_ceboll_axm[0]
 
 ```
-
-
 
 ### Pronóstico serie de tiempo de la habichuela (Ciudad de Armenia)
 
@@ -407,7 +407,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 plot_fcas_arimat(series_armenia,"Habichuela_axm_merc",0.20,fr_arima_habich_axm[2],fr_arima_habich_axm[3],fr_arima_habich_axm[4])
@@ -415,13 +414,11 @@ plot_fcas_arimat(series_armenia,"Habichuela_axm_merc",0.20,fr_arima_habich_axm[2
 
 ```
 
-
 ```{python}
 
 fr_arima_habich_axm[0]
 
 ```
-
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
 
@@ -435,7 +432,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 plot_fcas_arimat(series_armenia,"Tomate chonto_axm_merc",0.20,fr_arima_tomat_axm[2],fr_arima_tomat_axm[3],fr_arima_tomat_axm[4])
@@ -446,13 +442,11 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 fr_arima_tomat_axm[0]
 
 ```
-
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
 
@@ -466,7 +460,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 plot_fcas_arimat(series_pereira,"Ahuyama_per_merca",0.20,fr_arima_ahuy_per[2],
@@ -474,13 +467,11 @@ fr_arima_ahuy_per[3],fr_arima_ahuy_per[4])
 
 ```
 
-
 ```{python}
 
 fr_arima_ahuy_per[0]
 
 ```
-
 
 ### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Pereira)
 
@@ -494,7 +485,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 plot_fcas_arimat(series_pereira,"Cebolla junca_per_merca",0.20,fr_arima_ceboll_per[2],
@@ -503,13 +493,11 @@ fr_arima_ceboll_per[3],fr_arima_ceboll_per[4])
 
 ```
 
-
 ```{python}
 
 fr_arima_ceboll_per[0]
 
 ```
-
 
 ### Pronóstico serie de tiempo de la habichuela (Ciudad de Pereira)
 
@@ -523,7 +511,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 plot_fcas_arimat(series_pereira,"Habichuela_per_merca",0.20,fr_arima_habich_per[2],
@@ -532,13 +519,11 @@ fr_arima_habich_per[3],fr_arima_habich_per[4])
 
 ```
 
-
 ```{python}
 
 fr_arima_habich_per[0]
 
 ```
-
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)
 
@@ -552,7 +537,6 @@ plt.show()
 
 ```
 
-
 ```{python}
 
 
@@ -562,10 +546,229 @@ fr_arima_tomat_per[3],fr_arima_tomat_per[4])
 
 ```
 
-
 ```{python}
 
 fr_arima_tomat_per[0]
 
 ```
 
+## Modelo Prophet (Facebook)
+
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_ahuy_prohp_axm= perf_prophet(series_armenia,"Ahuyama_axm_merc",0.20)
+
+fr_ahuy_prohp_axm[2]
+```
+
+![](Prophet_Ahuyama_AXM.png)
+
+```{python}
+
+dic_output_prophet_ahuyama= {"Modelo":"Prophet",
+                 "MAE":[538.732107],
+                 "MSE":[315400.926538],
+                 "RMSE":[561.605668],
+                 "MAPE":[88.072058]}
+
+results_ahuyama= pd.DataFrame.from_dict(dic_output_prophet_ahuyama,orient="columns")
+
+results_ahuyama
+```
+
+### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Armenia)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_ceboll_prohp_axm= perf_prophet(series_armenia,"Cebolla junca_axm_merc",0.20)
+fr_ceboll_prohp_axm[2]
+
+```
+
+![](Prophet_Cebolla_AXM.png)
+
+```{python}
+
+dic_output_prophet_ceboll= {"Modelo":"Prophet",
+                 "MAE":[286.750398],
+                 "MSE":[121114.52877],
+                 "RMSE":[348.015127],
+                 "MAPE":[16.500639]}
+
+results_ceboll= pd.DataFrame.from_dict(dic_output_prophet_ceboll,orient="columns")
+
+results_ceboll
+
+```
+
+### Pronóstico serie de tiempo de la Habichuela (Ciudad de Armenia)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_habich_prohp_axm= perf_prophet(series_armenia,"Habichuela_axm_merc",0.20)
+fr_habich_prohp_axm[2]
+
+```
+
+![](Prophet_Habichuela_AXM.png)
+
+```{python echo=TRUE}
+
+dic_output_prophet_habich= {"Modelo":"Prophet",
+                 "MAE":[286.750398],
+                 "MSE":[121114.52877],
+                 "RMSE":[348.015127],
+                 "MAPE":[16.500639]}
+
+results_habich= pd.DataFrame.from_dict(dic_output_prophet_habich,orient="columns")
+
+results_habich
+
+```
+
+### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_tomat_prohp_axm= perf_prophet(series_armenia,"Tomate chonto_axm_merc",0.20)
+
+fr_tomat_prohp_axm[2]
+
+```
+
+![](Prophet_Tomate_AXM.png)
+
+```{python}
+
+dic_output_prophet_tomat= {"Modelo":"Prophet",
+                 "MAE":[711.60695],
+                 "MSE":[911478.292051],
+                 "RMSE":[954.713723	],
+                 "MAPE":[45.735255]}
+
+results_tomat= pd.DataFrame.from_dict(dic_output_prophet_tomat,orient="columns")
+
+results_tomat
+
+```
+
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_ahuy_prohp_per= perf_prophet(series_pereira,"Ahuyama_per_merca",0.20)
+
+fr_ahuy_prohp_per[2]
+
+```
+
+![](Prophet_Ahuyama_PER.png)
+
+```{python}
+
+dic_output_prophet_ahuy_per= {"Modelo":"Prophet",
+                 "MAE":[307.527883],
+                 "MSE":[122881.670276],
+                 "RMSE":[350.544819	],
+                 "MAPE":[29.782901]}
+
+results_ahuy_per= pd.DataFrame.from_dict(dic_output_prophet_ahuy_per,orient="columns")
+
+results_ahuy_per
+
+```
+
+### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Pereira)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_ceboll_prohp_per= perf_prophet(series_pereira,"Cebolla junca_per_merca",0.20)
+
+fr_ceboll_prohp_per[2]
+
+```
+
+![](Prophet_Cebolla_PER.png)
+
+```{python}
+
+dic_output_prophet_ceboll_per= {"Modelo":"Prophet",
+                 "MAE":[307.527883],
+                 "MSE":[122881.670276],
+                 "RMSE":[350.544819	],
+                 "MAPE":[29.782901]}
+
+results_ceboll_per= pd.DataFrame.from_dict(dic_output_prophet_ceboll_per,orient="columns")
+
+results_ceboll_per
+```
+
+### Pronóstico serie de tiempo de la Habichuela (Ciudad de Pereira)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_habich_prohp_per= perf_prophet(series_pereira,"Habichuela_per_merca",0.20)
+
+fr_habich_prohp_per[2]
+
+```
+
+![](Prophet_Habich_PER.png)
+
+```{python}
+
+dic_output_prophet_habich_per= {"Modelo":"Prophet",
+                 "MAE":[1109.12691],
+                 "MSE":[1.608060e+06],
+                 "RMSE":[1268.092867],
+                 "MAPE":[49.357022]}
+
+results_habich_per= pd.DataFrame.from_dict(dic_output_prophet_habich_per,orient="columns")
+
+results_habich_per
+```
+
+### Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)
+
+```{python eval=FALSE, include=FALSE}
+
+fr_tomat_prohp_per= perf_prophet(series_pereira,"Tomate chonto_per_merca",0.20)
+fr_tomat_prohp_per[2]
+
+```
+
+![](Prophet_Tomate_PER.png)
+
+```{python}
+
+dic_output_prophet_tomat_per= {"Modelo":"Prophet",
+                 "MAE":[926.268479],
+                 "MSE":[1.466837e+06],
+                 "RMSE":[1211.130395],
+                 "MAPE":[1211.130395]}
+
+results_tomat_per= pd.DataFrame.from_dict(dic_output_prophet_tomat_per,orient="columns")
+
+results_tomat_per
+
+```
+
+## Modelos RNN - Elman y Jordan
+
+### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
+
+```{r eval=FALSE, include=FALSE}
+
+library(RSNNS)
+library(tibble)
+library(lubridate)
+
+prueba <- py$series_armenia["Ahuyama_axm_merc"]
+prueba <- rownames_to_column(prueba)
+prueba$ds <- ymd(prueba$ds)
+
+prueba_prophet <- prophet(prueba)
+
+```
