@@ -49,5 +49,8 @@ pronóstico-serie-de-tiempo-de-la-habichuela-ciudad-de-pereira-2
 pronóstico-serie-de-tiempo-del-tomate-chonto-ciudad-de-pereira-2
 modelos-rnn---elman-y-jordan
 pronóstico-serie-de-tiempo-de-la-ahuyama-ciudad-de-armenia-3
+pronóstico-serie-de-tiempo-de-la-cebolla-junca-ciudad-de-armenia-3
+pronóstico-serie-de-tiempo-de-la-habichuela-ciudad-de-armenia-3
+pronóstico-serie-de-tiempo-del-tomate-chonto-armenia
 evaluación-y-ajuste-de-hiperparámetros-de-los-modelos
 contraste-entre-series-de-tiempo-y-proyección-de-precios-minoristas

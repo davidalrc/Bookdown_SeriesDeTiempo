@@ -137,7 +137,7 @@ def perf_auto_arima(serie,alimento,prop_test,fits):
                  #,n_fits=fits,information_criterion="aic",maxiter=500)
                  
     mod_aut_arima= auto_arima(serie_train,test="kpss",seasonal_test='ocsb',seasonal=True,m=52,
-                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True,maxiter=50,n_fits=10,method="nm",n_jobs=-1,information_criterion="bic").fit(serie_train)
+                            error_action='ignore',supress_warnings=True,stepwise=True,trace=True,maxiter=50,n_fits=10,method="nm",n_jobs=1,information_criterion="bic").fit(serie_train)
                             
                  
     arima_forecast,conf_int= mod_aut_arima.predict(n_periods=len(serie_test),return_conf_int=True,alpha=0.05)
@@ -747,7 +747,7 @@ dic_output_prophet_tomat_per= {"Modelo":"Prophet",
                  "MAE":[926.268479],
                  "MSE":[1.466837e+06],
                  "RMSE":[1211.130395],
-                 "MAPE":[1211.130395]}
+                 "MAPE":[62.819451]}
 
 results_tomat_per= pd.DataFrame.from_dict(dic_output_prophet_tomat_per,orient="columns")
 
@@ -759,16 +759,221 @@ results_tomat_per
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 
 library(RSNNS)
 library(tibble)
 library(lubridate)
+library(zoo)
+library(quantmod)
+library(reticulate)
 
-prueba <- py$series_armenia["Ahuyama_axm_merc"]
-prueba <- rownames_to_column(prueba)
-prueba$ds <- ymd(prueba$ds)
 
-prueba_prophet <- prophet(prueba)
+min_max_norm <- function(x) {
+    (x - min(x)) / (max(x) - min(x))
+  }
+
+
+ts_ahuyama_axm <- py$series_armenia["Ahuyama_axm_merc"]
+ts_ahuyama_axm <- as.data.frame(lapply(ts_ahuyama_axm,min_max_norm))
+ts_ahuyama_xm <- as.ts(ts_ahuyama_axm)
+train<- 1:293
+y<- as.zoo(ts_ahuyama_xm)
+x1<- Lag(y,k=1)
+x2<- Lag(y,k=2)
+x3<- Lag(y,k=3)
+x4<- Lag(y,k=4)
+x5<- Lag(y,k=5)
+x6<- Lag(y,k=6)
+x7<- Lag(y,k=7)
+x8<- Lag(y,k=8)
+x9<- Lag(y,k=9)
+x10<- Lag(y,k=10)
+x11<- Lag(y,k=11)
+x12<- Lag(y,k=12)
+x13<- Lag(y,k=13)
+x14<- Lag(y,k=14)
+x15<- Lag(y,k=15) 
+log_ahuyama_xm <- cbind(y,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_ahuyama_xm <- log_ahuyama_xm[-(1:15),]
+inputs<- log_ahuyama_xm[,2:16]
+outputs<- log_ahuyama_xm[,1]
+
+fit_elman_ahuy<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
+
+
+plotIterativeError(fit_elman_ahuy)
+```
+
+```{r}
+
+y <- as.vector(outputs[-train])
+plot(y,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_ahuy,inputs[-train])
+lines(pred,col="red")
 
 ```
+
+### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Armenia)
+
+
+```{r}
+
+ts_ceboll_axm <- py$series_armenia["Cebolla junca_axm_merc"]
+ts_ceboll_axm <- as.data.frame(lapply(ts_ceboll_axm,min_max_norm))
+ts_ceboll_xm <- as.ts(ts_ceboll_axm)
+train<- 1:293
+y2<- as.zoo(ts_ceboll_xm)
+x1<- Lag(y2,k=1)
+x2<- Lag(y2,k=2)
+x3<- Lag(y2,k=3)
+x4<- Lag(y2,k=4)
+x5<- Lag(y2,k=5)
+x6<- Lag(y2,k=6)
+x7<- Lag(y2,k=7)
+x8<- Lag(y2,k=8)
+x9<- Lag(y2,k=9)
+x10<- Lag(y2,k=10)
+x11<- Lag(y2,k=11)
+x12<- Lag(y2,k=12)
+x13<- Lag(y2,k=13)
+x14<- Lag(y2,k=14)
+x15<- Lag(y2,k=15) 
+log_ceboll_xm <- cbind(y2,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_ceboll_xm <- log_ceboll_xm[-(1:15),]
+inputs<- log_ceboll_xm[,2:16]
+outputs<- log_ceboll_xm[,1]
+
+fit_elman_ceboll<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
+
+
+plotIterativeError(fit_elman_ceboll)
+
+```
+
+```{r}
+y2 <- as.vector(outputs[-train])
+plot(y2,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_ceboll,inputs[-train])
+lines(pred,col="red")
+```
+
+### Pronóstico serie de tiempo de la habichuela (Ciudad de Armenia)
+
+```{r}
+
+ts_habich_axm <- py$series_armenia["Habichuela_axm_merc"]
+ts_habich_axm <- as.data.frame(lapply(ts_habich_axm,min_max_norm))
+ts_habich_xm <- as.ts(ts_habich_axm)
+train<- 1:293
+y3<- as.zoo(ts_habich_xm)
+x1<- Lag(y3,k=1)
+x2<- Lag(y3,k=2)
+x3<- Lag(y3,k=3)
+x4<- Lag(y3,k=4)
+x5<- Lag(y3,k=5)
+x6<- Lag(y3,k=6)
+x7<- Lag(y3,k=7)
+x8<- Lag(y3,k=8)
+x9<- Lag(y3,k=9)
+x10<- Lag(y3,k=10)
+x11<- Lag(y3,k=11)
+x12<- Lag(y3,k=12)
+x13<- Lag(y3,k=13)
+x14<- Lag(y3,k=14)
+x15<- Lag(y3,k=15) 
+log_habich_xm <- cbind(y3,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_habich_xm <- log_habich_xm[-(1:15),]
+inputs<- log_habich_xm[,2:16]
+outputs<- log_habich_xm[,1]
+
+fit_elman_habich<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
+
+
+plotIterativeError(fit_elman_habich)
+
+
+
+```
+
+
+```{r}
+
+y3 <- as.vector(outputs[-train])
+plot(y3,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_habich,inputs[-train])
+lines(pred,col="red")
+
+
+```
+
+### Pronóstico serie de tiempo del tomate chonto (Armenia)
+
+```{r}
+
+
+ts_tomat_axm <- py$series_armenia["Tomate chonto_axm_merc"]
+ts_tomat_axm <- as.data.frame(lapply(ts_tomat_axm,min_max_norm))
+ts_tomat_xm <- as.ts(ts_tomat_axm)
+train<- 1:293
+y4<- as.zoo(ts_tomat_xm)
+x1<- Lag(y4,k=1)
+x2<- Lag(y4,k=2)
+x3<- Lag(y4,k=3)
+x4<- Lag(y4,k=4)
+x5<- Lag(y4,k=5)
+x6<- Lag(y4,k=6)
+x7<- Lag(y4,k=7)
+x8<- Lag(y4,k=8)
+x9<- Lag(y4,k=9)
+x10<- Lag(y4,k=10)
+x11<- Lag(y4,k=11)
+x12<- Lag(y4,k=12)
+x13<- Lag(y4,k=13)
+x14<- Lag(y4,k=14)
+x15<- Lag(y4,k=15) 
+log_tomat_xm <- cbind(y4,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_tomat_xm <- log_tomat_xm[-(1:15),]
+inputs<- log_tomat_xm[,2:16]
+outputs<- log_tomat_xm[,1]
+
+fit_elman_tomat<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=25000)
+
+
+plotIterativeError(fit_elman_tomat)
+
+
+```
+
+```{r}
+y4 <- as.vector(outputs[-train])
+plot(y4,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_tomat,inputs[-train])
+lines(pred,col="red")
+
+
+```
+
+
+
+
