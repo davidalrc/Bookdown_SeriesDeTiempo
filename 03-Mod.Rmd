@@ -4,7 +4,11 @@ En esta sección se explorarán diferentes modelos para plantear el pronóstico 
 
 ## Definición de funciones base para la fase de modelación
 
-Esta sección tiene la finalidad de definir funciones con la finalidad de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para cada modelo a aplicar.
+Esta sección tiene la finalidad de definir funciones con el objetivo de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para las variantes de suavizamiento exponencial, ARIMA, y Prophet. 
+
+Adicionalmente se aclara que no se generan funciones para regresiones con especificación de errores ARIMA teniendo en cuenta que para los pronósticos aplicados no se esta considerando el uso de variables exógenas y por ende no se esta buscando conocer el grado de influencia o impacto sobre el precio futuro, seguidamente las propiedades de estacionalidad y estacionariedad de las series exceden este tipo de modelo teniendo en cuenta que para todos los casos el nivel de integración es mayor que 0 y además se aprecian patrones de estacionalidad compuesta, en este orden de ideas las exigencias de estacionariedad de todas las variables de la regresión con errores ARIMA implica múltiples transformacion que complejizan la interpretabbilidad y traslado a un pronóstico basado en la escala o medida de las variables reales de precio.
+
+Finalmente, lo relacionado a modelos de Redes Neuronales Recurrentes (RNN) se llevan a cabo usando R pero se abordan directamente en la respectiva sección dedicada a estos modelos, por ende las funciones para la aplicación de estos modelos no es incluida en esta sección.  
 
 ### Función para separación de la serie en conjunto de test y entrenamiento
 
