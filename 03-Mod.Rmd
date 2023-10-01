@@ -50,7 +50,7 @@ def plot_fcast(series,
       fig.add_trace(go.Scatter(x=serie_test.index,y=fcast2,name="Holt's Linear"))
       fig.add_trace(go.Scatter(x=serie_test.index,y=fcast3,name="Holt Winter's"))
       fig.update_layout(template="simple_white", font=dict(size=12), title_text=title,
-                      width=700, title_x=0.5, height=400, xaxis_title='Fecha',
+                      width=800, title_x=0.5, height=650, xaxis_title='Fecha',
                       yaxis_title='Precio (Pesos Colombianos)')
       
       return fig.show()
@@ -120,7 +120,7 @@ def plot_fcas_arimat(series,
       fig.add_trace(go.Scatter(x=serie_test.index,y=lower,name="Limite inferior cofint 95%",mode="lines",fillcolor="rgba(68, 68, 68,           0.3)",fill='tonexty',marker=dict(color="#444"),showlegend=False))
       fig.add_trace(go.Scatter(x=serie_test.index,y=fcast1,name="Gráfica pronóstico modelo "+title))
       fig.update_layout(template="simple_white", font=dict(size=12), title_text=title,
-                      width=700, title_x=0.5, height=400, xaxis_title='Fecha',
+                      width=800, title_x=0.5, height=650, xaxis_title='Fecha',
                       yaxis_title='Precio (Pesos Colombianos)')
       
       return fig.show()
@@ -965,6 +965,7 @@ plotIterativeError(fit_elman_tomat)
 ```
 
 ```{r}
+
 y4 <- as.vector(outputs[-train])
 plot(y4,type="l")
 axis(side=2, at=seq(0, 1, by=0.1))
@@ -974,6 +975,213 @@ lines(pred,col="red")
 
 ```
 
+### Pronóstico serie de tiempo de la Ahuyama (Pereira)
+
+```{r}
+
+ts_ahuyama_per <- py$series_pereira["Ahuyama_per_merca"]
+ts_ahuyama_per <- as.data.frame(lapply(ts_ahuyama_per,min_max_norm))
+ts_ahuyama_per <- as.ts(ts_ahuyama_per)
+train<- 1:293
+y5<- as.zoo(ts_ahuyama_per)
+x1<- Lag(y5,k=1)
+x2<- Lag(y5,k=2)
+x3<- Lag(y5,k=3)
+x4<- Lag(y5,k=4)
+x5<- Lag(y5,k=5)
+x6<- Lag(y5,k=6)
+x7<- Lag(y5,k=7)
+x8<- Lag(y5,k=8)
+x9<- Lag(y5,k=9)
+x10<- Lag(y5,k=10)
+x11<- Lag(y5,k=11)
+x12<- Lag(y5,k=12)
+x13<- Lag(y5,k=13)
+x14<- Lag(y5,k=14)
+x15<- Lag(y5,k=15) 
+log_ahuyama_per <- cbind(y5,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_ahuyama_per <- log_ahuyama_per[-(1:15),]
+inputs<- log_ahuyama_per[,2:16]
+outputs<- log_ahuyama_per[,1]
+
+fit_elman_ahuy_per<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
 
 
+plotIterativeError(fit_elman_ahuy_per)
+
+
+```
+
+
+```{r}
+
+y5 <- as.vector(outputs[-train])
+plot(y5,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_ahuy_per,inputs[-train])
+lines(pred,col="red")
+
+
+```
+
+### Pronóstico serie de tiempo de la cebolla junca (Pereira)
+
+```{r}
+
+ts_ceboll_per <- py$series_pereira["Cebolla junca_per_merca"]
+ts_ceboll_per <- as.data.frame(lapply(ts_ceboll_per,min_max_norm))
+ts_ceboll_per <- as.ts(ts_ceboll_per)
+train<- 1:293
+y6<- as.zoo(ts_ceboll_per)
+x1<- Lag(y6,k=1)
+x2<- Lag(y6,k=2)
+x3<- Lag(y6,k=3)
+x4<- Lag(y6,k=4)
+x5<- Lag(y6,k=5)
+x6<- Lag(y6,k=6)
+x7<- Lag(y6,k=7)
+x8<- Lag(y6,k=8)
+x9<- Lag(y6,k=9)
+x10<- Lag(y6,k=10)
+x11<- Lag(y6,k=11)
+x12<- Lag(y6,k=12)
+x13<- Lag(y6,k=13)
+x14<- Lag(y6,k=14)
+x15<- Lag(y6,k=15) 
+log_ceboll_per <- cbind(y6,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_ceboll_per <- log_ceboll_per[-(1:15),]
+inputs<- log_ceboll_per[,2:16]
+outputs<- log_ceboll_per[,1]
+
+fit_elman_ceboll_per<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
+
+
+plotIterativeError(fit_elman_ceboll_per)
+
+
+```
+
+
+```{r}
+
+y6 <- as.vector(outputs[-train])
+plot(y6,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_ceboll_per,inputs[-train])
+lines(pred,col="red")
+
+```
+
+### Pronóstico serie de tiempo de la habichuela (Pereira)
+
+```{r}
+ts_habich_per <- py$series_pereira["Habichuela_per_merca"]
+ts_habich_per <- as.data.frame(lapply(ts_habich_per,min_max_norm))
+ts_habich_per <- as.ts(ts_habich_per)
+train<- 1:293
+y7<- as.zoo(ts_ahuyama_xm)
+x1<- Lag(y7,k=1)
+x2<- Lag(y7,k=2)
+x3<- Lag(y7,k=3)
+x4<- Lag(y7,k=4)
+x5<- Lag(y7,k=5)
+x6<- Lag(y7,k=6)
+x7<- Lag(y7,k=7)
+x8<- Lag(y7,k=8)
+x9<- Lag(y7,k=9)
+x10<- Lag(y7,k=10)
+x11<- Lag(y7,k=11)
+x12<- Lag(y7,k=12)
+x13<- Lag(y7,k=13)
+x14<- Lag(y7,k=14)
+x15<- Lag(y7,k=15) 
+log_habich_per <- cbind(y7,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_habich_per <- log_habich_per[-(1:15),]
+inputs<- log_habich_per[,2:16]
+outputs<- log_habich_per[,1]
+
+fit_elman_habich_per<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
+
+
+plotIterativeError(fit_elman_habich_per)
+
+
+```
+
+
+```{r}
+
+y7 <- as.vector(outputs[-train])
+plot(y7,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_habich_per,inputs[-train])
+lines(pred,col="red")
+
+
+```
+
+### Pronóstico serie de tiempo del tomate (Pereira)
+
+```{r}
+
+ts_tomat_per <- py$series_pereira["Tomate chonto_per_merca"]
+ts_tomat_per <- as.data.frame(lapply(ts_ahuyama_per,min_max_norm))
+ts_tomat_per <- as.ts(ts_tomat_per)
+train<- 1:293
+y8<- as.zoo(ts_ahuyama_xm)
+x1<- Lag(y8,k=1)
+x2<- Lag(y8,k=2)
+x3<- Lag(y8,k=3)
+x4<- Lag(y8,k=4)
+x5<- Lag(y8,k=5)
+x6<- Lag(y8,k=6)
+x7<- Lag(y8,k=7)
+x8<- Lag(y8,k=8)
+x9<- Lag(y8,k=9)
+x10<- Lag(y8,k=10)
+x11<- Lag(y8,k=11)
+x12<- Lag(y8,k=12)
+x13<- Lag(y8,k=13)
+x14<- Lag(y8,k=14)
+x15<- Lag(y8,k=15) 
+log_tomat_per <- cbind(y8,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15)
+log_tomat_per <- log_tomat_per[-(1:15),]
+inputs<- log_tomat_per[,2:16]
+outputs<- log_tomat_per[,1]
+
+fit_elman_tomat_per<- elman(inputs[train],
+                       outputs[train],
+                       size=c(25,10),
+                       learnFuncParams=c(0.1),
+                       maxit=20000)
+
+
+plotIterativeError(fit_elman_tomat_per)
+
+
+```
+
+
+```{r}
+
+y8 <- as.vector(outputs[-train])
+plot(y8,type="l")
+axis(side=2, at=seq(0, 1, by=0.1))
+pred <- predict(fit_elman_tomat_per,inputs[-train])
+lines(pred,col="red")
+
+
+```
 
