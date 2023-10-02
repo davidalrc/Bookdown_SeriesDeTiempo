@@ -908,11 +908,9 @@ matplotlib$use("Agg", force = TRUE)
 
 ```
 
-
 En esta sección se hará una exploración inicial de las series de tiempo para los productos en cada ciudad, se revisará la estructura de la serie, su estacionalidad, estacionariedad y su descomposición con el fin de determinar si requiere transformaciones o tratamiento adicional para la etapa de modelación.
 
 Para facilitar el proceso de definición la estacionalidad de las series se crean las siguiente funciones con el fin de formatear el resultado de los test Dickey Fuller Aumentado y KPSS:
-
 
 ```{python}
 
@@ -968,7 +966,6 @@ def formated_kpss(series):
 
 ```
 
-
 ```{python include=FALSE}
 
 
@@ -1004,6 +1001,7 @@ ahuyama_ts["diff1"]= ahuyama_ts["Ahuyama_axm_merc"].diff()
 ahuyama_ts["diff2"]= ahuyama_ts["diff1"].diff()
 
 ```
+
 ```{python}
 
 import matplotlib.pyplot as plt
@@ -1024,10 +1022,10 @@ plt.close()
 
 
 ```
-Al visualizar la serie de tiempo de los precios promedio semanales de la ahuyama se puede apreciar que no hay un patrón claro que demarque periodos o ciclos consistentes para el precio, al apreciar las medias moviles se puede apreciar que el suavizamiento de las mismas no termina generando evidencia clara de algún patrón estacional, lo único que se puede abstraer con claridad es que este producto ha tenido momentos de "pico de precio" alcanzando valores por encima de los 1200 pesos colombianos, este caso de alza de precio no ha sido exclusivo del periodo pos-pandemia sino que particularmente para este producto ya se habia presentado en el pasado. 
+
+Al visualizar la serie de tiempo de los precios promedio semanales de la ahuyama se puede apreciar que no hay un patrón claro que demarque periodos o ciclos consistentes para el precio, al apreciar las medias moviles se puede apreciar que el suavizamiento de las mismas no termina generando evidencia clara de algún patrón estacional, lo único que se puede abstraer con claridad es que este producto ha tenido momentos de "pico de precio" alcanzando valores por encima de los 1200 pesos colombianos, este caso de alza de precio no ha sido exclusivo del periodo pos-pandemia sino que particularmente para este producto ya se habia presentado en el pasado.
 
 Ahora veamos un lag_plot con un rezago para esta serie de tiempo:
-
 
 ```{python}
 
@@ -1038,6 +1036,7 @@ plt.grid()
 plt.show()
 plt.close()
 ```
+
 A través del lag plot con un rezgo es posible apreciar que los datos de esta serie de tiempo exhiben un patrón lineal lo cual permite diagnosticar visualmente que la serie de tiempo en revisión tiene presencia de autocorrelación serial, seguidamente es claro que los datos no siguen un patrón aleatorio por lo tanto esta serie de tiempo no exhibe un patrón o dinámica aleatoria, finalmente teniendo en cuenta que cuando los datos presentan comportamiento periodico este tipo de gráfica toma comportamientos circulares o sinusuoidales, es posible inferir que efectivamente esta serie de tiempo no tiene estacionariedad clara.
 
 Demarcado lo anterior es conveniente revisar el comportamiento de la autocorrelación de la serie, para esto se genera un gráfico de función de autocorrelación (acf):
@@ -1052,9 +1051,10 @@ plt.close();
 
 
 ```
-La gráfica de la función de autocorrelación permite apreciar que hay correlación positiva entre las observaciones y el descenso hacia valores cercanos a 0 es lento al punto en el cual los primeros 15 rezagos resulta ser significativos, asi mismo es posible apreciar que el patrón de descenso es lineal por lo tanto no se aprecia alguna dinámica clara de estacionalidad, sin embargo el aspecto de la gráfica si lleva a inferir que la serie de tiempo no es estacionaria y por ende tiene presencia de tendencia dentro de su estructura. 
 
-Para validar estos elementos que se han mencionado se procede a graficar la descomposición de la serie de tiempo con el fin de visualizar sus componentes: 
+La gráfica de la función de autocorrelación permite apreciar que hay correlación positiva entre las observaciones y el descenso hacia valores cercanos a 0 es lento al punto en el cual los primeros 15 rezagos resulta ser significativos, asi mismo es posible apreciar que el patrón de descenso es lineal por lo tanto no se aprecia alguna dinámica clara de estacionalidad, sin embargo el aspecto de la gráfica si lleva a inferir que la serie de tiempo no es estacionaria y por ende tiene presencia de tendencia dentro de su estructura.
+
+Para validar estos elementos que se han mencionado se procede a graficar la descomposición de la serie de tiempo con el fin de visualizar sus componentes:
 
 ```{python}
  
@@ -1070,7 +1070,8 @@ plt.close();
 
 
 ```
-La descomposición de la serie de tiempo permite evidenciar que efectivamente la serie cuenta con un componente de tendencia que se acentua especialmente al final, en lo que respecta a la estacionalidad se puede apreciar que los "periodos" de la serie son extensos y además fluactuantes, tal como lo evidencia el lag plot no hay un comportamiento marcado en términos sinusoidales, es evidente un comportamiento de disminución de los precios a inicio de año y de un comportamiento creciente a lo largo del transcurso del mismo.  
+
+La descomposición de la serie de tiempo permite evidenciar que efectivamente la serie cuenta con un componente de tendencia que se acentua especialmente al final, en lo que respecta a la estacionalidad se puede apreciar que los "periodos" de la serie son extensos y además fluactuantes, tal como lo evidencia el lag plot no hay un comportamiento marcado en términos sinusoidales, es evidente un comportamiento de disminución de los precios a inicio de año y de un comportamiento creciente a lo largo del transcurso del mismo.
 
 Ahora que se conoce más en detalle la estructura y comportamiento de la series, procedamos a verificar a partir de test estadísticos si esta serie es o no estacionaria, para esto se hará uso de las pruebas Dickey Fuller Aumentado y Kwiatkowski-Phillips-Schmidt-Shin (KPSS):
 
@@ -1079,7 +1080,8 @@ Ahora que se conoce más en detalle la estructura y comportamiento de la series,
 formated_kpss(ahuyama_ts["Ahuyama_axm_merc"])
 formated_adf(ahuyama_ts["Ahuyama_axm_merc"])
 ```
-Al revisar ambos test estadísticos se puede apreciar que la serie de tiempo de la ahuyama no es estacionaria, por ende se puede decir que esta serie de tiempo tiene tendencia y por ende los cambios en el tiempo inciden o generan cambios en la forma de la serie, por lo tanto la tendencia que describe esta serie no es determinista y propiedades como su media y varianza son variables en el tiempo, asi las cosas, el nivel de integración de esta serie es mayor que 0,  para poder determinar de manera precisa el nivel de integración es necesario diferenciar la serie de tiempo con el fin de validar si con una primera diferenciación logra convertirse en una serie estacionaria. 
+
+Al revisar ambos test estadísticos se puede apreciar que la serie de tiempo de la ahuyama no es estacionaria, por ende se puede decir que esta serie de tiempo tiene tendencia y por ende los cambios en el tiempo inciden o generan cambios en la forma de la serie, por lo tanto la tendencia que describe esta serie no es determinista y propiedades como su media y varianza son variables en el tiempo, asi las cosas, el nivel de integración de esta serie es mayor que 0, para poder determinar de manera precisa el nivel de integración es necesario diferenciar la serie de tiempo con el fin de validar si con una primera diferenciación logra convertirse en una serie estacionaria.
 
 ```{python}
 
@@ -1095,7 +1097,8 @@ plt.show()
 
 
 ```
-Ahora realicemos un lag plot respecto a la serie diferenciada con el fin de ver su comportamiento: 
+
+Ahora realicemos un lag plot respecto a la serie diferenciada con el fin de ver su comportamiento:
 
 ```{python}
 
@@ -1105,7 +1108,8 @@ plt.title("Lag plot serie de precios promedios mayoristas semanales Ahuyama" )
 plt.show()
 plt.close()
 ```
-Con la aplicación de la primera diferencia se puede apreciar que el comportamiento lineal del lag plot de la serie original se pierde y varia hacia un patrón aleatorio en donde la nube de puntos no evidencia una dirección o trayectoria clara, esto da lugar a pensar que posiblemente el problema de autocorrelación tambien se encuentre corregido, para validar esto se genera nuevamente una gráfica acf() 
+
+Con la aplicación de la primera diferencia se puede apreciar que el comportamiento lineal del lag plot de la serie original se pierde y varia hacia un patrón aleatorio en donde la nube de puntos no evidencia una dirección o trayectoria clara, esto da lugar a pensar que posiblemente el problema de autocorrelación tambien se encuentre corregido, para validar esto se genera nuevamente una gráfica acf()
 
 ```{python}
 
@@ -1115,9 +1119,10 @@ plt.show()
 plt.close();
 
 ```
-La correlación entre las observaciones y sus rezagos tiende a 0 por lo tanto la serie diferenciada de la ahuyama carece de problemas de autocorrelación serial, por lo tanto el aumento de una observación anterior no afecta necesariamente las observaciones siguientes. 
 
-El análisis gráfico da lugar a establecer que la primera diferencia de esta serie de tiempo es estacionaria, confirmemoslo aplicando las pruebas adf y KPSS: 
+La correlación entre las observaciones y sus rezagos tiende a 0 por lo tanto la serie diferenciada de la ahuyama carece de problemas de autocorrelación serial, por lo tanto el aumento de una observación anterior no afecta necesariamente las observaciones siguientes.
+
+El análisis gráfico da lugar a establecer que la primera diferencia de esta serie de tiempo es estacionaria, confirmemoslo aplicando las pruebas adf y KPSS:
 
 ```{python}
 
@@ -1126,13 +1131,12 @@ formated_adf(ahuyama_ts["diff1"].dropna())
 
 
 ```
-Al aplicar ambas pruebas la interpretación de los valores p conduce a concluir que la primera diferencia de la serie de tiempo de precios es estacionaria, por ende se puede concluir que la serie de tiempo para este producto tiene un nivel de integración 1.  
 
-
+Al aplicar ambas pruebas la interpretación de los valores p conduce a concluir que la primera diferencia de la serie de tiempo de precios es estacionaria, por ende se puede concluir que la serie de tiempo para este producto tiene un nivel de integración 1.
 
 ### Cebolla Junca
 
-Para el caso de la cebolla junca se sigue el mismo curso metodológico que en el caso de la Ahuyama, se aisla la serie, se calculan medias moviles, primera y segunda diferencia. 
+Para el caso de la cebolla junca se sigue el mismo curso metodológico que en el caso de la Ahuyama, se aisla la serie, se calculan medias moviles, primera y segunda diferencia.
 
 ```{python}
 
@@ -1145,6 +1149,7 @@ cebollaj_ts["diff2"]= cebollaj_ts["diff1"].diff()
 
 
 ```
+
 Procedamos a visualizar la serie de tiempo y sus tres medias moviles:
 
 ```{python}
@@ -1164,7 +1169,8 @@ plt.close()
 
 
 ```
-Al revisar la gráfica de la serie de tiempo de precios promedios semanales se puede apreciar que la cebolla junca presenta un patrón mucho más volatil que el de la Ahuyama, y además se puede observar con claridad procesos de ascenso y descenso que dan cuenta que un patrón estacional pero que no es totalmente regular, sin embargo en medio de su dinámica se puede apreciar una dinámica con dos picos de precio al año, uno al inicio y otro al final, este patrón preserva mayor regularidad hasta 2020, desde 2021 hasta adelante se puede apreciar un cambio en la dinámica de precio en donde el mismo mantiene máximos cercanos a 2500 y llega continuamente a minimos cercanos a los 1700 pesos. Si se toma en cuenta todo el movimiento histórico del precio se puede evidenciar un aumento generalizado, a 2017 el precio alcanzó minimos cercanos a los 600 pesos y para el 2022 el precio nunca descendio por debajo de los 1500 pesos.  
+
+Al revisar la gráfica de la serie de tiempo de precios promedios semanales se puede apreciar que la cebolla junca presenta un patrón mucho más volatil que el de la Ahuyama, y además se puede observar con claridad procesos de ascenso y descenso que dan cuenta que un patrón estacional pero que no es totalmente regular, sin embargo en medio de su dinámica se puede apreciar una dinámica con dos picos de precio al año, uno al inicio y otro al final, este patrón preserva mayor regularidad hasta 2020, desde 2021 hasta adelante se puede apreciar un cambio en la dinámica de precio en donde el mismo mantiene máximos cercanos a 2500 y llega continuamente a minimos cercanos a los 1700 pesos. Si se toma en cuenta todo el movimiento histórico del precio se puede evidenciar un aumento generalizado, a 2017 el precio alcanzó minimos cercanos a los 600 pesos y para el 2022 el precio nunca descendio por debajo de los 1500 pesos.
 
 Ahora veamos un lag_plot con un rezago para esta serie de tiempo:
 
@@ -1177,6 +1183,7 @@ plt.close()
 
 
 ```
+
 El lag plot considerando tres rezagos describe una tendencia lineal positiva pero dispersa, dentro de la nube de puntos que se presenta no hay patrones claramente sinusoidales por lo tanto no logra evidenciarse con claridad algun patron de estacionalidad claramente definido, por otro lado no se encuentran en la gráfica puntos altamente desviados de la trayectoria, no obstante la linealidad indica presencia de autocorrelación lo cual genera indicios de la existencia de tendencia dentro de la serie lo cual demarcaria que esta no es estacionaria, con el fin de esclarecer las propiedades de la serie se continua ahondando en sus propiedades.
 
 Como parte de la exploración de propiedades de la serie se genera una gráfica de la función de autocorrelación de la serie de tiempo:
@@ -1189,7 +1196,8 @@ plt.show()
 plt.close();
 
 ```
-El patrón descendente progreviso  y fuera de los intervalos de confianza de la gráfica de autocorrelación permiten evidenciar que hay presencia de autocorrelación serial en la serie, esto implica que observaciones anteriores están presentando influencia en las observaciones siguientes. En lo que respecta a estacionalidad no se logra evidenciar un patrón lo suficientemente claro como para confirmarla, con el fin de seguir conociendo las propiedades de la serie se procede a revisar su descomposición:
+
+El patrón descendente progreviso y fuera de los intervalos de confianza de la gráfica de autocorrelación permiten evidenciar que hay presencia de autocorrelación serial en la serie, esto implica que observaciones anteriores están presentando influencia en las observaciones siguientes. En lo que respecta a estacionalidad no se logra evidenciar un patrón lo suficientemente claro como para confirmarla, con el fin de seguir conociendo las propiedades de la serie se procede a revisar su descomposición:
 
 ```{python}
 
@@ -1204,10 +1212,10 @@ plt.close();
 
 
 ```
-La descomposición permite evidenciar que la serie en términos de tendencia tiene un comportamiento creciente aunque con comportamiento variable, por ejemplo entre 2019 y 2020 el comportamiento tendencial entra en un periodo de estabilidad hasta entrar en un periodo de descenso hacia finales de 2020 y que persiste en 2021y 2022, en lo que respecta a estacionalidad se puede confirmar lo mencionado al inicio de la visualización de la serie y es que hay dos momentos en el comportamiento de los precios a lo largo del tiempo tales momentos corresponden a ascensos puntuales del precios que se presentan a inicios de año y un poco despues de la mitad del año.  Los elementos revisados al momento darian pie para decir que estamos ante una serie no estacionaria, con autocorrelación y una una estacionalidad existente pero irregular. 
+
+La descomposición permite evidenciar que la serie en términos de tendencia tiene un comportamiento creciente aunque con comportamiento variable, por ejemplo entre 2019 y 2020 el comportamiento tendencial entra en un periodo de estabilidad hasta entrar en un periodo de descenso hacia finales de 2020 y que persiste en 2021y 2022, en lo que respecta a estacionalidad se puede confirmar lo mencionado al inicio de la visualización de la serie y es que hay dos momentos en el comportamiento de los precios a lo largo del tiempo tales momentos corresponden a ascensos puntuales del precios que se presentan a inicios de año y un poco despues de la mitad del año. Los elementos revisados al momento darian pie para decir que estamos ante una serie no estacionaria, con autocorrelación y una una estacionalidad existente pero irregular.
 
 En aras de seguir validando las propiedades de la serie se aplican los test adf y kpss para validar si la serie es o no estacionaria:
-
 
 ```{python}
 
@@ -1216,7 +1224,8 @@ formated_kpss(cebollaj_ts["Cebolla junca_axm_merc"])
 formated_adf(cebollaj_ts["Cebolla junca_axm_merc"])
 
 ```
-Al revisar los resultados de los test estadísticos se puede apreciar que ambos conducen a conclusiones distintas, por lo tanto la revisión no es concluyente, sin embargo se le da prelación al hecho de que la series no es estacionaria, por lo tanto se procede a probar la primera diferencia de la serie con el fin de validar si al aplicar esta transformación el resultado de ambas pruebas resulta concluyente. 
+
+Al revisar los resultados de los test estadísticos se puede apreciar que ambos conducen a conclusiones distintas, por lo tanto la revisión no es concluyente, sin embargo se le da prelación al hecho de que la series no es estacionaria, por lo tanto se procede a probar la primera diferencia de la serie con el fin de validar si al aplicar esta transformación el resultado de ambas pruebas resulta concluyente.
 
 Veamos gráficamente la primera diferencia de la serie:
 
@@ -1235,7 +1244,8 @@ plt.show()
 
 
 ```
-Al revisar la primera diferencia de la serie es posible apreciar que el componente tendencial ha desaparecido y ahora se tiene una serie de tiempo que se asemeja más a una serie de tiempo estacionaria, se aprecia claramente que no hay un componente tendencial y además tambien es posible ver que en cierta forma se suaviza la dinámica estaciona, no obstante se puede apreciar claramente que hay algunos cambios considerablemente bruscos a mediados de 2016, finales de 2017, y a inicios de 2021. 
+
+Al revisar la primera diferencia de la serie es posible apreciar que el componente tendencial ha desaparecido y ahora se tiene una serie de tiempo que se asemeja más a una serie de tiempo estacionaria, se aprecia claramente que no hay un componente tendencial y además tambien es posible ver que en cierta forma se suaviza la dinámica estaciona, no obstante se puede apreciar claramente que hay algunos cambios considerablemente bruscos a mediados de 2016, finales de 2017, y a inicios de 2021.
 
 Ahora se procede a revisar el lag plot de la primera diferencia:
 
@@ -1260,7 +1270,8 @@ plt.show()
 plt.close();
 
 ```
-Al observar la gráfica acf se puede apreciar que el problema de autocorrelación ha logrado moderarse, solo se presentan algunas observaciones que superan los intervalos de confianza, no obstante estas observaciones ya no siguen un patron lineal decreciente como si ocurria con anterioridad. 
+
+Al observar la gráfica acf se puede apreciar que el problema de autocorrelación ha logrado moderarse, solo se presentan algunas observaciones que superan los intervalos de confianza, no obstante estas observaciones ya no siguen un patron lineal decreciente como si ocurria con anterioridad.
 
 Ahora veamos el resultado de los test adf y kpss sobre la primera diferencia:
 
@@ -1270,12 +1281,12 @@ formated_kpss(cebollaj_ts["diff1"].dropna())
 formated_adf(cebollaj_ts["diff1"].dropna())
 
 ```
-Se puede apreciar que una vez aplicada la primera diferencia sobre la serie es posible concluir que esta primera diferencia resulta ser estacionaria y se superan los resultados disimiles en los test estadisticos. Con esta revisión es posible concluir que la serie de tiempo de la cebolla junca para la ciudad de Armenia es una serie de tiempo con nivel de Integración 1 es decir I(1), por lo tanto para que esta serie llegue a ser estacionaria requiere que sea calculada su primera diferencia. 
 
+Se puede apreciar que una vez aplicada la primera diferencia sobre la serie es posible concluir que esta primera diferencia resulta ser estacionaria y se superan los resultados disimiles en los test estadisticos. Con esta revisión es posible concluir que la serie de tiempo de la cebolla junca para la ciudad de Armenia es una serie de tiempo con nivel de Integración 1 es decir I(1), por lo tanto para que esta serie llegue a ser estacionaria requiere que sea calculada su primera diferencia.
 
-### Habichuela 
+### Habichuela
 
-Para el caso de la habichuela se continua el mismo ciclo metodológico calculando previamente medidas moviles y primera y segunda diferencia. 
+Para el caso de la habichuela se continua el mismo ciclo metodológico calculando previamente medidas moviles y primera y segunda diferencia.
 
 ```{python}
 
@@ -1288,7 +1299,8 @@ habichuela_ts["diff2"]= habichuela_ts["diff1"].diff()
 
 
 ```
-Inicialmente se procede a visualizar la serie de tiempo y las medias moviles calculadas. 
+
+Inicialmente se procede a visualizar la serie de tiempo y las medias moviles calculadas.
 
 ```{python}
 
@@ -1305,9 +1317,10 @@ plt.show()
 plt.close()
 
 ```
-Al observar la serie de timepo de la habichuela se puede apreciar un comportamiento que demarca cierta volatilidad de precio durante el año presentando inclusive dos o inclusive tres picos de precio anuales, durante el periodo 2016-2021 la dinámica de precio conserva una estabilidad de minimos y máximos entre 900 y 3900 pesos mostrando dinámicas de pico de precios despues de la mitad del año. En el año 2022 del precio mayorista promedio alcanza máximos históricos superando la barrera de los 5000 pesos en el primer semestre de 2022 y en el segundo semestre tomando un comportamiento a la baja que no vuelve a los niveles de minímo histórico sino que se queda en un rango entre 2500 y 3500. El comportamiento de la serie permite apreciar que posiblemente sin el alza vertiginosa de 2022 estariamos ante una serie practicamente estacionaria, sin embargo este cambio en los niveles es una realidad para esta serie de tiempo y supone de hecho un cambio relevante en la varianza de la misma. 
 
-Conocido el comportamiento anterior de la serie se procede a visualizar un lag plot de la misma para identificar elementos como la autocorrelación, outlies y estacionalidad: 
+Al observar la serie de timepo de la habichuela se puede apreciar un comportamiento que demarca cierta volatilidad de precio durante el año presentando inclusive dos o inclusive tres picos de precio anuales, durante el periodo 2016-2021 la dinámica de precio conserva una estabilidad de minimos y máximos entre 900 y 3900 pesos mostrando dinámicas de pico de precios despues de la mitad del año. En el año 2022 del precio mayorista promedio alcanza máximos históricos superando la barrera de los 5000 pesos en el primer semestre de 2022 y en el segundo semestre tomando un comportamiento a la baja que no vuelve a los niveles de minímo histórico sino que se queda en un rango entre 2500 y 3500. El comportamiento de la serie permite apreciar que posiblemente sin el alza vertiginosa de 2022 estariamos ante una serie practicamente estacionaria, sin embargo este cambio en los niveles es una realidad para esta serie de tiempo y supone de hecho un cambio relevante en la varianza de la misma.
+
+Conocido el comportamiento anterior de la serie se procede a visualizar un lag plot de la misma para identificar elementos como la autocorrelación, outlies y estacionalidad:
 
 ```{python}
 
@@ -1317,9 +1330,10 @@ plt.close()
 
 
 ```
-El lag plot de la serie de la habichuela describe una trayectoria lineal dispersa que se acompaña por observaciones dispersas, este comportamiento permite demarcar que muy probablemente hay presencia de autocorrelación moderada y además hay una presencia de outliers o datos atipicos que se ven representados por las observaciones que se encuentran alejadas de la nube de puntos principal.  
 
-Ahora procedamos a revisar la gráfica de la función de autocorrelación con el fin de validar la presencia de autocorrelación serial: 
+El lag plot de la serie de la habichuela describe una trayectoria lineal dispersa que se acompaña por observaciones dispersas, este comportamiento permite demarcar que muy probablemente hay presencia de autocorrelación moderada y además hay una presencia de outliers o datos atipicos que se ven representados por las observaciones que se encuentran alejadas de la nube de puntos principal.
+
+Ahora procedamos a revisar la gráfica de la función de autocorrelación con el fin de validar la presencia de autocorrelación serial:
 
 ```{python}
 
@@ -1330,9 +1344,10 @@ plt.close();
 
 
 ```
-Al revisar la gráfica acf se puede apreciar que hay un patrón lineal decreciente con observaciones que estan fuera de los intervalos de confianza lo cual demarca que a lo largo del tiempo las observaciones no se comportan de manera independiente, esta dinámica es persistente y se acompaña por un leve comportamiento estacional a partir de la observación 10 en donde se puede apreciar un leve comportamiento periodico en la gráfica. El análisis gráfico da pie para decir que la serie presenta autocorrelación serial, no parece ser estacionaria y además presenta indicios de presentar estacionalidad. 
 
-Conocido lo anterior se procede a revisar la descomposición de la serie de tiempo con el fin de apreciar el comportamiento de sus componentes: 
+Al revisar la gráfica acf se puede apreciar que hay un patrón lineal decreciente con observaciones que estan fuera de los intervalos de confianza lo cual demarca que a lo largo del tiempo las observaciones no se comportan de manera independiente, esta dinámica es persistente y se acompaña por un leve comportamiento estacional a partir de la observación 10 en donde se puede apreciar un leve comportamiento periodico en la gráfica. El análisis gráfico da pie para decir que la serie presenta autocorrelación serial, no parece ser estacionaria y además presenta indicios de presentar estacionalidad.
+
+Conocido lo anterior se procede a revisar la descomposición de la serie de tiempo con el fin de apreciar el comportamiento de sus componentes:
 
 ```{python}
 
@@ -1346,8 +1361,8 @@ plt.close();
 
 
 ```
-Al revisar la descomposición de la serie se logra validar la tendencia creciente de precios en el tiempo, y además a nivel estacional se puede confirmar la dinámica de dos picos en donde el más pronunciado como se puede apreciar se encuentra a despues del primer semestre del año y se acompaña por otro pico a inicio de año que se muestra menor al del segundo semestre.  
 
+Al revisar la descomposición de la serie se logra validar la tendencia creciente de precios en el tiempo, y además a nivel estacional se puede confirmar la dinámica de dos picos en donde el más pronunciado como se puede apreciar se encuentra a despues del primer semestre del año y se acompaña por otro pico a inicio de año que se muestra menor al del segundo semestre.
 
 Ahora se procede a aplicar las pruebas adf y kpss con el fin de validar si la serie es estacionaria o no:
 
@@ -1358,7 +1373,8 @@ formated_adf(habichuela_ts["Habichuela_axm_merc"])
 
 
 ```
-Al revisar los resultados e interpretaciones de los p-valores de las pruebas se puede apreciar que las serie no resulta ser estacionaria, por lo tanto se hace necesario explorar la primera diferencia de la misma con el fin de validar si aplicando esta diferenciación se logra una serie estacionaria: 
+
+Al revisar los resultados e interpretaciones de los p-valores de las pruebas se puede apreciar que las serie no resulta ser estacionaria, por lo tanto se hace necesario explorar la primera diferencia de la misma con el fin de validar si aplicando esta diferenciación se logra una serie estacionaria:
 
 ```{python}
 
@@ -1372,6 +1388,7 @@ plt.legend(loc="lower right")
 plt.grid(alpha=0.5,linewidth=1)
 plt.show()
 ```
+
 Al aplicar la primera diferencia se puede apreciar claramente la magnitud de las variaciones a lo largo del tiempo, en este caso es posible ver los picos de precio que se comentaban al inicio del análisis de la serie de tiempo, la dinámica de cambio de precio más brusco se presenta en el primer semestre de 2022 presentando variaciones cercanas a los 2000 pesos (tanto al alza como a la baja)
 
 Ahora veamos el lag plot de la primera diferencia:
@@ -1383,10 +1400,10 @@ plt.show()
 plt.close()
 
 ```
+
 Al observar el lag plot se puede apreciar que la distribución de los puntos pierde su tendencia lineal lo cual indica una posible correción de la autocorrelación, a su vez tambien es posible apreciar que la dinámica de valores atipicos persiste como se analizaba con anterioridad.
 
-Ahora procedamos a revisar la gráfica de la función de autocorrelación con el fin de validar si efectivamente se ha corregido la  autocorrelación serial: 
-
+Ahora procedamos a revisar la gráfica de la función de autocorrelación con el fin de validar si efectivamente se ha corregido la autocorrelación serial:
 
 ```{python}
 
@@ -1396,7 +1413,8 @@ plt.show()
 plt.close();
 
 ```
-La aplicación de la primera diferencia permite evidenciar que la primera diferencia ha suavizado el problema de autocorrelación, no osbtante se puede apreciar que persiste ya que aun hay varias observaciones que sobrepasan los intervalos de confianza, sin embargo a pesar de que persiste la autocorrelación, es posible evidenciar que el patrón lineal descendente al inicio de la gráfica se ha corregido, por ende es probable que se este ante una serie estacionaria pero con presencia de autocorrelación serial, procedamos a validar la estacionariedad a partir de los test adf y kpss sobre la serie diferenciada. 
+
+La aplicación de la primera diferencia permite evidenciar que la primera diferencia ha suavizado el problema de autocorrelación, no osbtante se puede apreciar que persiste ya que aun hay varias observaciones que sobrepasan los intervalos de confianza, sin embargo a pesar de que persiste la autocorrelación, es posible evidenciar que el patrón lineal descendente al inicio de la gráfica se ha corregido, por ende es probable que se este ante una serie estacionaria pero con presencia de autocorrelación serial, procedamos a validar la estacionariedad a partir de los test adf y kpss sobre la serie diferenciada.
 
 ```{python}
 
@@ -1405,12 +1423,12 @@ formated_kpss(habichuela_ts["diff1"].dropna())
 formated_adf(habichuela_ts["diff1"].dropna())
 
 ```
-Al revisar los p-valores de las pruebas adf y kpss se puede apreciar que despues de aplicada una primera diferencia se logra que la serie de tiempo de la habichuela para la ciudad de Armenia sea estacionaria, esto llevar a concluir que esta serie tiene un orden de integración I(1) no obstant es preciso resaltar que es una serie que aun conserva algunos atributos como la autocorrelación serial y posiblemente tambien problemas de heterocedasticidad ligados a los cambios bruscos en la varianza que han podido evidenciarse al aplicar la primera diferencia. 
 
+Al revisar los p-valores de las pruebas adf y kpss se puede apreciar que despues de aplicada una primera diferencia se logra que la serie de tiempo de la habichuela para la ciudad de Armenia sea estacionaria, esto llevar a concluir que esta serie tiene un orden de integración I(1) no obstant es preciso resaltar que es una serie que aun conserva algunos atributos como la autocorrelación serial y posiblemente tambien problemas de heterocedasticidad ligados a los cambios bruscos en la varianza que han podido evidenciarse al aplicar la primera diferencia.
 
 ### Tomate Chonto
 
-Para el caso del tomate chonto se continua con el proceso de análisis calculando medias moviles, primera y segunda diferencia con el fin de ser visualizadas. 
+Para el caso del tomate chonto se continua con el proceso de análisis calculando medias moviles, primera y segunda diferencia con el fin de ser visualizadas.
 
 ```{python}
 
@@ -1422,6 +1440,7 @@ tomate_ts["diff1"]= tomate_ts["Tomate chonto_axm_merc"].diff()
 tomate_ts["diff2"]= tomate_ts["diff1"].diff()
 
 ```
+
 Inicialmente se visualiza la serie de tiempo del tomate chonto con sus respectivas medias moviles de 5, 10y 20 periodos:
 
 ```{python}
@@ -1439,7 +1458,8 @@ plt.show()
 plt.close()
 
 ```
-Al revisar la serie de tiempo se puede apreciar una dinámica precio que hasta el añ0 2021 oscilo entre los 800 (como minimo) y 3000 pesos como máximo, esta dinámica del precio mayorista cambia de manera abrupta a inicios de 2022 en donde supera la barrera de los 3000 y cerca a la mitad del año alcanza precios por encima de 5000 pesos. En términos de estacionalidad se puede apreciar que el precio tiene dos momentos de picos anuales que están precedidos por disminuciones de precio, los picos se generan mayormente en el primer semestre el año, en las ultimas semanas del año el precio sufren una estabilización a la baja. Si se observa la transición de los precios minimos es posible observar que desde 2029 en adelante los precios nunca volvieron a estar por debajo de los 1000 pesos y hacia finales de 2021 alcanza un minimo de 1200 pesos el cual se mantiene durante 2022 en donde inclusive tal minimo aumenta a 1500. Partiendo de las observaciones anteriores es claro que hay una dinámica de tendencia creciente en los precios teniendo en cuenta el histórico disponible. 
+
+Al revisar la serie de tiempo se puede apreciar una dinámica precio que hasta el añ0 2021 oscilo entre los 800 (como minimo) y 3000 pesos como máximo, esta dinámica del precio mayorista cambia de manera abrupta a inicios de 2022 en donde supera la barrera de los 3000 y cerca a la mitad del año alcanza precios por encima de 5000 pesos. En términos de estacionalidad se puede apreciar que el precio tiene dos momentos de picos anuales que están precedidos por disminuciones de precio, los picos se generan mayormente en el primer semestre el año, en las ultimas semanas del año el precio sufren una estabilización a la baja. Si se observa la transición de los precios minimos es posible observar que desde 2029 en adelante los precios nunca volvieron a estar por debajo de los 1000 pesos y hacia finales de 2021 alcanza un minimo de 1200 pesos el cual se mantiene durante 2022 en donde inclusive tal minimo aumenta a 1500. Partiendo de las observaciones anteriores es claro que hay una dinámica de tendencia creciente en los precios teniendo en cuenta el histórico disponible.
 
 Ahora veamos un lag plot de esta serie de tiempo:
 
@@ -1450,7 +1470,8 @@ plt.show()
 plt.close()
 
 ```
-En términos de patrones en el lag plot no se conforma totalmente un comportamiento lineal claro, se puede apreciar que los precios en su mayoria están concentrados sin embargo si hay evidencia suficiente de outliers que se aprecian muy claramente en el gráfico en la parte derecha del plano.  Con base a lo mencionado dado que la relación lineal no es fuerte podria encontrarse en esta serie un caso de autocorrelación serial moderada.
+
+En términos de patrones en el lag plot no se conforma totalmente un comportamiento lineal claro, se puede apreciar que los precios en su mayoria están concentrados sin embargo si hay evidencia suficiente de outliers que se aprecian muy claramente en el gráfico en la parte derecha del plano. Con base a lo mencionado dado que la relación lineal no es fuerte podria encontrarse en esta serie un caso de autocorrelación serial moderada.
 
 ```{python}
 
@@ -1460,7 +1481,8 @@ plt.show()
 plt.close();
 
 ```
-Al apreciar la gráfica de la función de autocorrelación se aprecia un descenso lineal de varias observaciones que están fuera del intervalo de confianza lo cual representa un problema claro de autocorrelación serial, para este caso no se evidencia o no hay indicios de un componente estacional claro, pero el descenso lineal si pertmite demarcar una serie no estacionaria. 
+
+Al apreciar la gráfica de la función de autocorrelación se aprecia un descenso lineal de varias observaciones que están fuera del intervalo de confianza lo cual representa un problema claro de autocorrelación serial, para este caso no se evidencia o no hay indicios de un componente estacional claro, pero el descenso lineal si pertmite demarcar una serie no estacionaria.
 
 ```{python}
 
@@ -1474,10 +1496,10 @@ plt.close();
 
 
 ```
+
 La descomposiición de la serie de tiempo permite evidenciar lo mencionado al principio de análisis de la serie, se puede confirmar claramente la tendencia creciente de los precios, y en términos de estacionalidad puede apreciarse la dinámica de los dos picos durante el año, al observar el patrón y su transición es posible apreciar que el periodo termina siendo practicamente anual.
 
 Ahora veamos por medio de los test estadisticos si efectivamente esta serie es estacionaria:
-
 
 ```{python}
 
@@ -1486,10 +1508,10 @@ formated_adf(tomate_ts["Tomate chonto_axm_merc"])
 
 
 ```
-Al revisar la interpretación de los p-valores de los test es posible identificar que los resultados no son consistentes, en test adf reporta que la serie es estacionaria, y el test kpss reporta que la serie no es estacionaria, dadas estas condiciones es conveniente revisar el comportamiento de la primera diferencia y ver como se comporta la misma al aplicar las pruebas. 
+
+Al revisar la interpretación de los p-valores de los test es posible identificar que los resultados no son consistentes, en test adf reporta que la serie es estacionaria, y el test kpss reporta que la serie no es estacionaria, dadas estas condiciones es conveniente revisar el comportamiento de la primera diferencia y ver como se comporta la misma al aplicar las pruebas.
 
 Veamos el comportamiento gráfico de la primera diferencia:
-
 
 ```{python}
 
@@ -1507,10 +1529,10 @@ plt.close()
 
 
 ```
-Es posible apreciar que la serie diferenciada muestra un comportamiento más estable y menos tendencial, sin embargo es claramente visible el alza vertiginosa de precio al inicio del año 2022 lo cual representa una distorsión considerable de la varianza pero que resulta corta y no se sostiene en el tiempo, en este orden de ideas se aprecia que la primera diferencia corrige la tendencia pero igualmente queda el impacto de los outliers asociados al comportamiento del precio en este caso del tomate chonto. 
 
-Ahora procedamos a revisar el lagplot de la serie: 
+Es posible apreciar que la serie diferenciada muestra un comportamiento más estable y menos tendencial, sin embargo es claramente visible el alza vertiginosa de precio al inicio del año 2022 lo cual representa una distorsión considerable de la varianza pero que resulta corta y no se sostiene en el tiempo, en este orden de ideas se aprecia que la primera diferencia corrige la tendencia pero igualmente queda el impacto de los outliers asociados al comportamiento del precio en este caso del tomate chonto.
 
+Ahora procedamos a revisar el lagplot de la serie:
 
 ```{python}
 
@@ -1519,8 +1541,8 @@ plt.show()
 plt.close()
 
 ```
-En este caso ya no se describe una tendencia lineal sino que se muestra una distribución mucho más variada de los puntos, sin embargo las observaciones aisladas persisten.  se puede observar que la autocorrelación logra ser superada, lo cual puede validar con la gráfica de la función de autocorrelación: 
 
+En este caso ya no se describe una tendencia lineal sino que se muestra una distribución mucho más variada de los puntos, sin embargo las observaciones aisladas persisten. se puede observar que la autocorrelación logra ser superada, lo cual puede validar con la gráfica de la función de autocorrelación:
 
 ```{python}
 
@@ -1531,9 +1553,10 @@ plt.close();
 
 
 ```
-Se puede apreciar que luego de aplicada la primera diferencia el problema pronunciado de autocorrelación serial evidenciado en la serie sin diferenciar resulta ser corregido dando lugar a que la mayoria de observaciones se encuentren dentro de los intervalos de confianza.  
 
-Ahora validemos si la serie diferenciada es estacionaria aplicando los test adf y kpss: 
+Se puede apreciar que luego de aplicada la primera diferencia el problema pronunciado de autocorrelación serial evidenciado en la serie sin diferenciar resulta ser corregido dando lugar a que la mayoria de observaciones se encuentren dentro de los intervalos de confianza.
+
+Ahora validemos si la serie diferenciada es estacionaria aplicando los test adf y kpss:
 
 ```{python}
 
@@ -1541,13 +1564,12 @@ print(formated_kpss(tomate_ts["diff1"].dropna()))
 print(formated_adf(tomate_ts["diff1"].dropna()))
 
 ```
-Al revisar los p-valores de los test se puede concluir que la primera diferencia de la serie del tomate chonto resulta ser estacionaria, asi las cosas es posible definir esta serie como I(1) es decir tiene un nivel de integración que implica estacionariedad si y solo si la serie es diferenciada una vez. 
 
+Al revisar los p-valores de los test se puede concluir que la primera diferencia de la serie del tomate chonto resulta ser estacionaria, asi las cosas es posible definir esta serie como I(1) es decir tiene un nivel de integración que implica estacionariedad si y solo si la serie es diferenciada una vez.
 
 ## Análisis de series de tiempo de precio promedio mayorista semanal para la ciudad de Pereira
 
-Para el análisis de las series de tiempo de Pereira se aplicará el mismo proceso realizado con las series de tiemp de Armenia, inicialmente se visualizará la serie de tiempo y sus medias moviles, posteriormente se validarán visualmente algunas propiedades por medio de lag-plot, gráfica de función de autocorrelación y descomposición de la serie. Adicional a lo antes mencionado se aplican los test KPSS y ADF con el fin de validar si las series revisada es o no estacionaria, y en caso de no serlo se hace una revisión de la primera diferencia con el fin de validar si a partir de la misma se corrige el carácter no-estacionario de la serie, todo este proceso tiene como finalidad conocer propiedades generales de la serie y a su vez determinar su nivel de integración, lo cual será util para procesos de modelación posteriores. 
-
+Para el análisis de las series de tiempo de Pereira se aplicará el mismo proceso realizado con las series de tiemp de Armenia, inicialmente se visualizará la serie de tiempo y sus medias moviles, posteriormente se validarán visualmente algunas propiedades por medio de lag-plot, gráfica de función de autocorrelación y descomposición de la serie. Adicional a lo antes mencionado se aplican los test KPSS y ADF con el fin de validar si las series revisada es o no estacionaria, y en caso de no serlo se hace una revisión de la primera diferencia con el fin de validar si a partir de la misma se corrige el carácter no-estacionario de la serie, todo este proceso tiene como finalidad conocer propiedades generales de la serie y a su vez determinar su nivel de integración, lo cual será util para procesos de modelación posteriores.
 
 ### Ahuyama
 
@@ -1563,6 +1585,7 @@ ahuyama_ts_per["diff1"]= ahuyama_ts_per["Ahuyama_per_merca"].diff()
 ahuyama_ts_per["diff2"]= ahuyama_ts_per["diff1"].diff()
 
 ```
+
 A partir de lo anterior se procede a visualizar las serie de tiempo de la Ahuyama para la ciudad de Pereira:
 
 ```{python}
@@ -1581,9 +1604,10 @@ plt.close()
 
 
 ```
-Al observar la serie de tiempo de la ahuyama para la ciudad de Pereira se puede apreciar que esta serie particularmente tiene una patrón de movimiento mucho más claro respecto a la serie que se evidencia para la ciudad de Armenia, se puede apreciar una dinámica de picos de precio y descensos, para el caso de Pereira los picos de precio se ubican hacia la mitad del año y en otros casos hacia final de año como ocurre en 2019, el periodo más estable a nivel de precio fue entre 2018 y mediados de 2019 durante este periodo el precio se mantuvo entre más o menos 900 pesos y 1100 pesos.  En términos generales de la cierrre se aprecia que el precio minimo alcanzado fue de cerca de 500 pesos y el máximo se alcanza a finales de 2023 en donde el precio llega por encima de los 1600. La observación general de la gráfica permite identificar una tendencia creciente que lleva a determinar a nivel de observación que esta serie tiene tendencia creciente. 
 
-Con el fin de seguir validando las propiedades de la serie se procede a revisar el lag-plot de la misma: 
+Al observar la serie de tiempo de la ahuyama para la ciudad de Pereira se puede apreciar que esta serie particularmente tiene una patrón de movimiento mucho más claro respecto a la serie que se evidencia para la ciudad de Armenia, se puede apreciar una dinámica de picos de precio y descensos, para el caso de Pereira los picos de precio se ubican hacia la mitad del año y en otros casos hacia final de año como ocurre en 2019, el periodo más estable a nivel de precio fue entre 2018 y mediados de 2019 durante este periodo el precio se mantuvo entre más o menos 900 pesos y 1100 pesos. En términos generales de la cierrre se aprecia que el precio minimo alcanzado fue de cerca de 500 pesos y el máximo se alcanza a finales de 2023 en donde el precio llega por encima de los 1600. La observación general de la gráfica permite identificar una tendencia creciente que lleva a determinar a nivel de observación que esta serie tiene tendencia creciente.
+
+Con el fin de seguir validando las propiedades de la serie se procede a revisar el lag-plot de la misma:
 
 ```{python}
 
@@ -1592,7 +1616,8 @@ plt.show()
 plt.close()
 
 ```
-Al observar el lag-plot se puede evidenciar una tendencia lineal positiva con relativamente baja dispersión, se presentan puntos ligeramente separados y además no hay evidencias de un patrón sinusoidal o circular que de cuenta de un componente estacional claro. El lag plot observado permite establecer que la serie de tiempo revisada cuenta con autocorrelación serial y que además no corresponde a un patrón de datos aleatorio, seguidamente la forma de la gráfica permite demarcar que la dinámica de la serie no se ajusta o relaciona a valores sinusoidales. 
+
+Al observar el lag-plot se puede evidenciar una tendencia lineal positiva con relativamente baja dispersión, se presentan puntos ligeramente separados y además no hay evidencias de un patrón sinusoidal o circular que de cuenta de un componente estacional claro. El lag plot observado permite establecer que la serie de tiempo revisada cuenta con autocorrelación serial y que además no corresponde a un patrón de datos aleatorio, seguidamente la forma de la gráfica permite demarcar que la dinámica de la serie no se ajusta o relaciona a valores sinusoidales.
 
 con el fin de seguir validando las propiedades de la serie, a continuación se visualiza la función de autocorrelación de la serie:
 
@@ -1603,9 +1628,11 @@ tsaplots.plot_acf(ahuyama_ts_per["Ahuyama_per_merca"],title="Función de autocor
 plt.show()
 plt.close();
 ```
+
 La función de autocorrelación permite evidenciar de manera clara la autocorrelación mencionada con anterioridad, se pueden apreciar 15 observaciones que sobrepasan los intervalos de confianza, seguidamente es posible apreciar que el descenso de las observaciones es lineal lo cual permite tambien establecer visualmente que hay un componente tendencial ligado a la autocorrelación serial.
 
 Ahora veamos la descomposición de la serie de tiempo:
+
 ```{python}
 
 plt.figure(figsize=(15,10))
@@ -1618,7 +1645,8 @@ plt.close();
 
 
 ```
-Al observar la descomposición de la serie se puede apreciar el componente tendencial creciente que se mencionaba en la primera revisión de la serie, y adicionalmente se puede apreciar un componente estacional que no es totalmente regular que se caracteriza por presentar dos picos a lo largo del tiempo. Los elementos mostrados en la descomposición especialmente relacionados a aspectos de tendencia permitan apreciar que la serie no parece ser estacionaria ,con el fin de confirmarlo se efectuan las pruebas adf y kpss: 
+
+Al observar la descomposición de la serie se puede apreciar el componente tendencial creciente que se mencionaba en la primera revisión de la serie, y adicionalmente se puede apreciar un componente estacional que no es totalmente regular que se caracteriza por presentar dos picos a lo largo del tiempo. Los elementos mostrados en la descomposición especialmente relacionados a aspectos de tendencia permitan apreciar que la serie no parece ser estacionaria ,con el fin de confirmarlo se efectuan las pruebas adf y kpss:
 
 ```{python}
 
@@ -1627,7 +1655,8 @@ formated_kpss(ahuyama_ts_per["Ahuyama_per_merca"])
 formated_adf(ahuyama_ts_per["Ahuyama_per_merca"])
 
 ```
-Al revisar los p-valores de los test se puede apreciar con claridad que ambos coinciden en establecer que la serie de precios semanales promedio de la Ahuyama en Pereira no describen una serie de tiempo estacionaria, dado esto se hace necesario calcular la primera diferencia con el fin de validar si por medio de la misma es posible convertir la serie en estacionaria.  
+
+Al revisar los p-valores de los test se puede apreciar con claridad que ambos coinciden en establecer que la serie de precios semanales promedio de la Ahuyama en Pereira no describen una serie de tiempo estacionaria, dado esto se hace necesario calcular la primera diferencia con el fin de validar si por medio de la misma es posible convertir la serie en estacionaria.
 
 ```{python}
 
@@ -1643,7 +1672,8 @@ plt.show()
 
 
 ```
-Al obtener una primera diferencia se pueden apreciar con claridad los cambios bruscos que sufre la serie a lo largo del tiempo, por ejemplo en el periodo 2018-2019 hay bastante estabilidad en la varianza del precio, esto cambia de forma considerable hacia adelante en donde la volatilidad del mismo incrementa de forma considerable. Más allá de las variaciones es posible apreciar que la diferenciación de la serie permite corregir el componente tendencial de la serie lo cual hace que se asemeje más a una serie de tipo estacionaria. 
+
+Al obtener una primera diferencia se pueden apreciar con claridad los cambios bruscos que sufre la serie a lo largo del tiempo, por ejemplo en el periodo 2018-2019 hay bastante estabilidad en la varianza del precio, esto cambia de forma considerable hacia adelante en donde la volatilidad del mismo incrementa de forma considerable. Más allá de las variaciones es posible apreciar que la diferenciación de la serie permite corregir el componente tendencial de la serie lo cual hace que se asemeje más a una serie de tipo estacionaria.
 
 ```{python}
 
@@ -1651,7 +1681,8 @@ pd.plotting.lag_plot(ahuyama_ts_per["diff1"].dropna(),lag=3)
 plt.show()
 plt.close()
 ```
-Al observar el lag plot se puede apreciar una nube de puntos que en este caso no describe un patrón lineal claro lo cual indica que ahora estamos ante una serie con un comportamiento mucho más aleatorio y con una menor presencia de autoccorelación serial respecto a la serie inicial.  
+
+Al observar el lag plot se puede apreciar una nube de puntos que en este caso no describe un patrón lineal claro lo cual indica que ahora estamos ante una serie con un comportamiento mucho más aleatorio y con una menor presencia de autoccorelación serial respecto a la serie inicial.
 
 Ahora veamos el aspecto de la función de autocorrelación:
 
@@ -1662,7 +1693,8 @@ tsaplots.plot_acf(ahuyama_ts_per["diff1"].dropna(),title="Función de autocorrel
 plt.show()
 plt.close();
 ```
-Se puede apreciar que aun hay observaciones que sobrepasan los intervalos de confianza lo cual indica que aun hay presencia de autocorrelación, no obstante esta autocorrelación se perfila como debil teniendo en cuenta que se presenta solo en 3 observaciones y no resulta ser continua o secuencial como en el caso de la serie sin diferenciar. 
+
+Se puede apreciar que aun hay observaciones que sobrepasan los intervalos de confianza lo cual indica que aun hay presencia de autocorrelación, no obstante esta autocorrelación se perfila como debil teniendo en cuenta que se presenta solo en 3 observaciones y no resulta ser continua o secuencial como en el caso de la serie sin diferenciar.
 
 Con el fin de validar si la primer diferencia ha sido efectiva para convertir esta serie en estacionaria, se procede a efectuar nuevamente los test adf y kpss:
 
@@ -1670,8 +1702,8 @@ Con el fin de validar si la primer diferencia ha sido efectiva para convertir es
 formated_kpss(ahuyama_ts_per["diff1"].dropna())
 formated_adf(ahuyama_ts_per["diff1"].dropna())
 ```
-Al revisar los p-valores de los test realizados se puede evidenciar que ambos coinciden en concluir que la primera diferencia de la serie es estacionaria, en este orden de ideas se puede concluir que la serie de precios semanales mayoristas de la Ahuyama para la ciudad de Pereira tiene un nivel de integración 1, es decir es una serie  I(1) y por ende para llegar a ser estacionaria requiere ser diferenciada una vez. 
 
+Al revisar los p-valores de los test realizados se puede evidenciar que ambos coinciden en concluir que la primera diferencia de la serie es estacionaria, en este orden de ideas se puede concluir que la serie de precios semanales mayoristas de la Ahuyama para la ciudad de Pereira tiene un nivel de integración 1, es decir es una serie I(1) y por ende para llegar a ser estacionaria requiere ser diferenciada una vez.
 
 ### Cebolla Junca
 
@@ -1687,6 +1719,7 @@ cebollaj_ts_per["diff1"]= cebollaj_ts_per["Cebolla junca_per_merca"].diff()
 cebollaj_ts_per["diff2"]= cebollaj_ts_per["diff1"].diff()
 
 ```
+
 A partir de los cálculos se procede a visualizar la serie principal y sus medias moviles de 5,10 y 20 periodos:
 
 ```{python}
@@ -1704,9 +1737,10 @@ plt.show()
 plt.close()
 
 ```
+
 Al revisar el comportamiento de la cebolla junca se puede apreciar que tiene un precio volatil con momentos continuos y repetitivos pero que no resultan ser del todo uniformes por ejemplo, los picos de 2021 tienen un alza de precio mucho más leve a la presentada en 2016, 2019, y 2022, esto da lugar a demarcar que hay cierta estacionalidad demarcada por dos picos de precio anuales pero que no resulta ser estable u homogenea. Como observación adicional, es posible apreciar que los a mediados y finales de 2022 son los más pronunciados en la historia del precio y muestran la ruptura del techo de 2500 pesos.
 
-En términos generales se aprecia que los minimos de la serie son crecientes lo cual da lugar a establecer que hay presencia de un componente tendencial en la serie de tiempo. 
+En términos generales se aprecia que los minimos de la serie son crecientes lo cual da lugar a establecer que hay presencia de un componente tendencial en la serie de tiempo.
 
 Con el fin de seguir identificando caracteristicas de la serie se genera su respectivo lag-plot:
 
@@ -1715,7 +1749,8 @@ pd.plotting.lag_plot(cebollaj_ts_per["Cebolla junca_per_merca"],lag=3)
 plt.show()
 plt.close()
 ```
-El lag plot evidencia una tendencia lineal creciente pero dispersa lo cual da cuenta de una autocorrelación serial moderada, tambien es posible apreciar multiples puntos dispersos lo cual indica dipersión de valores e inclusive presencia de outliers, adicionalmente no se aprecia algun patrón circular que de cuenta de presencia de comportamiento sinusoidal en la serie de tiempo. 
+
+El lag plot evidencia una tendencia lineal creciente pero dispersa lo cual da cuenta de una autocorrelación serial moderada, tambien es posible apreciar multiples puntos dispersos lo cual indica dipersión de valores e inclusive presencia de outliers, adicionalmente no se aprecia algun patrón circular que de cuenta de presencia de comportamiento sinusoidal en la serie de tiempo.
 
 Ahora con el fin de entende más la dinámica de la autocorrelación, se procede a graficar la autocorrelación serial de la serie:
 
@@ -1727,7 +1762,8 @@ plt.show()
 plt.close();
 
 ```
-Se aprecia que varias observaciones sobrepasan los intervalos de confianza y dan cuenta de una dinámica de autocorrelación serial que se acompaña de un patrón lineal progresivo de descenso que tambien da cuenta de una dinámica tendencial (no estacionaria). Con el fin de seguir comprendiendo la estructura de la serie de procede a revisar su descomposición: 
+
+Se aprecia que varias observaciones sobrepasan los intervalos de confianza y dan cuenta de una dinámica de autocorrelación serial que se acompaña de un patrón lineal progresivo de descenso que tambien da cuenta de una dinámica tendencial (no estacionaria). Con el fin de seguir comprendiendo la estructura de la serie de procede a revisar su descomposición:
 
 ```{python}
 
@@ -1742,6 +1778,7 @@ plt.close();
 
 
 ```
+
 Se puede apreciar que la tendencia es creciente en el largo plazo y además en términos de estacionalidad se puede apreciar que hay dos picos de precio en el transcurso del año, uno cerca a mitad del año y otro pico que se intersecta entre el final y el inicio del año siguiente. En sintesis se puede apreciar que hay un componente claro de tendencia por lo tanto hay evidencia de una dinámica estacionaria. En aras de validar se aplican los test estadísticos adf y kpss:
 
 ```{python}
@@ -1751,7 +1788,8 @@ formated_adf(cebollaj_ts_per["Cebolla junca_per_merca"])
 
 
 ```
-Al revisar los p-valores de los test estadisticos se puede apreciar que ambos coindicen en que las series de tiempo no son estacionarias, dada esta situación se hace necesario revisar la primera diferencia de esta serie de tiempo: 
+
+Al revisar los p-valores de los test estadisticos se puede apreciar que ambos coindicen en que las series de tiempo no son estacionarias, dada esta situación se hace necesario revisar la primera diferencia de esta serie de tiempo:
 
 ```{python}
 
@@ -1765,7 +1803,8 @@ plt.show()
 plt.close()
 
 ```
-La primera diferencia de la serie muestra con claridad la volatilidad del precio, como se analizaba desde la serie principal hay puntos particulares de variación que demarcan alzas significativas de precio, en general se puede apreciar una corrección del componente tendencial, ahora procedamos a revisar el lag plot de la serie de tiempo: 
+
+La primera diferencia de la serie muestra con claridad la volatilidad del precio, como se analizaba desde la serie principal hay puntos particulares de variación que demarcan alzas significativas de precio, en general se puede apreciar una corrección del componente tendencial, ahora procedamos a revisar el lag plot de la serie de tiempo:
 
 ```{python}
 
@@ -1774,6 +1813,7 @@ plt.show()
 plt.close()
 
 ```
+
 El lag plot muestra una dinámica de dispersión que no indica una tendencia clara, esto indica posiblemente una corrección del componente de autocorrelación, para validar esto se genera la gráfica de la función de autocorrelación:
 
 ```{python}
@@ -1784,9 +1824,10 @@ plt.show()
 plt.close();
 
 ```
-Al observar la gráfica de función de autocorrelación, se puede observar que tiene 3 observaciones que pasan el umbral de los intervalos de confianza, por lo tanto aun hay algunas observaciones que pasan los umbrales, no obstante no resultan existir observaciones seguidas como en el caso anterior, en sintesis aun hay evidencias de autocorrelación, no obstante esta es mucho más debil, y además las observaciones que presentan autocorrelación no se asocian a un patrón que demarque una tendencia. 
 
-Ahora se procede a validar si la serie es estacionaria o no estacionaria por medio de las pruebas estadisticas kpss y adf: 
+Al observar la gráfica de función de autocorrelación, se puede observar que tiene 3 observaciones que pasan el umbral de los intervalos de confianza, por lo tanto aun hay algunas observaciones que pasan los umbrales, no obstante no resultan existir observaciones seguidas como en el caso anterior, en sintesis aun hay evidencias de autocorrelación, no obstante esta es mucho más debil, y además las observaciones que presentan autocorrelación no se asocian a un patrón que demarque una tendencia.
+
+Ahora se procede a validar si la serie es estacionaria o no estacionaria por medio de las pruebas estadisticas kpss y adf:
 
 ```{python}
 
@@ -1794,12 +1835,12 @@ formated_kpss(cebollaj_ts_per["diff1"].dropna())
 formated_adf(cebollaj_ts_per["diff1"].dropna())
 
 ```
-Al aplicar los test estadísticos se puede apreciar que ambos coinciden en que la serie de tiempo es estacionaria, teniendo en cuenta esto se puede concluir que la serie de tiempo de precios semanales de la cebolla junca se vuelve estacionaria al aplica la primera diferencia sobre la misma, esto indica que la serie es I(1). 
 
+Al aplicar los test estadísticos se puede apreciar que ambos coinciden en que la serie de tiempo es estacionaria, teniendo en cuenta esto se puede concluir que la serie de tiempo de precios semanales de la cebolla junca se vuelve estacionaria al aplica la primera diferencia sobre la misma, esto indica que la serie es I(1).
 
-### Habichuela 
+### Habichuela
 
-Para este caso de la habichuela se sigue el mismo proceso, se calculan las medias moviles de periodos 5,10 y 20; y además se calculan la primera y segunda diferencia de la serie de tiempo. 
+Para este caso de la habichuela se sigue el mismo proceso, se calculan las medias moviles de periodos 5,10 y 20; y además se calculan la primera y segunda diferencia de la serie de tiempo.
 
 ```{python}
 
@@ -1811,7 +1852,8 @@ habichuela_ts_per["diff1"]= habichuela_ts_per["Habichuela_per_merca"].diff()
 habichuela_ts_per["diff2"]= habichuela_ts_per["diff1"].diff()
 
 ```
-Una vez generados los cálculos anteriormente mencionados se procede a visualizar la serie de tiempo y las medias moviles: 
+
+Una vez generados los cálculos anteriormente mencionados se procede a visualizar la serie de tiempo y las medias moviles:
 
 ```{python}
 
@@ -1828,9 +1870,10 @@ plt.show()
 plt.close()
 
 ```
-Al revisar las series de tiempo de la habichuela para Pereira se puede apreciar una dinámica de precio bastante volatil,los periodos de pico entre cada año resultan ser variables y de hecho se pueden presentar más de dos picos de precio durante un año. Al revisar los máximos y minimos se puede apreciar que el minimo alcanzado por el precio es de 700 pesos y el máximo supera los 5000 pesos, esto representa un rango de variación de 4600 pesos durante toda la ventana de variación de precios, esto representa una volatilidad elevada que tiene sus manifestaciones más fuertes a inicios de 2020 y a inicios de 2022 en donde el precio llega a superar la barrera de los 5000 pesos. Esta revisión gráfica permite evidenciar que la serie es altamente volatil, que tiene una tendencia creciente y que su varianza es elevada y su estacionalidad irregular. 
 
-Con el fin de seguir conociendo la serie se procede a revisar el lag plot de la misma: 
+Al revisar las series de tiempo de la habichuela para Pereira se puede apreciar una dinámica de precio bastante volatil,los periodos de pico entre cada año resultan ser variables y de hecho se pueden presentar más de dos picos de precio durante un año. Al revisar los máximos y minimos se puede apreciar que el minimo alcanzado por el precio es de 700 pesos y el máximo supera los 5000 pesos, esto representa un rango de variación de 4600 pesos durante toda la ventana de variación de precios, esto representa una volatilidad elevada que tiene sus manifestaciones más fuertes a inicios de 2020 y a inicios de 2022 en donde el precio llega a superar la barrera de los 5000 pesos. Esta revisión gráfica permite evidenciar que la serie es altamente volatil, que tiene una tendencia creciente y que su varianza es elevada y su estacionalidad irregular.
+
+Con el fin de seguir conociendo la serie se procede a revisar el lag plot de la misma:
 
 ```{python}
 
@@ -1840,7 +1883,8 @@ plt.close()
 
 
 ```
-Al revisar el lag plot de la serie de tiempo se puede apreciar que describe un patrón lineal disperso mostrando varios puntos alejados de la nube de puntos principal que da cuenta de posibles outliers o valores atipicos, la forma de la nube de puntos da cuenta de una autocorrelación moderada dentro de la distribución. La distribución de los puntos no muestra ningún patrón circular por lo tanto se descarta la presencia de patrones estacionales sinuosoidales lo cual es consistente teniendo en cuenta que la dinámica estacional es variable y no presenta una dinámica fija reconocible como en casos anteriores, asi las cosas, se evidencia a través del lag plot la presencia de correlación serial moderada y presencia de outliers dentro de la serie. 
+
+Al revisar el lag plot de la serie de tiempo se puede apreciar que describe un patrón lineal disperso mostrando varios puntos alejados de la nube de puntos principal que da cuenta de posibles outliers o valores atipicos, la forma de la nube de puntos da cuenta de una autocorrelación moderada dentro de la distribución. La distribución de los puntos no muestra ningún patrón circular por lo tanto se descarta la presencia de patrones estacionales sinuosoidales lo cual es consistente teniendo en cuenta que la dinámica estacional es variable y no presenta una dinámica fija reconocible como en casos anteriores, asi las cosas, se evidencia a través del lag plot la presencia de correlación serial moderada y presencia de outliers dentro de la serie.
 
 Con el fin de validar el problema de autocorrelación seria se genera la gráfica de la función de autocorrelación:
 
@@ -1854,9 +1898,10 @@ plt.close();
 
 
 ```
-Al observar la función de autocorrelación se puede evidenciar que la autocorrelación resulta ser más fuerte que lo evidenciado en el lag plot, la mayoria de las observaciones están por encima de los intervalos de confianza y además en las primera observaciones se aprecia un patrón decreciente que genera evidencia respecto a una dinámica tendencial, siendo consecuentes con esto se evidencia con claridad que la serie de tiempo analizada tiene una presencia marcada de autocorrelación serial.  
 
-Con el fin de seguir conociendo las propiedades de la serie se procede a revisar su descomposición: 
+Al observar la función de autocorrelación se puede evidenciar que la autocorrelación resulta ser más fuerte que lo evidenciado en el lag plot, la mayoria de las observaciones están por encima de los intervalos de confianza y además en las primera observaciones se aprecia un patrón decreciente que genera evidencia respecto a una dinámica tendencial, siendo consecuentes con esto se evidencia con claridad que la serie de tiempo analizada tiene una presencia marcada de autocorrelación serial.
+
+Con el fin de seguir conociendo las propiedades de la serie se procede a revisar su descomposición:
 
 ```{python}
 
@@ -1870,9 +1915,10 @@ plt.show()
 plt.close();
 
 ```
-La descomposición permite evidenciar que la dinámica tendencial es mucho más marcada al final de la serie de tiempo, a partir de 2021 comienza a tener una dinámica marcada al alza, antes de este momento la dinámica tendencial es muy leve, en lo que respecta a la estacionalidad es posible confirmar una dinámica bastante irregular en donde hay diversidad de picos y descensos que no permiten demarcar momentos muy claro respecto a la dinámica de la serie en el tiempo, finalmente en lo que respecta a los residuales es posible evidenciar que hacia 2020 hay amplias desviaciones. 
 
-Los elementos hasta ahora revisados dan evidencia visual suficiente para determinar que la serie es no estacionaria y que además presenta problemas relevantes de autocorrelación serial, no obstante con el fin de confirmar estas afirmaciones se aplican las pruebas adf y kpss: 
+La descomposición permite evidenciar que la dinámica tendencial es mucho más marcada al final de la serie de tiempo, a partir de 2021 comienza a tener una dinámica marcada al alza, antes de este momento la dinámica tendencial es muy leve, en lo que respecta a la estacionalidad es posible confirmar una dinámica bastante irregular en donde hay diversidad de picos y descensos que no permiten demarcar momentos muy claro respecto a la dinámica de la serie en el tiempo, finalmente en lo que respecta a los residuales es posible evidenciar que hacia 2020 hay amplias desviaciones.
+
+Los elementos hasta ahora revisados dan evidencia visual suficiente para determinar que la serie es no estacionaria y que además presenta problemas relevantes de autocorrelación serial, no obstante con el fin de confirmar estas afirmaciones se aplican las pruebas adf y kpss:
 
 ```{python}
 
@@ -1881,7 +1927,8 @@ formated_adf(habichuela_ts_per["Habichuela_per_merca"])
 
 
 ```
-Al aplicar las pruebas se puede evidenciar que ambos test conciden al interpretar sus p-valores en que la serie no es estacionaria, por ende se hace necesario calcular una primera diferencia y determinar si con esta transformación se logra estacionariedad: 
+
+Al aplicar las pruebas se puede evidenciar que ambos test conciden al interpretar sus p-valores en que la serie no es estacionaria, por ende se hace necesario calcular una primera diferencia y determinar si con esta transformación se logra estacionariedad:
 
 ```{python}
 
@@ -1896,7 +1943,8 @@ plt.close()
 
 
 ```
-Al aplicar la primera diferencia de la serie se puede apreciar que esta muestra con bastante claridad la volatilidad de la serie de tiempo, tambien se aprecia de forma muy clara que el momento con variaciones más bruscas resulta ser el inicio del año 2020 en donde se presentan ascensos y descensos bruscos del precio en un periodo de tiempo muy reducido, en e marco del periodo se presentan picos de cambio positivos de más de 2000 pesos en un solo periodo y descensos por el mismo valor, en general se puede apreciar una dinámica mucho más aleatoria y alejada de la presencia de tendencia, no obstante es necesario seguir revisando demás elementos para validar si se ha logrado estacionariedad. 
+
+Al aplicar la primera diferencia de la serie se puede apreciar que esta muestra con bastante claridad la volatilidad de la serie de tiempo, tambien se aprecia de forma muy clara que el momento con variaciones más bruscas resulta ser el inicio del año 2020 en donde se presentan ascensos y descensos bruscos del precio en un periodo de tiempo muy reducido, en e marco del periodo se presentan picos de cambio positivos de más de 2000 pesos en un solo periodo y descensos por el mismo valor, en general se puede apreciar una dinámica mucho más aleatoria y alejada de la presencia de tendencia, no obstante es necesario seguir revisando demás elementos para validar si se ha logrado estacionariedad.
 
 ```{python}
 
@@ -1905,9 +1953,10 @@ plt.show()
 plt.close()
 
 ```
-Al observar el lag plot se puede observar que la forma linea de la serie inicial ya no esta presente y ahora se muestra una nube de puntos con alta dispersión, tambien es posible apreciar los valores atipicos que se separan considerablemente de los valores que se encuentran en la nube de puntos principal. 
 
-Ahora veamos la función de autocorrelación: 
+Al observar el lag plot se puede observar que la forma linea de la serie inicial ya no esta presente y ahora se muestra una nube de puntos con alta dispersión, tambien es posible apreciar los valores atipicos que se separan considerablemente de los valores que se encuentran en la nube de puntos principal.
+
+Ahora veamos la función de autocorrelación:
 
 ```{python}
 
@@ -1917,8 +1966,8 @@ plt.show()
 plt.close();
 
 ```
-Se puede apreciar que la autocorrelación ha cedido sin embargo aun persisten algunas observaciones que están fuera de los intervalos de confianza, ahora verifiquemos si la serie es estacionaria a partir de las pruebas adf y kpss: 
 
+Se puede apreciar que la autocorrelación ha cedido sin embargo aun persisten algunas observaciones que están fuera de los intervalos de confianza, ahora verifiquemos si la serie es estacionaria a partir de las pruebas adf y kpss:
 
 ```{python}
 
@@ -1926,7 +1975,8 @@ formated_kpss(habichuela_ts_per["diff1"].dropna())
 formated_adf(habichuela_ts_per["diff1"].dropna())
 
 ```
-Al revisar las pruebas se puede apreciar que los test no convergen en una misma respuesta, es decir, en este caso la interpretación del p-valor del test kpss indica que la serie no es estacionaria y el p-valor del test adf indica que es estacionaria, en este caso se hace necesario revisar la segunda diferencia de la serie con el fin de validar si se logra tener finalmente una serie estacionaria: 
+
+Al revisar las pruebas se puede apreciar que los test no convergen en una misma respuesta, es decir, en este caso la interpretación del p-valor del test kpss indica que la serie no es estacionaria y el p-valor del test adf indica que es estacionaria, en este caso se hace necesario revisar la segunda diferencia de la serie con el fin de validar si se logra tener finalmente una serie estacionaria:
 
 ```{python}
 
@@ -1941,7 +1991,8 @@ plt.close()
 
 
 ```
-La segunda diferencia sigue resaltando la volatilidad de la serie y resalta los movimientos negativos de la misma, no obstante en general se logra mayor estabilidad en el rango de 2000 y -2000 sin embargo resalta el descenso hacia -4000 debido a la segunda diferencia, ahora se revisará brevemente el lag plot y la función de autocorrelación de esta segunda diferencia: 
+
+La segunda diferencia sigue resaltando la volatilidad de la serie y resalta los movimientos negativos de la misma, no obstante en general se logra mayor estabilidad en el rango de 2000 y -2000 sin embargo resalta el descenso hacia -4000 debido a la segunda diferencia, ahora se revisará brevemente el lag plot y la función de autocorrelación de esta segunda diferencia:
 
 ```{python}
 
@@ -1952,7 +2003,8 @@ plt.close()
 
 
 ```
-En general se logra apreciar que persiste la nube de puntos con un comportamiento más aleaotorio y alejado de una dinámica o patrón que muestre una tendencia, y asi mismo es posible apreciar la persistencia de outliers que están ligados a los cambios bruscos de precio que ha sufrido este producto en la ventana de tiempo analizada. 
+
+En general se logra apreciar que persiste la nube de puntos con un comportamiento más aleaotorio y alejado de una dinámica o patrón que muestre una tendencia, y asi mismo es posible apreciar la persistencia de outliers que están ligados a los cambios bruscos de precio que ha sufrido este producto en la ventana de tiempo analizada.
 
 ```{python}
 plt.figure(figsize=(15,10))
@@ -1961,18 +2013,19 @@ plt.show()
 plt.close();
 
 ```
-La función de autocorrrelación permite apreciar que aun con una segunda diferencia la autocorrelación persiste mostrando aun varias observaciones por fuera de los intervalos de confianza. Finalmente se procede a realizar nuevamente las pruebas kpss y adf para validar si la segunda diferencia de la serie resulta ser estacionaria: 
+
+La función de autocorrrelación permite apreciar que aun con una segunda diferencia la autocorrelación persiste mostrando aun varias observaciones por fuera de los intervalos de confianza. Finalmente se procede a realizar nuevamente las pruebas kpss y adf para validar si la segunda diferencia de la serie resulta ser estacionaria:
 
 ```{python}
 formated_kpss(habichuela_ts_per["diff2"].dropna())
 formated_adf(habichuela_ts_per["diff2"].dropna())
 ```
-Al analizar los p-valores de los test se logra apreciar que al aplicar una segunda diferencia sobre la serie se logra finalmente obtener una serie estacionaria, esto permite concluir que la serie de la habichuela para la ciudad de Pereira resulta ser una serie de tiempo con nivel de integración 2  I(2) lo cual significa que para que esta serie sea estacionaria es necesario aplicar una segunda diferencia sobre la serie de tiempo. 
 
+Al analizar los p-valores de los test se logra apreciar que al aplicar una segunda diferencia sobre la serie se logra finalmente obtener una serie estacionaria, esto permite concluir que la serie de la habichuela para la ciudad de Pereira resulta ser una serie de tiempo con nivel de integración 2 I(2) lo cual significa que para que esta serie sea estacionaria es necesario aplicar una segunda diferencia sobre la serie de tiempo.
 
 ### Tomate Chonto
 
-Finalmente se aplica la misma metodologia a la serie del tomate chonto para la ciudad de Pereira calculando las respectivas medias moviles y la primera y segunda diferencia: 
+Finalmente se aplica la misma metodologia a la serie del tomate chonto para la ciudad de Pereira calculando las respectivas medias moviles y la primera y segunda diferencia:
 
 ```{python}
 
@@ -1985,7 +2038,8 @@ tomate_ts_per["diff2"]= tomate_ts_per["diff1"].diff()
 
 
 ```
-A partir de lo anteriormente calculado se procede a visualizar la serie y las medias moviles: 
+
+A partir de lo anteriormente calculado se procede a visualizar la serie y las medias moviles:
 
 ```{python}
 
@@ -2003,9 +2057,10 @@ plt.close()
 
 
 ```
-Al observar la serie de tiempo se puede identificar hasta finales de 2021 una oscilación de precios entre los 900 pesos y los 3300 pesos como valores máximo, a inicios de 2022 es posible evidenciar una alza notoria en donde primero se alcanza un precio de 3500 y posteriormente hacia mediados del año en mención se llega a un valor por encima de los 5000 pesos y luego se desciende a valores cercanos a los 3500 llegando hacia Julio y Agosto a niveles de precio cercanos a los 1800. En términos de estacionalidad se pueden identificar como minimo dos picos anuales, sin embargo esta dinámica no es fija o persistente por el contrario se torna variable en algunos periodos en donde pueden llegar a presentarse más de dos picos de precio en el año, asi mismo la amplitud de los incrementos o movimientos del precio no convergen siempre a un punto común, por ejemplo durante 2020 los picos solo llegaron como máximo a un precio de 2500 mientras en años anteriorees habian superado el umbral de los 3000.  En concordancia a lo mencionado la visualización de la serie permite demarcar que hay presencia de tendencia creciente pero no constante o con velocidad uniforme, la mayor aceleración de la serie se dentro del tramo de 2022, seguidamente la estacionalidad no resulta ser regular. 
 
-Con el fin de ahondar más en las caracteristicas de la serie, se procede a revisar su lag plot: 
+Al observar la serie de tiempo se puede identificar hasta finales de 2021 una oscilación de precios entre los 900 pesos y los 3300 pesos como valores máximo, a inicios de 2022 es posible evidenciar una alza notoria en donde primero se alcanza un precio de 3500 y posteriormente hacia mediados del año en mención se llega a un valor por encima de los 5000 pesos y luego se desciende a valores cercanos a los 3500 llegando hacia Julio y Agosto a niveles de precio cercanos a los 1800. En términos de estacionalidad se pueden identificar como minimo dos picos anuales, sin embargo esta dinámica no es fija o persistente por el contrario se torna variable en algunos periodos en donde pueden llegar a presentarse más de dos picos de precio en el año, asi mismo la amplitud de los incrementos o movimientos del precio no convergen siempre a un punto común, por ejemplo durante 2020 los picos solo llegaron como máximo a un precio de 2500 mientras en años anteriorees habian superado el umbral de los 3000. En concordancia a lo mencionado la visualización de la serie permite demarcar que hay presencia de tendencia creciente pero no constante o con velocidad uniforme, la mayor aceleración de la serie se dentro del tramo de 2022, seguidamente la estacionalidad no resulta ser regular.
+
+Con el fin de ahondar más en las caracteristicas de la serie, se procede a revisar su lag plot:
 
 ```{python}
 
@@ -2015,7 +2070,8 @@ plt.close()
 
 
 ```
-A partir del lag plot es posible apreciar que la serie tiene una tendencia lineal dispersa y que además dentro de la misma resaltan outliers que se encuentran muy alejados de la nube de puntos principal, es preciso resalar que la tendencia lineal de la nube no es fuerte y por lo tanto representa una dinámica de autocorrelación serial moderada. Con el fin de conocer un poco más la naturaleza de la autocorrelación se procede a gráficar la función de autocorrelación de la serie: 
+
+A partir del lag plot es posible apreciar que la serie tiene una tendencia lineal dispersa y que además dentro de la misma resaltan outliers que se encuentran muy alejados de la nube de puntos principal, es preciso resalar que la tendencia lineal de la nube no es fuerte y por lo tanto representa una dinámica de autocorrelación serial moderada. Con el fin de conocer un poco más la naturaleza de la autocorrelación se procede a gráficar la función de autocorrelación de la serie:
 
 ```{python}
 
@@ -2026,7 +2082,8 @@ plt.close();
 
 
 ```
-Se puede apreciar que 7 observaciones están por encima de los intervalor de confianza, y que estos elementos tienen una dinámica decreciente que evidencia cierta linealidad lo cual implica no solo presencia de autocorrelación lineal sino que tambien indica la presencia de tendencia, sin embargo la autocorrelación no es persistente en toda la serie y se evidencia que a partir de la observación 8 tiene una clara convergencia a 0. 
+
+Se puede apreciar que 7 observaciones están por encima de los intervalor de confianza, y que estos elementos tienen una dinámica decreciente que evidencia cierta linealidad lo cual implica no solo presencia de autocorrelación lineal sino que tambien indica la presencia de tendencia, sin embargo la autocorrelación no es persistente en toda la serie y se evidencia que a partir de la observación 8 tiene una clara convergencia a 0.
 
 Ahora veamos la descomposición de esta serie de tiempo:
 
@@ -2042,9 +2099,9 @@ plt.close();
 
 ```
 
-La revisión de la serie de tiempo permite confirmar algunos elementos mencionados con anterioridad, el primero son las observaciones relacionadas a la tendencia, la descomposición muestra con claridad que la tendencia creciente se acentua especialmente a finales de 2021,  y a su vez se aprecia que el componente estacional efectivamente es irregular y presenta varios picos a través del tiempo. 
+La revisión de la serie de tiempo permite confirmar algunos elementos mencionados con anterioridad, el primero son las observaciones relacionadas a la tendencia, la descomposición muestra con claridad que la tendencia creciente se acentua especialmente a finales de 2021, y a su vez se aprecia que el componente estacional efectivamente es irregular y presenta varios picos a través del tiempo.
 
-Los elementos revisados hasta ahora dan pie para demarcar que la serie no es estacionaria, no obstante con el fin de confirmar esto se procede a aplicar las pruebas adf y kpss: 
+Los elementos revisados hasta ahora dan pie para demarcar que la serie no es estacionaria, no obstante con el fin de confirmar esto se procede a aplicar las pruebas adf y kpss:
 
 ```{python}
 
@@ -2052,8 +2109,8 @@ formated_kpss(tomate_ts_per["Tomate chonto_per_merca"])
 formated_adf(tomate_ts_per["Tomate chonto_per_merca"])
 
 ```
-A partir de la revisión de los p-valores de las pruebas estadisticas es posible evidenciar que no hay convergencia respecto a las conclusiones de las pruebas, dada esta situación se procede a calcular la primera diferencia de la serie con el fin de validar si al aplicar la misma se logra que la serie sea estacionaria: 
 
+A partir de la revisión de los p-valores de las pruebas estadisticas es posible evidenciar que no hay convergencia respecto a las conclusiones de las pruebas, dada esta situación se procede a calcular la primera diferencia de la serie con el fin de validar si al aplicar la misma se logra que la serie sea estacionaria:
 
 ```{python}
 
@@ -2067,7 +2124,8 @@ plt.show()
 plt.close()
 
 ```
-La visualización de la primera diferencia de la serie permite apreciar claramente los cambios de precio que se asocian a los picos y tambien a los descenso del precio del producto, particularmente se puede apreciar un comportamiento mucho más aleatoria y tambien desmarcado de una dinámica tendencial perceptible. En aras de validar esto se procede a visualizar el lag plot de la serie de tiempo: 
+
+La visualización de la primera diferencia de la serie permite apreciar claramente los cambios de precio que se asocian a los picos y tambien a los descenso del precio del producto, particularmente se puede apreciar un comportamiento mucho más aleatoria y tambien desmarcado de una dinámica tendencial perceptible. En aras de validar esto se procede a visualizar el lag plot de la serie de tiempo:
 
 ```{python}
 
@@ -2076,7 +2134,8 @@ plt.show()
 plt.close()
 
 ```
-Se puede apreciar que la nube de puntos toma una forma dispersa que se aleja del patrón lineal de la serie sin diferenciar, y a su vez se aprecia con claridad una cantidad considerable de puntos que se alejan de la nube de puntos principal lo cual demarca la presencia de varios valores extremos dentro de la serie diferenciada, los cuales se asocian a los puntos de incremento y descenso de las series de tiempo. 
+
+Se puede apreciar que la nube de puntos toma una forma dispersa que se aleja del patrón lineal de la serie sin diferenciar, y a su vez se aprecia con claridad una cantidad considerable de puntos que se alejan de la nube de puntos principal lo cual demarca la presencia de varios valores extremos dentro de la serie diferenciada, los cuales se asocian a los puntos de incremento y descenso de las series de tiempo.
 
 ```{python}
 
@@ -2088,9 +2147,10 @@ plt.close();
 
 
 ```
-Al apreciar la gráfica de la función de autocorrelación es posible evidenciar que la mayoria de observaciones ahora convergen a 0, sin embargo aun hay una leve presencia de autocorrelación serial ligada a 3 observaciones que están por encima de los intervalos de confianza establecidos. 
 
-Finalmente se aplican las pruebas estadisticas respectivas ante las cuales se evidencia lo siguiente: 
+Al apreciar la gráfica de la función de autocorrelación es posible evidenciar que la mayoria de observaciones ahora convergen a 0, sin embargo aun hay una leve presencia de autocorrelación serial ligada a 3 observaciones que están por encima de los intervalos de confianza establecidos.
+
+Finalmente se aplican las pruebas estadisticas respectivas ante las cuales se evidencia lo siguiente:
 
 ```{python}
 
@@ -2099,8 +2159,13 @@ formated_adf(tomate_ts_per["diff1"].dropna())
 
 
 ```
-El análisis de los p-valores de los test permite identificar ambas pruebas coinciden en demarcar la primera diferencia de la serie como estacionaria, esto lleva a concluir que la serie de tiempo del tomate chonto es I(1) es decir, esta serie llega a ser estacionaria una vez se le aplica la primera diferencia.  
 
+El análisis de los p-valores de los test permite identificar ambas pruebas coinciden en demarcar la primera diferencia de la serie como estacionaria, esto lleva a concluir que la serie de tiempo del tomate chonto es I(1) es decir, esta serie llega a ser estacionaria una vez se le aplica la primera diferencia.\
+\## Resumen
+
+El análisis realizado permite apreciar que las series de tiempo de alimentos para las dos ciudades cuentan en su mayoria con estacionalidad compuesta, por ende la determinación de un "periodo" o dinámica fija no resulta ser explicable con un solo patrón, asi mismo en términos de integración se puede apreciar que la mayoria de las series son I(1) a excepción de la serie de la habichuela en ciudad de Pereira en donde el comportamiento se muestra como I(2) a continuación se deja una tabla general de resumen en donde se demarcan los niveles de integración hallados para cada serie de tiempo:
+
+![](NivelIntegracion.png)
 
 <!--chapter:end:02-EDA.Rmd-->
 
@@ -2110,7 +2175,11 @@ En esta sección se explorarán diferentes modelos para plantear el pronóstico 
 
 ## Definición de funciones base para la fase de modelación
 
-Esta sección tiene la finalidad de definir funciones con la finalidad de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para cada modelo a aplicar.
+Esta sección tiene la finalidad de definir funciones con el objetivo de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para las variantes de suavizamiento exponencial, ARIMA, y Prophet. 
+
+Adicionalmente se aclara que no se generan funciones para regresiones con especificación de errores ARIMA teniendo en cuenta que para los pronósticos aplicados no se esta considerando el uso de variables exógenas y por ende no se esta buscando conocer el grado de influencia o impacto sobre el precio futuro, seguidamente las propiedades de estacionalidad y estacionariedad de las series exceden este tipo de modelo teniendo en cuenta que para todos los casos el nivel de integración es mayor que 0 y además se aprecian patrones de estacionalidad compuesta, en este orden de ideas las exigencias de estacionariedad de todas las variables de la regresión con errores ARIMA implica múltiples transformacion que complejizan la interpretabbilidad y traslado a un pronóstico basado en la escala o medida de las variables reales de precio.
+
+Finalmente, lo relacionado a modelos de Redes Neuronales Recurrentes (RNN) se llevan a cabo usando R pero se abordan directamente en la respectiva sección dedicada a estos modelos, por ende las funciones para la aplicación de estos modelos no es incluida en esta sección.  
 
 ### Función para separación de la serie en conjunto de test y entrenamiento
 
@@ -2312,6 +2381,8 @@ def perf_prophet(serie,alimento,prop_test):
 
 ## Modelos de suavizamiento Exponencial (Simple,Doble y Triple)
 
+Por medio de las funciones diseñadas en la sección anterior se procede a aplicar las tre variantes de suavizamiento exponencial que corresponde a suavizamiento simple, suavizamiento de Holt y suavizamiento de Holt Winters, para cada caso se genera de manera directa la grafica de evaluación del modelo en donde se revisa el resultado del pronóstico respecto al valor presentado en el conjunto de datos de test, a partir de esto finalmente se calculan las métricas MAE, MSE, RMSE y MAPE con el fin de conocer el desempeño de cada uno de los modelos privados, para cada caso el análisis se realizará en contraste a las capacidades de cada uno de los modelos aplicados. 
+
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
 ```{python}
@@ -2322,13 +2393,17 @@ plot_fcast(series_armenia,"Ahuyama_axm_merc",0.20,fr_ahuy_axm[1],fr_ahuy_axm[2],
 
 ```
 
-Al comparar el desempeño de los modelos se tiene lo siguiente
+Al observar el compartamiento de las tres técnicas de suavizamiento para el último 20% de información de la serie de tiempo se puede apreciar que el suavizamiento simple en este caso se comporta como una media que resulta bastante desfasada respecto al comportamiento real que toma la serie en el futuro, mientras este modelo considera un precio futuro de 833.608 pesos, la serie real toma en los periodos siguientes valores que inclusive superan los 1000 pesos; el segundo modelo correspondiente a un suavizamiento de Holt acierta al pronósticar una tendencia creciente y presenta una buena aproximación hasta mayo de 2022, no obstante al describir una tendencia lineal constante se puede apreciar que la pendiente modelada excede por mucho los valores reales del precio del producto; finalmente el suavizamiento tipo Holt-Winters toma un comportamiento tendencial y estacional coherente con la dinámica de la serie lo cual lleva a que este en general por debajo de los precios reales pero con un buen nivel de acercamiento a los mismos, en sintesis, al revisar el comportamiento de los tres modelos de suavizamiento sobre esta serie es posible apreciar que el modelo que mejor predice el comportamiento de la serie es el suavizamiento exponencial tripe (o Holt Winters)
+
+Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
 
 ```{python}
 
 fr_ahuy_axm[0]
 
 ```
+Las métricas generadas son consistentes con lo mencionado anteriormente, los modelos que mejor ajuste presentan corresponden al suavizamiento exponencial doble y triple, no obstante, al tomar como referencia métricas como el MAPE se puede apreciar que la desviación promedio respecto al precio resulta ser la menor aun asi presentando algunas desviaciones mayores en las demás métricas de error, en términos prácticos el suavizamiento triple resulta ser el modelo más funcional en especial porque captura de manera más conservadora la tendencia y además tambien captura los periodos de ascenso y descenso del precio, asi las cosas, aunque el suavizamiento de Holt presenta MAE,MSE y RMSE más bajos se espera que termine sobre-estimando la dinámica de precios en especial por su tendencia a considerar una linea de tendencia. 
+
 
 ### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Armenia)
 
@@ -2341,11 +2416,18 @@ plot_fcast(series_armenia,"Cebolla junca_axm_merc",0.20,fr_cebollj_axm[1],fr_ceb
 
 ```
 
+La revisión gráfica del resultado de pronóstico sobre el conjunto de test permite apreciar que el suavizamiento exponencial simple maneja una media equivalente a 1866.47 que no presenta variaciones en el tiempo y que tiene realmente poca capacidad para capturar los movimientos dentro del periodo comprendido entre Agosto de 2021 y Dicembre de 2022; en lo que respecta al suavizamiento exponencial doble se puede apreciar que el modelo toma como refefencia una tendencia bajista no lineal que inclusive tiende a los minimos históricos presentados por el precio  finales de 2016, sin embargo tal trayectoria es erronea y se aleja de manera considerable de los valores reales que toma el precio para el periodo de análisis, en consecuencia el suavizamiento exponencial doble no cumple con la necesidad de pronóstico, finalmente el suavizamiento exponencial triple presenta una dinámica un tanto más acertada capturando la estacionalidad y la estructura del movimiento, sin embargo tal dinámica se proyecta en un umbral decreciente muy por debajo, de hecho en los momentos minímos del precio pronosticado se llega a 1090 pesos mientras el precio real se encuentra en 1643 (niveles por encima de 1500), dadas las particularidades de cada pronóstico realmente a pesar de su simpleza el suavizamiento exponencial simple presenta el mejor desemepeño de las técnicas utilizadas teniendo en cuenta que para el periodo comprendido por el conjunto de test la tednencia del precio resulta ser lateral. 
+
+
+Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
+
 ```{python}
 
 fr_cebollj_axm[0]
 
 ```
+Como se expresoón con anterioridad a pesar de que el suavizamiento se esta comportando practicamente como un valor medio, termina siendo mucho más efectivo en términos de error respecto a los otros dos modelos que acentuan la dinámica bajista del precio lo cual lleva a que el error final se maximice aun cuando elementos como la estacionalidad y la estructura del movimiento son captadas con mayor precisión. 
+
 
 ### Pronóstico serie de tiempo de la Habichuela (Ciudad de Armenia)
 
@@ -2357,12 +2439,23 @@ plot_fcast(series_armenia,"Habichuela_axm_merc",0.20,fr_habich_axm[1],fr_habich_
 
 
 ```
+Como primer elemento a resaltar el precio de la habichuela para el periodo de revisión presenta un comportamiento alcista que lleva inclusive el precio por encima de los 5000 pesos hacia Enero de 2022, y que mantiene a partir de Septiembre de 2021 el precio por encima de los 2000 pesos. Para este caso el suavizamiento exponencial simple que se presenta como un valor medio constante tiene muy proca precisión dado que la desviación del precio presenta una clara tendencia y tambien tiene un caracter de alzas explosivas hacia Enero y Marzo de 2022 lo cual amplifica el grado de error de este método; por otro lado, el suavizamiento doble demarcar una linea de tendencia creciente que resulta funcional para capturar algunos picos de precio pero que pierde efectividad en el tiempo dado que despues de Marzo de 2022 el precio del alimento entra en un periodo de corrección en donde toma un movimiento lateral que se aleja de una dinámica estrictamente creciente como la que demarca el método de Holt. Finalmente el suavizamiento exponencial triple presenta un mejor desempeño ya que captura el movimiento estacional de la serie y tambien incorpora la tendencia pero sin llevar al extremo su pendiente, las pérdidas más considerables de precisión para este método se sufren al principio de periodo en donde hay una baja sustancia el precio antes de iniciar el alza y durante la corrección del precio hacia mayo de 2022 en donde el precio alcanza niveles de 2133 mientras que el pronóstico alcanza los 3985.  
+
+En concordancia a lo anterior, al remitirse a la visualización del pronóstico se apreciar que la mayor precisión la logra el suavizamiento triple no obstante no es un modelo que capture totalmente el movimiento sino que su efectividad se ve disminuida dadas las variaciones bruscas que sufre el precio para el periodo del conjunto de test. 
+
+
+Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
 
 ```{python}
 
 fr_habich_axm[0]
 
 ```
+En términos de métricas se puede apreciar que las desviaciones observadas respecto al modelo de suavizamiento triple incrementan 
+
+
+
+
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
 

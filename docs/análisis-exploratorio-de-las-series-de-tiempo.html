@@ -399,8 +399,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb107"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb107-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb107-1" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">&quot;lower right&quot;</span>)</span>
 <span id="cb107-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb107-2" tabindex="-1"></a>plt.grid(alpha<span class="op">=</span><span class="fl">0.5</span>,linewidth<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb107-3"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb107-3" tabindex="-1"></a>plt.show()</span></code></pre></div>
-<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-50-9.png" width="1440" />
-Ahora realicemos un lag plot respecto a la serie diferenciada con el fin de ver su comportamiento:</p>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-50-9.png" width="1440" /></p>
+<p>Ahora realicemos un lag plot respecto a la serie diferenciada con el fin de ver su comportamiento:</p>
 <div class="sourceCode" id="cb108"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb108-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb108-1" tabindex="-1"></a></span>
 <span id="cb108-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb108-2" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>,<span class="dv">10</span>))</span>
 <span id="cb108-3"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb108-3" tabindex="-1"></a>pd.plotting.lag_plot(ahuyama_ts[<span class="st">&quot;diff1&quot;</span>],lag<span class="op">=</span><span class="dv">1</span>)</span>
@@ -541,8 +541,8 @@ Ahora realicemos un lag plot respecto a la serie diferenciada con el fin de ver 
 <div class="sourceCode" id="cb137"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb137-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb137-1" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">&quot;lower right&quot;</span>)</span>
 <span id="cb137-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb137-2" tabindex="-1"></a>plt.grid(alpha<span class="op">=</span><span class="fl">0.5</span>,linewidth<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb137-3"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb137-3" tabindex="-1"></a>plt.show()</span></code></pre></div>
-<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-60-23.png" width="1440" />
-Al revisar la primera diferencia de la serie es posible apreciar que el componente tendencial ha desaparecido y ahora se tiene una serie de tiempo que se asemeja más a una serie de tiempo estacionaria, se aprecia claramente que no hay un componente tendencial y además tambien es posible ver que en cierta forma se suaviza la dinámica estaciona, no obstante se puede apreciar claramente que hay algunos cambios considerablemente bruscos a mediados de 2016, finales de 2017, y a inicios de 2021.</p>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-60-23.png" width="1440" /></p>
+<p>Al revisar la primera diferencia de la serie es posible apreciar que el componente tendencial ha desaparecido y ahora se tiene una serie de tiempo que se asemeja más a una serie de tiempo estacionaria, se aprecia claramente que no hay un componente tendencial y además tambien es posible ver que en cierta forma se suaviza la dinámica estaciona, no obstante se puede apreciar claramente que hay algunos cambios considerablemente bruscos a mediados de 2016, finales de 2017, y a inicios de 2021.</p>
 <p>Ahora se procede a revisar el lag plot de la primera diferencia:</p>
 <div class="sourceCode" id="cb138"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb138-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb138-1" tabindex="-1"></a></span>
 <span id="cb138-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb138-2" tabindex="-1"></a>pd.plotting.lag_plot(cebollaj_ts[[<span class="st">&quot;diff1&quot;</span>]].dropna(),lag<span class="op">=</span><span class="dv">3</span>)</span>
@@ -682,8 +682,8 @@ Al revisar la primera diferencia de la serie es posible apreciar que el componen
 <div class="sourceCode" id="cb167"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb167-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb167-1" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">&quot;lower right&quot;</span>)</span>
 <span id="cb167-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb167-2" tabindex="-1"></a>plt.grid(alpha<span class="op">=</span><span class="fl">0.5</span>,linewidth<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb167-3"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb167-3" tabindex="-1"></a>plt.show()</span></code></pre></div>
-<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-70-37.png" width="1440" />
-Al aplicar la primera diferencia se puede apreciar claramente la magnitud de las variaciones a lo largo del tiempo, en este caso es posible ver los picos de precio que se comentaban al inicio del análisis de la serie de tiempo, la dinámica de cambio de precio más brusco se presenta en el primer semestre de 2022 presentando variaciones cercanas a los 2000 pesos (tanto al alza como a la baja)</p>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-70-37.png" width="1440" /></p>
+<p>Al aplicar la primera diferencia se puede apreciar claramente la magnitud de las variaciones a lo largo del tiempo, en este caso es posible ver los picos de precio que se comentaban al inicio del análisis de la serie de tiempo, la dinámica de cambio de precio más brusco se presenta en el primer semestre de 2022 presentando variaciones cercanas a los 2000 pesos (tanto al alza como a la baja)</p>
 <p>Ahora veamos el lag plot de la primera diferencia:</p>
 <div class="sourceCode" id="cb168"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb168-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb168-1" tabindex="-1"></a></span>
 <span id="cb168-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb168-2" tabindex="-1"></a>pd.plotting.lag_plot(habichuela_ts[[<span class="st">&quot;diff1&quot;</span>]].dropna(),lag<span class="op">=</span><span class="dv">3</span>)</span>
@@ -965,8 +965,8 @@ Al aplicar la primera diferencia se puede apreciar claramente la magnitud de las
 <div class="sourceCode" id="cb228"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb228-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb228-1" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">&quot;lower right&quot;</span>)</span>
 <span id="cb228-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb228-2" tabindex="-1"></a>plt.grid(alpha<span class="op">=</span><span class="fl">0.5</span>,linewidth<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb228-3"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb228-3" tabindex="-1"></a>plt.show()</span></code></pre></div>
-<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-90-65.png" width="1440" />
-Al obtener una primera diferencia se pueden apreciar con claridad los cambios bruscos que sufre la serie a lo largo del tiempo, por ejemplo en el periodo 2018-2019 hay bastante estabilidad en la varianza del precio, esto cambia de forma considerable hacia adelante en donde la volatilidad del mismo incrementa de forma considerable. Más allá de las variaciones es posible apreciar que la diferenciación de la serie permite corregir el componente tendencial de la serie lo cual hace que se asemeje más a una serie de tipo estacionaria.</p>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-90-65.png" width="1440" /></p>
+<p>Al obtener una primera diferencia se pueden apreciar con claridad los cambios bruscos que sufre la serie a lo largo del tiempo, por ejemplo en el periodo 2018-2019 hay bastante estabilidad en la varianza del precio, esto cambia de forma considerable hacia adelante en donde la volatilidad del mismo incrementa de forma considerable. Más allá de las variaciones es posible apreciar que la diferenciación de la serie permite corregir el componente tendencial de la serie lo cual hace que se asemeje más a una serie de tipo estacionaria.</p>
 <div class="sourceCode" id="cb229"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb229-1"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb229-1" tabindex="-1"></a></span>
 <span id="cb229-2"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb229-2" tabindex="-1"></a>pd.plotting.lag_plot(ahuyama_ts_per[<span class="st">&quot;diff1&quot;</span>].dropna(),lag<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb229-3"><a href="análisis-exploratorio-de-las-series-de-tiempo.html#cb229-3" tabindex="-1"></a>plt.show()</span></code></pre></div>
@@ -1460,7 +1460,10 @@ Al obtener una primera diferencia se pueden apreciar con claridad los cambios br
 ## Crit_val5%:                    -2.869557
 ## Crit_val10%                    -2.571041
 ## Interpretation  La serie es estacionaria, 4.905027695947852e-28)</code></pre>
-<p>El análisis de los p-valores de los test permite identificar ambas pruebas coinciden en demarcar la primera diferencia de la serie como estacionaria, esto lleva a concluir que la serie de tiempo del tomate chonto es I(1) es decir, esta serie llega a ser estacionaria una vez se le aplica la primera diferencia.</p>
+<p>El análisis de los p-valores de los test permite identificar ambas pruebas coinciden en demarcar la primera diferencia de la serie como estacionaria, esto lleva a concluir que la serie de tiempo del tomate chonto es I(1) es decir, esta serie llega a ser estacionaria una vez se le aplica la primera diferencia.<br />
+## Resumen</p>
+<p>El análisis realizado permite apreciar que las series de tiempo de alimentos para las dos ciudades cuentan en su mayoria con estacionalidad compuesta, por ende la determinación de un “periodo” o dinámica fija no resulta ser explicable con un solo patrón, asi mismo en términos de integración se puede apreciar que la mayoria de las series son I(1) a excepción de la serie de la habichuela en ciudad de Pereira en donde el comportamiento se muestra como I(2) a continuación se deja una tabla general de resumen en donde se demarcan los niveles de integración hallados para cada serie de tiempo:</p>
+<p><img src="NivelIntegracion.png" /></p>
 
 </div>
 </div>

@@ -210,6 +210,8 @@ def perf_prophet(serie,alimento,prop_test):
 
 ## Modelos de suavizamiento Exponencial (Simple,Doble y Triple)
 
+Por medio de las funciones diseñadas en la sección anterior se procede a aplicar las tre variantes de suavizamiento exponencial que corresponde a suavizamiento simple, suavizamiento de Holt y suavizamiento de Holt Winters, para cada caso se genera de manera directa la grafica de evaluación del modelo en donde se revisa el resultado del pronóstico respecto al valor presentado en el conjunto de datos de test, a partir de esto finalmente se calculan las métricas MAE, MSE, RMSE y MAPE con el fin de conocer el desempeño de cada uno de los modelos privados, para cada caso el análisis se realizará en contraste a las capacidades de cada uno de los modelos aplicados. 
+
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
 ```{python}
@@ -220,13 +222,17 @@ plot_fcast(series_armenia,"Ahuyama_axm_merc",0.20,fr_ahuy_axm[1],fr_ahuy_axm[2],
 
 ```
 
-Al comparar el desempeño de los modelos se tiene lo siguiente
+Al observar el compartamiento de las tres técnicas de suavizamiento para el último 20% de información de la serie de tiempo se puede apreciar que el suavizamiento simple en este caso se comporta como una media que resulta bastante desfasada respecto al comportamiento real que toma la serie en el futuro, mientras este modelo considera un precio futuro de 833.608 pesos, la serie real toma en los periodos siguientes valores que inclusive superan los 1000 pesos; el segundo modelo correspondiente a un suavizamiento de Holt acierta al pronósticar una tendencia creciente y presenta una buena aproximación hasta mayo de 2022, no obstante al describir una tendencia lineal constante se puede apreciar que la pendiente modelada excede por mucho los valores reales del precio del producto; finalmente el suavizamiento tipo Holt-Winters toma un comportamiento tendencial y estacional coherente con la dinámica de la serie lo cual lleva a que este en general por debajo de los precios reales pero con un buen nivel de acercamiento a los mismos, en sintesis, al revisar el comportamiento de los tres modelos de suavizamiento sobre esta serie es posible apreciar que el modelo que mejor predice el comportamiento de la serie es el suavizamiento exponencial tripe (o Holt Winters)
+
+Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
 
 ```{python}
 
 fr_ahuy_axm[0]
 
 ```
+Las métricas generadas son consistentes con lo mencionado anteriormente, los modelos que mejor ajuste presentan corresponden al suavizamiento exponencial doble y triple, no obstante, al tomar como referencia métricas como el MAPE se puede apreciar que la desviación promedio respecto al precio resulta ser la menor aun asi presentando algunas desviaciones mayores en las demás métricas de error, en términos prácticos el suavizamiento triple resulta ser el modelo más funcional en especial porque captura de manera más conservadora la tendencia y además tambien captura los periodos de ascenso y descenso del precio, asi las cosas, aunque el suavizamiento de Holt presenta MAE,MSE y RMSE más bajos se espera que termine sobre-estimando la dinámica de precios en especial por su tendencia a considerar una linea de tendencia. 
+
 
 ### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Armenia)
 
@@ -239,11 +245,18 @@ plot_fcast(series_armenia,"Cebolla junca_axm_merc",0.20,fr_cebollj_axm[1],fr_ceb
 
 ```
 
+La revisión gráfica del resultado de pronóstico sobre el conjunto de test permite apreciar que el suavizamiento exponencial simple maneja una media equivalente a 1866.47 que no presenta variaciones en el tiempo y que tiene realmente poca capacidad para capturar los movimientos dentro del periodo comprendido entre Agosto de 2021 y Dicembre de 2022; en lo que respecta al suavizamiento exponencial doble se puede apreciar que el modelo toma como refefencia una tendencia bajista no lineal que inclusive tiende a los minimos históricos presentados por el precio  finales de 2016, sin embargo tal trayectoria es erronea y se aleja de manera considerable de los valores reales que toma el precio para el periodo de análisis, en consecuencia el suavizamiento exponencial doble no cumple con la necesidad de pronóstico, finalmente el suavizamiento exponencial triple presenta una dinámica un tanto más acertada capturando la estacionalidad y la estructura del movimiento, sin embargo tal dinámica se proyecta en un umbral decreciente muy por debajo, de hecho en los momentos minímos del precio pronosticado se llega a 1090 pesos mientras el precio real se encuentra en 1643 (niveles por encima de 1500), dadas las particularidades de cada pronóstico realmente a pesar de su simpleza el suavizamiento exponencial simple presenta el mejor desemepeño de las técnicas utilizadas teniendo en cuenta que para el periodo comprendido por el conjunto de test la tednencia del precio resulta ser lateral. 
+
+
+Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
+
 ```{python}
 
 fr_cebollj_axm[0]
 
 ```
+Como se expresoón con anterioridad a pesar de que el suavizamiento se esta comportando practicamente como un valor medio, termina siendo mucho más efectivo en términos de error respecto a los otros dos modelos que acentuan la dinámica bajista del precio lo cual lleva a que el error final se maximice aun cuando elementos como la estacionalidad y la estructura del movimiento son captadas con mayor precisión. 
+
 
 ### Pronóstico serie de tiempo de la Habichuela (Ciudad de Armenia)
 
@@ -255,12 +268,23 @@ plot_fcast(series_armenia,"Habichuela_axm_merc",0.20,fr_habich_axm[1],fr_habich_
 
 
 ```
+Como primer elemento a resaltar el precio de la habichuela para el periodo de revisión presenta un comportamiento alcista que lleva inclusive el precio por encima de los 5000 pesos hacia Enero de 2022, y que mantiene a partir de Septiembre de 2021 el precio por encima de los 2000 pesos. Para este caso el suavizamiento exponencial simple que se presenta como un valor medio constante tiene muy proca precisión dado que la desviación del precio presenta una clara tendencia y tambien tiene un caracter de alzas explosivas hacia Enero y Marzo de 2022 lo cual amplifica el grado de error de este método; por otro lado, el suavizamiento doble demarcar una linea de tendencia creciente que resulta funcional para capturar algunos picos de precio pero que pierde efectividad en el tiempo dado que despues de Marzo de 2022 el precio del alimento entra en un periodo de corrección en donde toma un movimiento lateral que se aleja de una dinámica estrictamente creciente como la que demarca el método de Holt. Finalmente el suavizamiento exponencial triple presenta un mejor desempeño ya que captura el movimiento estacional de la serie y tambien incorpora la tendencia pero sin llevar al extremo su pendiente, las pérdidas más considerables de precisión para este método se sufren al principio de periodo en donde hay una baja sustancia el precio antes de iniciar el alza y durante la corrección del precio hacia mayo de 2022 en donde el precio alcanza niveles de 2133 mientras que el pronóstico alcanza los 3985.  
+
+En concordancia a lo anterior, al remitirse a la visualización del pronóstico se apreciar que la mayor precisión la logra el suavizamiento triple no obstante no es un modelo que capture totalmente el movimiento sino que su efectividad se ve disminuida dadas las variaciones bruscas que sufre el precio para el periodo del conjunto de test. 
+
+
+Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
 
 ```{python}
 
 fr_habich_axm[0]
 
 ```
+En términos de métricas se puede apreciar que las desviaciones observadas respecto al modelo de suavizamiento triple incrementan 
+
+
+
+
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
 
