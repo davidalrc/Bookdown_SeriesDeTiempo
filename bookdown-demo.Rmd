@@ -9,7 +9,7 @@ bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
 github-repo: rstudio/bookdown-demo
-description: "Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia, Pereira y Manizales"
+description: "Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira"
 ---
 
 # Justificación y fuentes de información
@@ -23,21 +23,24 @@ En concordancia a lo anterior, en este ejercicio se tomarán las series de tiemp
 -   Habichuela
 -   Ahuyama
 
-Las series de tiempo en mención serán tomadas de los boletines semanales del SIPSA que emite el Departamento Nacional de Estadística (DANE) comprendiendo el periodo 2016-2022 buscando realizar pronósticos de las 4 semanas siguientes de los productos de referencia. Para relacionar el precio mayorista con el precio minorista se tomara como referencia la Canasta Básica de Salud Ailmentaria (CABASA) a través de la cual se proyectarán por inflación los precios minoristas con el fin de contrastarlos con la dinámica del precio mayorista mostrado por el mercado y por los periodos de pronóstico, asi mismo se proyectará el valor total de la canasta básica estándar por medio de la inflación y se validará como varia la proporción de la participación monetaria de los 4 alimentos con el fin de determinar como se ve impactado el poder adquisitivo en relación a estos alimentos de referencia tomando siempre como base la participación relativa inicial respecto a las participaciones relativas futuras respecto al precio que toman sobre el valor total de la canasta. Al final del ejercicio se podrá evidenciar que tanto ha variado el esfuerzo monetario para preservar estas hortalizas básicas en la canasta y que tanto será el esfuerzo en las semanas pronosticadas.
+Las series de tiempo en mención serán tomadas de los boletines semanales del SIPSA que emite el Departamento Nacional de Estadística (DANE) comprendiendo el periodo 2016-2022 buscando demarcar que modelos sería los más adecuados para realizar pronósticos de las 4 semanas siguientes de los productos de referencia. Para en ejercicios posteriores relacionar el precio mayorista con el precio minorista, tomando como referencia la Canasta Básica de Salud Ailmentaria (CABASA) a través de la cual es posible proyectar por inflación los precios minoristas con el fin de contrastarlos con la dinámica del precio mayorista mostrado por el mercado y por los periodos de pronóstico. La delimitación de los modelos más adecuados para la predicción de precio de ciertos alimentos base permite hacer un acercamiento inicial para determinar la complejidad de las series, asi como su estructura y potencial para ser estimadas por métodos lineales o no lineales. 
+
+En un escenario posterior, el conocimiento respecto a modelos adecuados de predicción permiten ejercicios como proyectar el valor total de la canasta básica estándar por medio de la inflación y validar su variación como la proporción de la participación monetaria de los 4 alimentos con el fin de determinar como se ve impactado el poder adquisitivo en relación a estos alimentos de referencia tomando siempre como base la participación relativa inicial respecto a las participaciones relativas futuras respecto al precio que toman sobre el valor total de la canasta. 
+
+Al final del ejercicio se podrá evidenciar cuales son los modelos más adecuados de pronóstico que podrían habilitar ejercicios como el anteriormente descrito que buscan conocer tanto ha variado el esfuerzo monetario para preservar alimentos básicos en la canasta y que tanto será el esfuerzo en las semanas pronosticadas.
 
 Conocer las variaciones de la participación monetaria de los alimentos en la canasta básica permite evidenciar que tanto menos dinero disponible tendrá el consumidor luego de comprar una cantidad "n" de un alimento, por lo tanto, si la participación de ciertos alimentos incrementa de forma desmedida la preservación de las cantidades iniciales consumidas supondrá un esfuerzo mayor y una cantidad restante menor para acceder a los demás alimentos que conforman la canasta completa, manteniendo las cantidades consumidas constantes, esto supondrá finalmente una reducción de las cantidades consumidas o inclusive la eliminación o sustitución de algunos alimentos dentro de la dieta.
 
-El ejercicio de pronóstico y análisis propuesto representa un ejercicio por medio del cual es posible acercarse al impacto del aumento de los precios mayoristas en el consumidor final lo cual se relaciona directamente con la seguridad alimentaria ligada al acceso desde una perspectiva monetaria.
+El ejercicio de pronóstico y análisis propuesto representa un ejercicio por medio del cual es posible acercarse al impacto del aumento de los precios mayoristas en el consumidor final lo cual se relaciona directamente con la seguridad alimentaria ligada al acceso desde una perspectiva monetaria. En este caso se explorarán métodos de pronóstico para los alimentos anteriormente mencionados, se realizará un comparación y se determinará que modelos serian potencialmente adecuados para usar en ejercicios posteriores.  
 
 Para la ejecución de este ejercicio se llevarán a cabo los siguientes pasos que demarcarán la estructura del documento:
 
 1.  Recolección, carga y transformación de los datos de precios semanales
 2.  Análisis exploratorio de las series de tiempo
 3.  Modelación para el pronóstico de las series de tiempo
-4.  Evaluación y ajuste de hiperparámetros de los modelos
-5.  Contraste entre series de tiempo y proyección de precios minoristas
-6.  Análisis de la participación conjunta del grupo de 4 hortalizas sobre el valor total de la CABASA
-7.  Conclusiones y recomendaciones
+4.  Comparación de modelos
+5.  Concusiones
+
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
@@ -2175,11 +2178,11 @@ En esta sección se explorarán diferentes modelos para plantear el pronóstico 
 
 ## Definición de funciones base para la fase de modelación
 
-Esta sección tiene la finalidad de definir funciones con el objetivo de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para las variantes de suavizamiento exponencial, ARIMA, y Prophet. 
+Esta sección tiene la finalidad de definir funciones con el objetivo de simplificar la fase de modelación, en esta sección se calculan elementos como la estacionalidad, y se crean funciones que calculan métricas y gráficas de forma automática para las variantes de suavizamiento exponencial, ARIMA, y Prophet.
 
 Adicionalmente se aclara que no se generan funciones para regresiones con especificación de errores ARIMA teniendo en cuenta que para los pronósticos aplicados no se esta considerando el uso de variables exógenas y por ende no se esta buscando conocer el grado de influencia o impacto sobre el precio futuro, seguidamente las propiedades de estacionalidad y estacionariedad de las series exceden este tipo de modelo teniendo en cuenta que para todos los casos el nivel de integración es mayor que 0 y además se aprecian patrones de estacionalidad compuesta, en este orden de ideas las exigencias de estacionariedad de todas las variables de la regresión con errores ARIMA implica múltiples transformacion que complejizan la interpretabbilidad y traslado a un pronóstico basado en la escala o medida de las variables reales de precio.
 
-Finalmente, lo relacionado a modelos de Redes Neuronales Recurrentes (RNN) se llevan a cabo usando R pero se abordan directamente en la respectiva sección dedicada a estos modelos, por ende las funciones para la aplicación de estos modelos no es incluida en esta sección.  
+Finalmente, lo relacionado a modelos de Redes Neuronales Recurrentes (RNN) se llevan a cabo usando R pero se abordan directamente en la respectiva sección dedicada a estos modelos, por ende las funciones para la aplicación de estos modelos no es incluida en esta sección.
 
 ### Función para separación de la serie en conjunto de test y entrenamiento
 
@@ -2381,7 +2384,7 @@ def perf_prophet(serie,alimento,prop_test):
 
 ## Modelos de suavizamiento Exponencial (Simple,Doble y Triple)
 
-Por medio de las funciones diseñadas en la sección anterior se procede a aplicar las tre variantes de suavizamiento exponencial que corresponde a suavizamiento simple, suavizamiento de Holt y suavizamiento de Holt Winters, para cada caso se genera de manera directa la grafica de evaluación del modelo en donde se revisa el resultado del pronóstico respecto al valor presentado en el conjunto de datos de test, a partir de esto finalmente se calculan las métricas MAE, MSE, RMSE y MAPE con el fin de conocer el desempeño de cada uno de los modelos privados, para cada caso el análisis se realizará en contraste a las capacidades de cada uno de los modelos aplicados. 
+Por medio de las funciones diseñadas en la sección anterior se procede a aplicar las tre variantes de suavizamiento exponencial que corresponde a suavizamiento simple, suavizamiento de Holt y suavizamiento de Holt Winters, para cada caso se genera de manera directa la grafica de evaluación del modelo en donde se revisa el resultado del pronóstico respecto al valor presentado en el conjunto de datos de test, a partir de esto finalmente se calculan las métricas MAE, MSE, RMSE y MAPE con el fin de conocer el desempeño de cada uno de los modelos privados, para cada caso el análisis se realizará en contraste a las capacidades de cada uno de los modelos aplicados.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
@@ -2402,8 +2405,8 @@ Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indica
 fr_ahuy_axm[0]
 
 ```
-Las métricas generadas son consistentes con lo mencionado anteriormente, los modelos que mejor ajuste presentan corresponden al suavizamiento exponencial doble y triple, no obstante, al tomar como referencia métricas como el MAPE se puede apreciar que la desviación promedio respecto al precio resulta ser la menor aun asi presentando algunas desviaciones mayores en las demás métricas de error, en términos prácticos el suavizamiento triple resulta ser el modelo más funcional en especial porque captura de manera más conservadora la tendencia y además tambien captura los periodos de ascenso y descenso del precio, asi las cosas, aunque el suavizamiento de Holt presenta MAE,MSE y RMSE más bajos se espera que termine sobre-estimando la dinámica de precios en especial por su tendencia a considerar una linea de tendencia. 
 
+Las métricas generadas son consistentes con lo mencionado anteriormente, los modelos que mejor ajuste presentan corresponden al suavizamiento exponencial doble y triple, no obstante, al tomar como referencia métricas como el MAPE se puede apreciar que la desviación promedio respecto al precio resulta ser la menor aun asi presentando algunas desviaciones mayores en las demás métricas de error, en términos prácticos el suavizamiento triple resulta ser el modelo más funcional en especial porque captura de manera más conservadora la tendencia y además tambien captura los periodos de ascenso y descenso del precio, asi las cosas, aunque el suavizamiento de Holt presenta MAE,MSE y RMSE más bajos se espera que termine sobre-estimando la dinámica de precios en especial por su tendencia a considerar una linea de tendencia.
 
 ### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Armenia)
 
@@ -2416,8 +2419,7 @@ plot_fcast(series_armenia,"Cebolla junca_axm_merc",0.20,fr_cebollj_axm[1],fr_ceb
 
 ```
 
-La revisión gráfica del resultado de pronóstico sobre el conjunto de test permite apreciar que el suavizamiento exponencial simple maneja una media equivalente a 1866.47 que no presenta variaciones en el tiempo y que tiene realmente poca capacidad para capturar los movimientos dentro del periodo comprendido entre Agosto de 2021 y Dicembre de 2022; en lo que respecta al suavizamiento exponencial doble se puede apreciar que el modelo toma como refefencia una tendencia bajista no lineal que inclusive tiende a los minimos históricos presentados por el precio  finales de 2016, sin embargo tal trayectoria es erronea y se aleja de manera considerable de los valores reales que toma el precio para el periodo de análisis, en consecuencia el suavizamiento exponencial doble no cumple con la necesidad de pronóstico, finalmente el suavizamiento exponencial triple presenta una dinámica un tanto más acertada capturando la estacionalidad y la estructura del movimiento, sin embargo tal dinámica se proyecta en un umbral decreciente muy por debajo, de hecho en los momentos minímos del precio pronosticado se llega a 1090 pesos mientras el precio real se encuentra en 1643 (niveles por encima de 1500), dadas las particularidades de cada pronóstico realmente a pesar de su simpleza el suavizamiento exponencial simple presenta el mejor desemepeño de las técnicas utilizadas teniendo en cuenta que para el periodo comprendido por el conjunto de test la tednencia del precio resulta ser lateral. 
-
+La revisión gráfica del resultado de pronóstico sobre el conjunto de test permite apreciar que el suavizamiento exponencial simple maneja una media equivalente a 1866.47 que no presenta variaciones en el tiempo y que tiene realmente poca capacidad para capturar los movimientos dentro del periodo comprendido entre Agosto de 2021 y Dicembre de 2022; en lo que respecta al suavizamiento exponencial doble se puede apreciar que el modelo toma como refefencia una tendencia bajista no lineal que inclusive tiende a los minimos históricos presentados por el precio finales de 2016, sin embargo tal trayectoria es erronea y se aleja de manera considerable de los valores reales que toma el precio para el periodo de análisis, en consecuencia el suavizamiento exponencial doble no cumple con la necesidad de pronóstico, finalmente el suavizamiento exponencial triple presenta una dinámica un tanto más acertada capturando la estacionalidad y la estructura del movimiento, sin embargo tal dinámica se proyecta en un umbral decreciente muy por debajo, de hecho en los momentos minímos del precio pronosticado se llega a 1090 pesos mientras el precio real se encuentra en 1643 (niveles por encima de 1500), dadas las particularidades de cada pronóstico realmente a pesar de su simpleza el suavizamiento exponencial simple presenta el mejor desemepeño de las técnicas utilizadas teniendo en cuenta que para el periodo comprendido por el conjunto de test la tednencia del precio resulta ser lateral.
 
 Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
 
@@ -2426,8 +2428,8 @@ Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indica
 fr_cebollj_axm[0]
 
 ```
-Como se expresoón con anterioridad a pesar de que el suavizamiento se esta comportando practicamente como un valor medio, termina siendo mucho más efectivo en términos de error respecto a los otros dos modelos que acentuan la dinámica bajista del precio lo cual lleva a que el error final se maximice aun cuando elementos como la estacionalidad y la estructura del movimiento son captadas con mayor precisión. 
 
+Como se expresoón con anterioridad a pesar de que el suavizamiento se esta comportando practicamente como un valor medio, termina siendo mucho más efectivo en términos de error respecto a los otros dos modelos que acentuan la dinámica bajista del precio lo cual lleva a que el error final se maximice aun cuando elementos como la estacionalidad y la estructura del movimiento son captadas con mayor precisión.
 
 ### Pronóstico serie de tiempo de la Habichuela (Ciudad de Armenia)
 
@@ -2439,10 +2441,10 @@ plot_fcast(series_armenia,"Habichuela_axm_merc",0.20,fr_habich_axm[1],fr_habich_
 
 
 ```
-Como primer elemento a resaltar el precio de la habichuela para el periodo de revisión presenta un comportamiento alcista que lleva inclusive el precio por encima de los 5000 pesos hacia Enero de 2022, y que mantiene a partir de Septiembre de 2021 el precio por encima de los 2000 pesos. Para este caso el suavizamiento exponencial simple que se presenta como un valor medio constante tiene muy proca precisión dado que la desviación del precio presenta una clara tendencia y tambien tiene un caracter de alzas explosivas hacia Enero y Marzo de 2022 lo cual amplifica el grado de error de este método; por otro lado, el suavizamiento doble demarcar una linea de tendencia creciente que resulta funcional para capturar algunos picos de precio pero que pierde efectividad en el tiempo dado que despues de Marzo de 2022 el precio del alimento entra en un periodo de corrección en donde toma un movimiento lateral que se aleja de una dinámica estrictamente creciente como la que demarca el método de Holt. Finalmente el suavizamiento exponencial triple presenta un mejor desempeño ya que captura el movimiento estacional de la serie y tambien incorpora la tendencia pero sin llevar al extremo su pendiente, las pérdidas más considerables de precisión para este método se sufren al principio de periodo en donde hay una baja sustancia el precio antes de iniciar el alza y durante la corrección del precio hacia mayo de 2022 en donde el precio alcanza niveles de 2133 mientras que el pronóstico alcanza los 3985.  
 
-En concordancia a lo anterior, al remitirse a la visualización del pronóstico se apreciar que la mayor precisión la logra el suavizamiento triple no obstante no es un modelo que capture totalmente el movimiento sino que su efectividad se ve disminuida dadas las variaciones bruscas que sufre el precio para el periodo del conjunto de test. 
+Como primer elemento a resaltar el precio de la habichuela para el periodo de revisión presenta un comportamiento alcista que lleva inclusive el precio por encima de los 5000 pesos hacia Enero de 2022, y que mantiene a partir de Septiembre de 2021 el precio por encima de los 2000 pesos. Para este caso el suavizamiento exponencial simple que se presenta como un valor medio constante tiene muy proca precisión dado que la desviación del precio presenta una clara tendencia y tambien tiene un caracter de alzas explosivas hacia Enero y Marzo de 2022 lo cual amplifica el grado de error de este método; por otro lado, el suavizamiento doble demarcar una linea de tendencia creciente que resulta funcional para capturar algunos picos de precio pero que pierde efectividad en el tiempo dado que despues de Marzo de 2022 el precio del alimento entra en un periodo de corrección en donde toma un movimiento lateral que se aleja de una dinámica estrictamente creciente como la que demarca el método de Holt. Finalmente el suavizamiento exponencial triple presenta un mejor desempeño ya que captura el movimiento estacional de la serie y tambien incorpora la tendencia pero sin llevar al extremo su pendiente, las pérdidas más considerables de precisión para este método se sufren al principio de periodo en donde hay una baja sustancia el precio antes de iniciar el alza y durante la corrección del precio hacia mayo de 2022 en donde el precio alcanza niveles de 2133 mientras que el pronóstico alcanza los 3985.
 
+En concordancia a lo anterior, al remitirse a la visualización del pronóstico se apreciar que la mayor precisión la logra el suavizamiento triple no obstante no es un modelo que capture totalmente el movimiento sino que su efectividad se ve disminuida dadas las variaciones bruscas que sufre el precio para el periodo del conjunto de test.
 
 Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indicadores:
 
@@ -2451,11 +2453,8 @@ Al comparar el desempeño de los modelos se tiene lo siguiente a nivel de indica
 fr_habich_axm[0]
 
 ```
-En términos de métricas se puede apreciar que las desviaciones observadas respecto al modelo de suavizamiento triple incrementan 
 
-
-
-
+En términos de métricas se puede apreciar que las desviaciones observadas respecto al modelo de suavizamiento triple incrementan el error observado finalmente a nivel de métricas, esto al punto de presentar métricas como el MAPE mayores al suavizamiento simple, particularmente el tramo predicho cuenta con variaciones abruptas del precio y estacionalidad irregular lo que impide un resultado final más precio.
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
 
@@ -2469,12 +2468,18 @@ plot_fcast(series_armenia,"Tomate chonto_axm_merc",0.20,fr_tomate_axm[1],fr_toma
 
 ```
 
+El tomate chonto particularmente presenta una dinámica estacional un tanto más calra durante periodos anuales, sin embargo sufre distorsiones importantes druante 2022, por ejemplo durante Abril de 2022 la serie original presenta un aumento vertiginoso que lleva el precio hasta los 5000 y posteriormente se normaliza; para este caso puntual el suavizamiento simple demarca un punto medio bastante distante de la dinámica real de la serie, al igual que el suavizamiento doble que presenta una dinámica lateral que termina asemejandose a lo proyectado por el suavizamiento simple; finalmente el modelo Holt Winters logra capturar de mejor manera la dinámica de la serie aunque en gran parte un poco por debajo del movimiento real del precio.
+
+Ahora veamos las métricas resultantes de estos modelos:
+
 ```{python}
 
 fr_tomate_axm[0]
 
 
 ```
+
+Al observar las métricas resultantes para los modelos se puede apreciar que los menores niveles de error son logrados por el suavizamiento exponencial triple que en términos de MAPE logra evidenciar una desviación promedio del 13,66% respecto a los valores reales lo cual es considerablemente bueno en comparación a los otros dos modelos que presentan desviaciones del 19% promedio.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
 
@@ -2486,6 +2491,8 @@ plot_fcast(series_pereira,"Ahuyama_per_merca",0.20,fr_ahuy_per[1],fr_ahuy_per[2]
 
 
 ```
+
+Para el caso del precio de la Ahuyama en la ciudad de Pereira es posible apreciar que al igual que en el caso de Armenia el comportamiento del precio resulta ser mejor descrito por el suavizamiento exponencial triple, en este caso el precio de la Ahuyama tiene una volatilidad un poco menor, por lo tanto el MAPE alcanzado es mucho mejor llegando a un 8% de desviación promedio respecto a los valores reales.
 
 ```{python}
 
@@ -2504,12 +2511,18 @@ plot_fcast(series_pereira,"Cebolla junca_per_merca",0.20,fr_ceboll_per[1],fr_ceb
 
 ```
 
+En este caso particular en el plano visual se puede apreciar que el precio real presenta una volatilidad atipica que reduce la precisión final del pronóstico; el lapso entre Mayo y Octubre de 2022 presenta un movimiento alcista inusual que no logra ser capturado de manera totalmente efectiva por ninguno de los tres modelos , el suavizamiento exponencial simple solo captura un valor medio de los movimientos minimos del precio, el suavizamiento doble captura una tendencia bastante conservadora del precio que se ve desbordada por los incrementos abruptos, y finalmente el suavizamiento triple logra capturar la dinámica estacional del precio pero se termina quedando corta o reducida su efectividad frente a los incrementos vertiginosos que presenta el precio real.
+
+En términos de métricas se tiene lo siguiente:
+
 ```{python}
 
 fr_ceboll_per[0]
 
 
 ```
+
+En este caso la demarcación acertada del suavizamiento exponencial triple presenta el valor final con mejor ajuste en lo que respecta a variaciones relativas sin embargo la desviación promedio resulta ser de 21% respecto al valor real.
 
 ### Pronóstico serie de tiempo de la Habichuela (Ciudad de Pereira)
 
@@ -2522,11 +2535,17 @@ plot_fcast(series_pereira,"Habichuela_per_merca",0.20,fr_habich_per[1],fr_habich
 
 ```
 
+Para el caso de Pereira al igual que para el caso de Armenia la habichuela se presenta como un producto de alta volatilidad que no presenta una estacionalidad clara, sino que por el contrario presenta atributos compuestos que no son facilmente capturarables, es preciso recordar que para este caso puntual la serie mostro propiedades de nivel de integración 2, por ende es una serie con una estructura compleja, lo cual puede evidenciarse en el resultado de las trés técnicas de suavizamiento exponencial en donde se evidencia con claridad que ninguna logra una precisión alta sino que por el contrario se evidencian amplias desviaciones respecto a los precios reales, asi mismo, al suavizamiento triple no logra capturar una estacionalidad consistente y tampoco toma un componente tendencial que mejor el ajuste.
+
+Veamos las métricas resultantes de los modelos:
+
 ```{python}
 
 fr_habich_per[0]
 
 ```
+
+En general se puede apreciar que las métricas de error MAE, MSE y RMSE son elevadas para todos los casos, y en lo que respecta al MAPE se puede apreciar que todos los modelos presentan una desviación promedio respecto al precio real superior al 30%, en este caso el modelo con menor MAPE es el suavizamiento exponencial triple.
 
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)
 
@@ -2538,13 +2557,21 @@ plot_fcast(series_pereira,"Tomate chonto_per_merca",0.20,fr_tomat_per[1],fr_toma
 
 ```
 
+Al igual que en el caso de Armenia, el tomate chonto en la ciudad de Pereira presenta una dinámica estacional más clara, bajo esta premisa, teniendo en cuenta que en general el movimiento del precio es lateral, se presenta que los valores del suavizamiento doble y triple se terminan visualizando como valores medios que al no capturar la dinámica estacional pierde considerablemente la efectividad, por ende el suavizamiento triple evidencia una dinámica mucho más acorde a la dinámica estacional dando como resultado un pronóstico que se encuentra por debajo de los precios reales pero que logra un simil bastante acertado respecto a periodos "normales" de precio.
+
+Al revisar las métricas se tiene lo siguiente:
+
 ```{python}
 
 fr_tomat_per[0]
 
 ```
 
+Se puede apreciar que como se mencionaba con anterioridad el suavizamiento triple logra los mejores resultados presentando desviaciones por debajo del 20% lo cual es consistente ante la capacidad del modelo de tomar la dinámica estacional de la serie lo cual reduce en general el margen de error respecto a los datos reales.
+
 ## Modelo ARIMA
+
+Para la estimación de los modelos ARIMA se hace uso del paquete de Python pmdarima que contiene la funcion auto.arima que esta en capacidad de calcular parámetros optimos para modelos de este tipo. Para este caso particular se abordará el análisis de los modelos de manera general, es decir, se estima el modelo optimo para cada alimento en cada ciudad y se generan pequeñas conclusiones parciales y finalmente una conclusión general por ciudad con el fin de enmarcar el comportamiento de este tipo de modelos respecto a las series de tiempo de alimentos que son objeto de análisis.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
@@ -2568,6 +2595,8 @@ plot_fcas_arimat(series_armenia,"Ahuyama_axm_merc",0.20,fr_arima_ahuy_axm[2],fr_
 fr_arima_ahuy_axm[0]
 
 ```
+
+Se puede apreciar que el modelo óptimo es un SARIMAX (0,1,1) que visualmente se presenta como una linea recta sin pendiente definida esto en términos comparativos demarca un ajuste mucho peor al presentado por el modelo de suavizamiento exponencial simple, en este caso el valor medio resultante esta mucho más abajo que el valor reportado por el suavizamiento exponencial, asi mismo al evaluar el comportamiento de los errores es posible apreciar que violan el supuesto de normalidad al presentar una distribución notablemente leptocurtica, sin embargo en términos de correlograma se aprecia que no hay presencia de autocorrelación. La estimación de este primer modelo permite apreciar que el modelo ARIMA tiene seria dificultades para ajustarse a series con estacionalidad irregular y esto se ve reflejado en un MAPE de 30 que inclusive esta casi 20 puntos porcentuales por encima que el suavizamiento exponencial simple.
 
 ### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Armenia)
 
@@ -2594,6 +2623,8 @@ fr_arima_ceboll_axm[0]
 
 ```
 
+Para el caso de la cebolla junca en general se presenta una serie con unas variaciones un tanto más conservadoras respecto al set de datos de test, en este caso el modelo proyecta un precio de 1865 pesos que de hecho se comporta de manera conveniente como un promedio respecto a los precios reales, en este caso lo único que esta capturando el modelo es el nivel de integración de la serie y esta tomando un valor promedio que en este caso dado que los precios en el horizonte de los precio de test no son tan elevados resulta en un MAPE de 7 que para este caso puntual presenta un comportamiento casi identico con el suavizamiento simple cuya metríca es de 7,06. En lo que respecta al comportamiento de los errores se puede apreciar que no hay presencia de autocorrelación y que los errores se comportan de manera similar a una distribución normal.
+
 ### Pronóstico serie de tiempo de la habichuela (Ciudad de Armenia)
 
 ```{python}
@@ -2619,6 +2650,8 @@ fr_arima_habich_axm[0]
 
 ```
 
+Se puede apreciar que nuavamente se ha tomado como modelo optimo un SARIMAX(0,1,0) nuevamente se encuentra una métrica muy similar al suavizamiento simple, y se aprecia nuevamente la dificultad de este tipo de modelo para trabajar con estacionalidades irregulares, a pesar de que el comportamiento de los errores es consistente, conveniente resaltar que la desviación respecto a los valores reales es elevada, y además los intervalos de confianza son muy amplios.
+
 ### Pronóstico serie de tiempo del tomate chonto (Ciudad de Armenia)
 
 ```{python}
@@ -2636,9 +2669,6 @@ plt.show()
 plot_fcas_arimat(series_armenia,"Tomate chonto_axm_merc",0.20,fr_arima_tomat_axm[2],fr_arima_tomat_axm[3],fr_arima_tomat_axm[4])
 
 
-plt.show()
-
-
 ```
 
 ```{python}
@@ -2646,6 +2676,15 @@ plt.show()
 fr_arima_tomat_axm[0]
 
 ```
+
+Para el caso de el tomate chonto el modelo optimo captura más elementos sin embargo estos terminan acotando los intervalos de confianza, pero se continua con un valor de pronóstico puntual que describe un promedio y cuya métrica resulta ser similar al MAPE del suavizamiento exponencial simple.
+
+La revisión de los diferentes modelos para la ciudad de Armenia permiten evidenciar lo siguiente:
+
+-   El modelo ARIMA presenta dificultades para capturar estacionalidad irregular y además su resultado termina asemejandose al suavizamiento exponencial simple teniendo inclusive valores de MAPE similares.\
+-   Al momento de la estimación de los modelos el modelo de suavizamiento exponencial triple termina siendo mucho más efectivo en términos de la métrica relativa MAPE.
+
+Para el caso de la ciudad de Pereira se estiman los respectivos modelos y se genera un comentario final, teniendo en cuenta que aunque la ciudad cuenta con dinámicas de precios distintas conserva una dinámica irregular de estacionalidad y cambios bruscos en términos de precio lo cual llevaria a esperar un comportamiento similar al presentado en la ciudad de Armenia.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
 
@@ -2751,7 +2790,11 @@ fr_arima_tomat_per[0]
 
 ```
 
+Para el caso de Pereira es posible apreciar que el comportamiento general de los mdoelos ARIMA no difiere mucho del caso de Armenia, de los modelos estimados dos de ellos son SARIMAX(0,1,0) y solo excepcionalmente para el caso de la habichuela con orden de integración 2 se presenta un modelo SARIMA con componente estacional, finalmente para el caso del tomate se genera un modelo diferente con el orden SARIMAX(1,0,0), de los 4 modelos estimados 3 de ellos tuvieron un compartmiento relativo muy similar al presentado por el suavizamiento exponencial simple, además para el caso de la habichuela el comportamiento ha tenido un margen de error muy por encima al suavizamiento exponencial.
+
 ## Modelo Prophet (Facebook)
+
+Para ejecutar el modelo prophet de Facebook se han tenido inconvenientes con la compilación del modelo pystan basado en C++, por lo cual se ha optado por realizar el proceso en google colab con el fin de lograr la estimación efectiva del modelo. El modelo Prophet de Facebook esta en la capacidad de detectar puntos de cambio estructural e inclusive esta en la capacidad de manejar estacionalidades de carácter compuesto, se esperaria que este tipo de modelo presentará un mayor grado de acierto para la estimación de las series que han sido abordadas. Con el fin de enfatizar el desempeño del modelo en cada serie en los elementos subsiguientes se enfatizará en la estimación de prophet y finalmente se relacionará una tabla consolidada con las métricas obtenidas con el fin de analizar el desempeño general del modelo.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
@@ -2775,6 +2818,7 @@ dic_output_prophet_ahuyama= {"Modelo":"Prophet",
 results_ahuyama= pd.DataFrame.from_dict(dic_output_prophet_ahuyama,orient="columns")
 
 results_ahuyama
+
 ```
 
 ### Pronóstico serie de tiempo de la Cebolla Junca (Ciudad de Armenia)
@@ -2852,6 +2896,12 @@ results_tomat= pd.DataFrame.from_dict(dic_output_prophet_tomat,orient="columns")
 results_tomat
 
 ```
+
+Al finalizar las estimaciones del modelo para cada una serie los resultados consolidados son los siguientes:
+
+![](ConsolidadoProphetArmenia.png)
+
+Se puede apreciar que el modelo muestra un mejor desempeño para la serie de tiempo de la cebolla junca en donde el MAPE es de 16,50, el peor desempeño se presenta en la serie de tiempo de la ahuyama en donde la desviación respecto al precio real es del 88,07, en general el comportamiento del modelo no ha sido tan satisfactorio para los casos de la ahuyama, la habichuela y el tomate chonto las desviaciones estan por encima del 30%.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Pereira)
 
@@ -2954,7 +3004,29 @@ results_tomat_per
 
 ```
 
-## Modelos RNN - Elman y Jordan
+Al finalizar las estimaciones del modelo para cada una serie los resultados consolidados son los siguientes:
+
+![](Imagen5.png)
+
+Para el caso de Pereira se puede apreciar que el MAPE para la habichuela y el tomate chonto se encuentran por encima del 40%, asi mismo se aprecia que la ahuyama y la cebolla junca han tenido valores de MAPE iguales pero aun asi elevados.
+
+La revisión del método permite apreciar que realmente el ajuste de este modelo no ha sido tan bueno, por el contrario para el caso de ambas ciudades ha llegado a superar valores de MAPE vistos con anterioridad.
+
+## Modelos RNN - Red Neuronal Recurrente de Elman
+
+Finalmente en esta sección se explora la red neuronal de Elman, en un inicio tambien se validaria la arquitectura de Jordan sin embargo esta ha generado errores de computo que no han permitido desarollar arquitecturas complejas, para el caso de la red de Elman se han considerado los siguientes parametros:
+
+Número de lags -\> 15
+
+Primera capa -\> 25
+
+Segunda capa -\> 10
+
+Learn -\> 0.1
+
+Max iterations -\> 20000
+
+Cada una de las redes ha sido entrenada empleando los mismos parámetros, en esta ocasión se revisa de manera consolidada los resultados de las modelaciones al final de la seccion, para cada red entrenada se muestra la gráfica de error , el contraste entre valor real y predicho , y las métricas.
 
 ### Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)
 
@@ -3018,8 +3090,28 @@ lines(pred,col="red")
 
 ```
 
-### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Armenia)
+```{r}
+## metricas
 
+MAE<- mean(abs(y-pred))
+MSE <- mean((y-pred)**2)
+RMSE<- sqrt(mean((y-pred)**2))
+MAPE <- mean(abs(y-pred)/y)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
+
+
+
+```
+
+### Pronóstico serie de tiempo de la cebolla junca (Ciudad de Armenia)
 
 ```{r}
 
@@ -3067,6 +3159,26 @@ pred <- predict(fit_elman_ceboll,inputs[-train])
 lines(pred,col="red")
 ```
 
+```{r}
+
+## metricas
+
+MAE<- mean(abs(y2-pred))
+MSE <- mean((y2-pred)**2)
+RMSE<- sqrt(mean((y2-pred)**2))
+MAPE <- mean(abs(y2-pred)/y2)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
+
+```
+
 ### Pronóstico serie de tiempo de la habichuela (Ciudad de Armenia)
 
 ```{r}
@@ -3109,7 +3221,6 @@ plotIterativeError(fit_elman_habich)
 
 ```
 
-
 ```{r}
 
 y3 <- as.vector(outputs[-train])
@@ -3117,6 +3228,27 @@ plot(y3,type="l")
 axis(side=2, at=seq(0, 1, by=0.1))
 pred <- predict(fit_elman_habich,inputs[-train])
 lines(pred,col="red")
+
+
+```
+
+```{r}
+
+## metricas
+
+MAE<- mean(abs(y3-pred))
+MSE <- mean((y3-pred)**2)
+RMSE<- sqrt(mean((y3-pred)**2))
+MAPE <- mean(abs(y3-pred)/y3)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
 
 
 ```
@@ -3174,6 +3306,27 @@ lines(pred,col="red")
 
 ```
 
+```{r}
+## metricas
+
+MAE<- mean(abs(y4-pred))
+MSE <- mean((y4-pred)**2)
+RMSE<- sqrt(mean((y4-pred)**2))
+MAPE <- mean(abs(y4-pred)/y4)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
+
+
+
+```
+
 ### Pronóstico serie de tiempo de la Ahuyama (Pereira)
 
 ```{r}
@@ -3215,7 +3368,6 @@ plotIterativeError(fit_elman_ahuy_per)
 
 ```
 
-
 ```{r}
 
 y5 <- as.vector(outputs[-train])
@@ -3225,6 +3377,24 @@ pred <- predict(fit_elman_ahuy_per,inputs[-train])
 lines(pred,col="red")
 
 
+```
+
+```{r}
+## metricas
+
+MAE<- mean(abs(y5-pred))
+MSE <- mean((y5-pred)**2)
+RMSE<- sqrt(mean((y5-pred)**2))
+MAPE <- mean(abs(y5-pred)/y5)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
 ```
 
 ### Pronóstico serie de tiempo de la cebolla junca (Pereira)
@@ -3268,7 +3438,6 @@ plotIterativeError(fit_elman_ceboll_per)
 
 ```
 
-
 ```{r}
 
 y6 <- as.vector(outputs[-train])
@@ -3277,6 +3446,24 @@ axis(side=2, at=seq(0, 1, by=0.1))
 pred <- predict(fit_elman_ceboll_per,inputs[-train])
 lines(pred,col="red")
 
+```
+
+```{r}
+## metricas
+
+MAE<- mean(abs(y6-pred))
+MSE <- mean((y6-pred)**2)
+RMSE<- sqrt(mean((y6-pred)**2))
+MAPE <- mean(abs(y6-pred)/y6)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
 ```
 
 ### Pronóstico serie de tiempo de la habichuela (Pereira)
@@ -3319,7 +3506,6 @@ plotIterativeError(fit_elman_habich_per)
 
 ```
 
-
 ```{r}
 
 y7 <- as.vector(outputs[-train])
@@ -3327,6 +3513,29 @@ plot(y7,type="l")
 axis(side=2, at=seq(0, 1, by=0.1))
 pred <- predict(fit_elman_habich_per,inputs[-train])
 lines(pred,col="red")
+
+
+```
+
+```{r}
+
+
+## metricas
+
+MAE<- mean(abs(y7-pred))
+MSE <- mean((y7-pred)**2)
+RMSE<- sqrt(mean((y7-pred)**2))
+MAPE <- mean(abs(y7-pred)/y7)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
+
 
 
 ```
@@ -3372,7 +3581,6 @@ plotIterativeError(fit_elman_tomat_per)
 
 ```
 
-
 ```{r}
 
 y8 <- as.vector(outputs[-train])
@@ -3384,18 +3592,75 @@ lines(pred,col="red")
 
 ```
 
+```{r}
+
+## metricas
+
+MAE<- mean(abs(y8-pred))
+MSE <- mean((y8-pred)**2)
+RMSE<- sqrt(mean((y8-pred)**2))
+MAPE <- mean(abs(y8-pred)/y8)*100
+
+print("El MAE del modelo es ")
+print(MAE)
+print("El MSE del modelo es ")
+print(MSE)
+print("El RMSE del modelo es ")
+print(RMSE)
+print("El MAPE del modelo es ")
+print(MAPE)
+
+
+
+```
+
+El consolidado de resultados es el siguiente:
+
+![](RNN_Armenia.png)
+
+![](RNN_Pereira.png)
+
+Se logra apreciar que con los paramétros iniciales para el caso de Armenia el pronóstico con mejor ajuste corresponde a la cebolla junca y para el caso de Pereira corresponde a la Ahuyama , para los demás casos de Armenia el MAPE supera el 45 y para el caso de Pereira en promedio el valor se mantiene pordeabjo de los 30.
 
 <!--chapter:end:03-Mod.Rmd-->
 
-# Evaluación y ajuste de hiperparámetros de los modelos 
+# Comparación de modelos
+
+## Consolidado de métricas para alimentos en Armenia:
+
+![](ConsolidadoModelosArmenia.png)
+
+El proceso de análisis y modelación permiten evidenciar que para cada alimento en el caso de Armenia el modelo con mejor ajuste para cada alimento es:
+
+-   Ahuyama -\> El modelo con un mejor ajuste es el suavizamiento exponencial triple.
+
+-   Cebolla Junca -\> El modelo con un mejor ajuste es el SARIMAX(0,1,0)
+
+-   Habichuela -\> El modelo con un mejor ajuste es el suavizamiento simple o modelo ARIMA.
+
+-   Tomate Chonto -\> El modelo con un mejor ajuste es el suavizamiento exponencial triple.
+
+## Consolidado de métricas para alimentos en Pereira:
+
+![](ConsolidadoPereira.png)
+
+El proceso de análisis y modelación permiten evidenciar que para cada alimento en el caso de Pereira el modelo con mejor ajuste para cada alimento es:
+
+-   Ahuyama -\> El modelo con un mejor ajuste es el suavizamiento exponencial triple.
+
+-   Cebolla Junca -\> El modelo con un mejor ajuste es el suavizamiento exponencial triple.
+
+-   Habichuela -\> El modelo con un mejor ajuste es la red neuronal recurrente de Elman.
+
+-   Tomate Chonto -\> El modelo con un mejor ajuste es el suavizamiento exponencial triple.
+
+<!--chapter:end:04-Comparacion-modelos.Rmd-->
+
+# Conclusiones
+
+El análisis de series de tiempo realizado a lo largo de este documento permite evidenciar que los precios de la ahuyama, la cebolla junca, habichuela y tomate chonto tienen algunos atributos como estacionalidad compuesta,es decir, el periodo bajo el cual se repiten algunos patrones temporales no es fijo o regular sino que puede variar,  adicionalmente es posible apreciar que ninguna de las series es estacionaria y además en términos generales todas las series presentan periodos de alta volatilidad despues del año 2020 alcanzando inclusive momentos de máximos históricos. Los atributos de las series de tiempo analizadas llevan a que los modelos lineales tradicionales como el modelo ARIMA no sean los más efectivos para realizar un pronóstico ajustado, en contraste a esto los modelos no lineales como el suavizamiento exponencial presentan procesos de ajuste favorables y que emulan de manera eficiente la estacionalidad de las series de tiempo, sin embargo es preciso aclarar que en el marco de este ejercicio se ha probado solo una configuración por modelo, por lo tanto vale la pena explorar otras combinaciones de hiperparámetros en otros modelos con el fin de poder determinar si definitivamente modelos como el suavizamiento exponencial triple realmente se perfilan como el modelo más adecuado para este tipo de serie. 
 
 
 
-<!--chapter:end:04-Evaluacion.Rmd-->
-
-# Contraste entre series de tiempo y proyección de precios minoristas 
-
-
-
-<!--chapter:end:05-Contraste.Rmd-->
+<!--chapter:end:05-Conclusiones.Rmd-->
 
