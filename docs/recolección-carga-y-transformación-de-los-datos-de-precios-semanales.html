@@ -5,25 +5,25 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Capítulo 2 Recolección, carga y transformación de los datos de precios semanales | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)</title>
-  <meta name="description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia, Pereira y Manizales" />
+  <meta name="description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira" />
   <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Capítulo 2 Recolección, carga y transformación de los datos de precios semanales | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)" />
   <meta property="og:type" content="book" />
   
-  <meta property="og:description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia, Pereira y Manizales" />
+  <meta property="og:description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira" />
   <meta name="github-repo" content="rstudio/bookdown-demo" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Capítulo 2 Recolección, carga y transformación de los datos de precios semanales | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)" />
   
-  <meta name="twitter:description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia, Pereira y Manizales" />
+  <meta name="twitter:description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira" />
   
 
 <meta name="author" content="David Alejandro Rivera Correa" />
 
 
-<meta name="date" content="2023-10-01" />
+<meta name="date" content="2023-10-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -206,7 +206,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.4.7" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#pronóstico-serie-de-tiempo-de-la-habichuela-ciudad-de-pereira-2"><i class="fa fa-check"></i><b>4.4.7</b> Pronóstico serie de tiempo de la Habichuela (Ciudad de Pereira)</a></li>
 <li class="chapter" data-level="4.4.8" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#pronóstico-serie-de-tiempo-del-tomate-chonto-ciudad-de-pereira-2"><i class="fa fa-check"></i><b>4.4.8</b> Pronóstico serie de tiempo del tomate chonto (Ciudad de Pereira)</a></li>
 </ul></li>
-<li class="chapter" data-level="4.5" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#modelos-rnn---elman-y-jordan"><i class="fa fa-check"></i><b>4.5</b> Modelos RNN - Elman y Jordan</a>
+<li class="chapter" data-level="4.5" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#modelos-rnn---red-neuronal-recurrente-de-elman"><i class="fa fa-check"></i><b>4.5</b> Modelos RNN - Red Neuronal Recurrente de Elman</a>
 <ul>
 <li class="chapter" data-level="4.5.1" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#pronóstico-serie-de-tiempo-de-la-ahuyama-ciudad-de-armenia-3"><i class="fa fa-check"></i><b>4.5.1</b> Pronóstico serie de tiempo de la Ahuyama (Ciudad de Armenia)</a></li>
 <li class="chapter" data-level="4.5.2" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#pronóstico-serie-de-tiempo-de-la-cebolla-junca-ciudad-de-armenia-3"><i class="fa fa-check"></i><b>4.5.2</b> Pronóstico serie de tiempo de la cebolla junca (Ciudad de Armenia)</a></li>
@@ -218,8 +218,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.5.8" data-path="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"><a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html#pronóstico-serie-de-tiempo-del-tomate-pereira"><i class="fa fa-check"></i><b>4.5.8</b> Pronóstico serie de tiempo del tomate (Pereira)</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="evaluación-y-ajuste-de-hiperparámetros-de-los-modelos.html"><a href="evaluación-y-ajuste-de-hiperparámetros-de-los-modelos.html"><i class="fa fa-check"></i><b>5</b> Evaluación y ajuste de hiperparámetros de los modelos</a></li>
-<li class="chapter" data-level="6" data-path="contraste-entre-series-de-tiempo-y-proyección-de-precios-minoristas.html"><a href="contraste-entre-series-de-tiempo-y-proyección-de-precios-minoristas.html"><i class="fa fa-check"></i><b>6</b> Contraste entre series de tiempo y proyección de precios minoristas</a></li>
+<li class="chapter" data-level="5" data-path="comparación-de-modelos.html"><a href="comparación-de-modelos.html"><i class="fa fa-check"></i><b>5</b> Comparación de modelos</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="comparación-de-modelos.html"><a href="comparación-de-modelos.html#consolidado-de-métricas-para-alimentos-en-armenia"><i class="fa fa-check"></i><b>5.1</b> Consolidado de métricas para alimentos en Armenia:</a></li>
+<li class="chapter" data-level="5.2" data-path="comparación-de-modelos.html"><a href="comparación-de-modelos.html#consolidado-de-métricas-para-alimentos-en-pereira"><i class="fa fa-check"></i><b>5.2</b> Consolidado de métricas para alimentos en Pereira:</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="conclusiones.html"><a href="conclusiones.html"><i class="fa fa-check"></i><b>6</b> Conclusiones</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 

@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)</title>
+  <title>Capítulo 5 Comparación de modelos | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)</title>
   <meta name="description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira" />
   <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)" />
+  <meta property="og:title" content="Capítulo 5 Comparación de modelos | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira" />
   <meta name="github-repo" content="rstudio/bookdown-demo" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)" />
+  <meta name="twitter:title" content="Capítulo 5 Comparación de modelos | Pronóstico de precios mayoristas de alimentos del grupo de verduras y hortalizas haciendo uso de boletines semanales del Sistema de Información de Precios y Abastecimiento del Sector Agropecuario (SIPSA)" />
   
   <meta name="twitter:description" content="Este libro tiene como finalidad explorar técnicas de pronóstico de series de tiempo para la predicción de precios mayoristas de algunos alimentos del grupo de verduras y hortalizas para las centrales de abasto de Armenia y Pereira" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-
+<link rel="prev" href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html"/>
+<link rel="next" href="conclusiones.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -244,19 +244,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="comparación-de-modelos" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Capítulo 5</span> Comparación de modelos<a href="comparación-de-modelos.html#comparación-de-modelos" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="consolidado-de-métricas-para-alimentos-en-armenia" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Consolidado de métricas para alimentos en Armenia:<a href="comparación-de-modelos.html#consolidado-de-métricas-para-alimentos-en-armenia" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="ConsolidadoModelosArmenia.png" /></p>
+<p>El proceso de análisis y modelación permiten evidenciar que para cada alimento en el caso de Armenia el modelo con mejor ajuste para cada alimento es:</p>
+<ul>
+<li><p>Ahuyama -&gt; El modelo con un mejor ajuste es el suavizamiento exponencial triple.</p></li>
+<li><p>Cebolla Junca -&gt; El modelo con un mejor ajuste es el SARIMAX(0,1,0)</p></li>
+<li><p>Habichuela -&gt; El modelo con un mejor ajuste es el suavizamiento simple o modelo ARIMA.</p></li>
+<li><p>Tomate Chonto -&gt; El modelo con un mejor ajuste es el suavizamiento exponencial triple.</p></li>
+</ul>
+</div>
+<div id="consolidado-de-métricas-para-alimentos-en-pereira" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Consolidado de métricas para alimentos en Pereira:<a href="comparación-de-modelos.html#consolidado-de-métricas-para-alimentos-en-pereira" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="ConsolidadoPereira.png" /></p>
+<p>El proceso de análisis y modelación permiten evidenciar que para cada alimento en el caso de Pereira el modelo con mejor ajuste para cada alimento es:</p>
+<ul>
+<li><p>Ahuyama -&gt; El modelo con un mejor ajuste es el suavizamiento exponencial triple.</p></li>
+<li><p>Cebolla Junca -&gt; El modelo con un mejor ajuste es el suavizamiento exponencial triple.</p></li>
+<li><p>Habichuela -&gt; El modelo con un mejor ajuste es la red neuronal recurrente de Elman.</p></li>
+<li><p>Tomate Chonto -&gt; El modelo con un mejor ajuste es el suavizamiento exponencial triple.</p></li>
+</ul>
+
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-
+<a href="modelación-para-el-pronóstico-de-las-series-de-tiempo.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusiones.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -287,7 +307,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/rstudio/bookdown-demo/edit/master/%s",
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/04-Comparacion-modelos.Rmd",
 "text": "Edit"
 },
 "history": {
